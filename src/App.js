@@ -1,14 +1,20 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './Page/Home.js';
+import useAuth from './Hooks/useAuth.js';
+import Login from './Page/Login.js';
+import TestLoginSuccess from './Page/TestLoginSuccess';
 
 function App() {
+  const { isLoggedIn, login, logout } = useAuth();
+
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* 위처럼 경로, 불러올 페이지 적어주시면 됩니다 */}
+          <Route path="/login" element={<Login login={login} />} />
+          <Route path="/testLoginSuccess" element={<TestLoginSuccess />} />
         </Routes>
       </div>
     </Router>
@@ -16,4 +22,3 @@ function App() {
 }
 
 export default App;
-
