@@ -1,0 +1,36 @@
+.sidebar {
+    position: relative; /* 고정되지 않은 상대적 위치 */
+    width: 210px; /* 고정된 너비 */
+    height: 100vh; /* 화면 전체 높이 */
+    background-color: white;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sidebar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 20px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar ul li {
+    margin: 10px 0;
+    cursor: pointer;
+  }
+  
+  .sidebar ul li:hover {
+    text-decoration: underline;
+  }
+  
+  
+  .main-content {
+    flex: 1; /* 사이드바 옆 공간을 모두 차지 */
+  }

@@ -1,6 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './Page/Home.js';
+import './Assets/Font/Font.css';
 
 function App() {
   return (
