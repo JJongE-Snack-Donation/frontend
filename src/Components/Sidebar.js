@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../Styles/Components.css";
+import "../Styles/Sidebar.css";
 import { Link, useLocation } from 'react-router-dom';
 import { ReactComponent as Icon1 } from "../Assets/images/btn/project_btn.svg";
 import { ReactComponent as Icon2 } from "../Assets/images/btn/inspection_btn.svg";

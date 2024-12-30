@@ -1,94 +1,33 @@
-.sidebar {
-  position: relative;
-  width: 210px;
-  height: 100vh;
-  background-color: white;
-  color: black;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  user-select: none;
+.nametag {
+    display: flex;
+    width: 120px;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: auto;
+    padding: 10px 20px;
+    font-size: 12px;
+    color: #A5A5A5;
 }
 
-.sidebar .logo {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 10px 20px;
+.nametag .name {
+    color: black;
 }
 
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.title {
+    display: flex;
+    padding: 10px 20px;
+    margin-right: auto;
+    align-items: center;
 }
 
-.sidebar ul li {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  margin: 5px 0;
-  width: 180px;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.title .text {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
 }
 
-/* 활성화된 버튼 배경색 변경 */
-.sidebar ul li.active {
-  background-color: #ADBCAB;
-  color: #006D01;
-}
-
-/* 이벤트 검수 버튼이 토글된 경우 스타일 (배경색 변경 없음) */
-.sidebar ul li.toggled {
-  color: #006D01;
-}
-
-/* 아이콘 색상 변경 */
-.sidebar ul li .menu-icon {
-  width: 10px;
-  height: 10px;
-  margin-right: 10px;
-  fill: black;
-  stroke: black;
-  transition: fill 0.3s ease;
-}
-
-.sidebar ul li.active .menu-icon,
-.sidebar ul li.toggled .menu-icon {
-  fill: #006D01;
-  stroke: #006D01;
-}
-
-/* 화살표 아이콘 스타일 */
-.sidebar ul li .arrow-icon {
-  margin-left: auto;
-  width: 10px;
-  height: 10px;
-  stroke: black;
-  transition: transform 0.3s ease, stroke 0.3s ease;
-}
-
-.sidebar ul li.toggled .arrow-icon {
-  transform: rotate(180deg);
-  stroke: #006D01;
-}
-
-.sidebar ul li a {
-  width: 100%;
-  text-decoration: none;
-  color: black;
-  display: flex;
-  align-items: center;
-  transition: color 0.3s ease;
-}
-
-.sidebar ul li.active a {
-  color: #006D01;
-}
-
-.sub-menu li .menu-icon {
-  margin-left: 20px;
+.title .text p {
+    font-size: 12px;
+    color: #A5A5A5;
+    margin-left: 10px;
 }
