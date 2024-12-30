@@ -7,7 +7,7 @@
     margin: 0; /* 기본 여백 제거 */
     padding: 0; /* 기본 패딩 제거 */
 }
-  
+
 .sidebar-layout .content {
     flex: 1;
 }

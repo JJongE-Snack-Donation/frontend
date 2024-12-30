@@ -1,58 +1,94 @@
 .sidebar {
-    position: relative; /* 고정되지 않은 상대적 위치 */
-    width: 210px; /* 고정된 너비 */
-    height: 100vh; /* 화면 전체 높이 */
-    background-color: white;
-    color: black;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .sidebar .logo {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 10px 20px;
-  }
-  
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .sidebar ul li {
-    margin: 10px 0;
-    cursor: pointer;
-    width: 180px;
-    padding: 10px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    font-size: 12px;
-    transition: all 0.3s ease;
-  }
-  
-  .sidebar ul li:hover {
-    background-color: #ADBCAB;
-    color: #006D01;
-  }
-  
-  .sidebar ul li .menu-icon {
-    width: 10px;
-    height: 10px;
-    margin-right: 10px;
-    fill: black; /* 기본 색상 */
-    stroke: black; /* 기본 색상 */
-    transition: fill 0.3s ease; /* 부드러운 전환 효과 */
-  }
-  
-  .sidebar ul li:hover .menu-icon {
-    fill: #006D01; /* 호버 시 색상 변경 */
-    stroke: #006D01; /* 호버 시 색상 변경 */
-  }
+  position: relative;
+  width: 210px;
+  height: 100vh;
+  background-color: white;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
 
-  
-  .main-content {
-    flex: 1; /* 사이드바 옆 공간을 모두 차지 */
-  }
+.sidebar .logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin: 5px 0;
+  width: 180px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 활성화된 버튼 배경색 변경 */
+.sidebar ul li.active {
+  background-color: #ADBCAB;
+  color: #006D01;
+}
+
+/* 이벤트 검수 버튼이 토글된 경우 스타일 (배경색 변경 없음) */
+.sidebar ul li.toggled {
+  color: #006D01;
+}
+
+/* 아이콘 색상 변경 */
+.sidebar ul li .menu-icon {
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  fill: black;
+  stroke: black;
+  transition: fill 0.3s ease;
+}
+
+.sidebar ul li.active .menu-icon,
+.sidebar ul li.toggled .menu-icon {
+  fill: #006D01;
+  stroke: #006D01;
+}
+
+/* 화살표 아이콘 스타일 */
+.sidebar ul li .arrow-icon {
+  margin-left: auto;
+  width: 10px;
+  height: 10px;
+  stroke: black;
+  transition: transform 0.3s ease, stroke 0.3s ease;
+}
+
+.sidebar ul li.toggled .arrow-icon {
+  transform: rotate(180deg);
+  stroke: #006D01;
+}
+
+.sidebar ul li a {
+  width: 100%;
+  text-decoration: none;
+  color: black;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.sidebar ul li.active a {
+  color: #006D01;
+}
+
+.sub-menu li .menu-icon {
+  margin-left: 20px;
+}
