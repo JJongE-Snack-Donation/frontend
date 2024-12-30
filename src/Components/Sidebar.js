@@ -8,6 +8,7 @@ import { ReactComponent as Icon3 } from "../Assets/images/btn/image_btn.svg";
 import { ReactComponent as Icon4 } from "../Assets/images/btn/g_inspection_btn.svg";
 import { ReactComponent as Icon5 } from "../Assets/images/btn/ex_inspection_btn.svg";
 import { ReactComponent as Icon6 } from "../Assets/images/btn/camera_btn.svg";
+import { ReactComponent as Icon7 } from "../Assets/images/btn/logout_btn.svg";
 
 
 const Sidebar = () => {
@@ -63,6 +64,10 @@ const Sidebar = () => {
               <Icon6 className="menu-icon" />
               카메라 정보
             </Link>
+          </li>
+          <li>
+            <Icon7 className="menu-icon" />
+            로그아웃
           </li>
         </ul>
       </nav>
