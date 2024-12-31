@@ -2,12 +2,12 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SidebarLayout from "./Layouts/SidebarLayout";
 import AuthLayout from "./Layouts/AuthLayout";
-import Home from './Page/Home.js';
-import Project from './Page/Project.js';
-import Camera from './Page/camera.js';
-import ImageInquiry from './Page/ImageInquiry.js';
-import GeneralInspection from './Page/GInspection.js';
-import ExceptionInspection from './Page/ExInspection.js';
+import Home from './Pages/Home.js';
+import Project from './Pages/Project.js';
+import Camera from './Pages/camera.js';
+import ImageInquiry from './Pages/ImageInquiry.js';
+import GeneralInspection from './Pages/GInspection.js';
+import ExceptionInspection from './Pages/ExInspection.js';
 import './Assets/Font/Font.css';
 
 function App() {
