@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
 import { Link, useLocation } from 'react-router-dom';
-import { ReactComponent as Icon1 } from "../Assets/images/btn/project_btn.svg";
-import { ReactComponent as Icon2 } from "../Assets/images/btn/inspection_btn.svg";
-import { ReactComponent as Arrow } from "../Assets/images/btn/arrow_down.svg";
-import { ReactComponent as Icon3 } from "../Assets/images/btn/image_btn.svg";
-import { ReactComponent as Icon4 } from "../Assets/images/btn/g_inspection_btn.svg";
-import { ReactComponent as Icon5 } from "../Assets/images/btn/ex_inspection_btn.svg";
-import { ReactComponent as Icon6 } from "../Assets/images/btn/camera_btn.svg";
-import { ReactComponent as Icon7 } from "../Assets/images/btn/logout_btn.svg";
+import { ReactComponent as Icon1 } from "../Assets/Imgs/btn/project_btn.svg";
+import { ReactComponent as Icon2 } from "../Assets/Imgs/btn/inspection_btn.svg";
+import { ReactComponent as Arrow } from "../Assets/Imgs/btn/arrow_down.svg";
+import { ReactComponent as Icon3 } from "../Assets/Imgs/btn/image_btn.svg";
+import { ReactComponent as Icon4 } from "../Assets/Imgs/btn/g_inspection_btn.svg";
+import { ReactComponent as Icon5 } from "../Assets/Imgs/btn/ex_inspection_btn.svg";
+import { ReactComponent as Icon6 } from "../Assets/Imgs/btn/camera_btn.svg";
+import { ReactComponent as Icon7 } from "../Assets/Imgs/btn/logout_btn.svg";
 
 
 const Sidebar = () => {

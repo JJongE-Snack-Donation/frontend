@@ -1,6 +1,6 @@
 import React from 'react';
 import '../Styles/Components.css';
-import user from "../Assets/images/etc/user.svg";
+import user from "../Assets/Imgs/etc/user.svg";
 
 const NameTag = () => {
     return (

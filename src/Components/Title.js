@@ -1,6 +1,6 @@
 import React from 'react';
 import '../Styles/Components.css';
-import arrow from '../Assets/images/etc/arrow_left.svg';
+import arrow from '../Assets/Imgs/etc/arrow_left.svg';
 
 const Title = (props) => {
     return (
