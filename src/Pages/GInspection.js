@@ -11,7 +11,6 @@ const GeneralInspection = () => {
         <div className="wrap">
             {/* 상단 필터 영역 */}
             
-
             {/* 이미지 그리드 */}
             <ImageGrid images={images} />
 
