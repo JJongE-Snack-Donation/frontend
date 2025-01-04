@@ -1,0 +1,46 @@
+.search-filter {
+    position: relative;
+    padding: 16px 20px;
+    background: #fff;
+    margin-right: 10px;
+}
+
+.filter-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.legend-wrapper {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    margin-right: 20px;
+}
+
+.legend-dots {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.dot-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dot {
+    display: flex;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.wildboar { background-color: #FF0000; }
+.deer { background-color: #FFA500; }
+.goat { background-color: #008000; }
+.human { background-color: #0000FF; }
+.car { background-color: #800080; }
+.etc { background-color: #A9A9A9; }
