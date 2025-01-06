@@ -2,7 +2,7 @@ import React from 'react';
 import '../Styles/Home.css';
 import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
-import SearchBar  from '../Components/SearchBar';
+import SearchBar from '../Components/Search/SearchBar';
 
 const ExceptionInspection = () => {
     return (

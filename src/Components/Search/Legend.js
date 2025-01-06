@@ -1,5 +1,5 @@
 import React from "react";
-import '../Styles/Legend.css'
+import '../../Styles/Legend.css'
 const Legend = () => {
     return (
         <div className="legend-wrapper">
