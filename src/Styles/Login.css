@@ -37,11 +37,21 @@
 }
 
 .login-box {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     width: 400px;
+    height: 250px;
+}
+
+.login-box .error {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    color: #b8b8b8;
+    font-size: 12px;
 }
 
 .login-box p {
@@ -74,6 +84,7 @@
     border: 1px solid #ddd;
     font-size: 14px;
     outline: none;
+    font-family: 'Pretendard';
 }
 
 .login-box input:focus {
