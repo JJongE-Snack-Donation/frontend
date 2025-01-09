@@ -1,0 +1,23 @@
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 20px;  /* 좌우 여백 지정 */
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.image-item {
+  flex: 0 0 calc(16.66% - 17px); /* 6개의 열로 고정 */
+  width: calc(16.66% - 17px); /* 명시적 너비 설정 */
+  min-width: calc(16.66% - 17px); /* 최소 너비 설정 */
+  aspect-ratio: 1/1;
+  overflow: hidden;
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
