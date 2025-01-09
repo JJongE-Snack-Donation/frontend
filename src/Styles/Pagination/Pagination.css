@@ -1,0 +1,59 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    margin: 0;  /* 기본 마진 제거 */
+    padding: 0;  /* 기본 패딩 제거 */
+}
+
+.pagination-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 240px;
+    right: 0;
+    background: #F4F4F4;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    z-index: 1000;
+}
+
+.page-item {
+    display: none;  /* 숫자 외의 모든 항목 숨기기 */
+}
+
+.page-link {
+    text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+}
+
+.page-item.active {
+    display: flex;  /* 현재 페이지(active)만 보이게 설정 */
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: #F4F4F4;
+}
+
+.arrow-button {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+
+.arrow_icon {
+    width: 12px;
+    height: 12px;
+}
+

@@ -1,0 +1,33 @@
+.nametag {
+    display: flex;
+    width: 120px;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: auto;
+    padding: 7px 20px;
+    font-size: 12px;
+    color: #A5A5A5;
+}
+
+.nametag .name {
+    color: black;
+}
+
+.title {
+    display: flex;
+    padding: 0px 20px;
+    margin-right: auto;
+    align-items: center;
+}
+
+.title .text {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.title .text p {
+    font-size: 12px;
+    color: #A5A5A5;
+    margin-left: 10px;
+}
