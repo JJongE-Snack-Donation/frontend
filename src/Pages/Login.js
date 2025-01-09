@@ -18,7 +18,7 @@ const Login = () => {
         try {
             // axios를 사용한 로그인 요청
             const response = await api.post(
-                `${API_URL}/login`,
+                `/admin/login`,
                 { username, password }, // JSON 형식으로 전달
                 { withCredentials: true } // 쿠키 포함
             );
@@ -26,7 +26,7 @@ const Login = () => {
             // 로그인 성공 처리
             if (response.status === 200) {
                 alert('로그인 성공!');
-                navigate('/dashboard'); // 페이지 이동
+                navigate('/project'); // 페이지 이동
             }
         } catch (err) {
             console.error('로그인 에러:', err);
