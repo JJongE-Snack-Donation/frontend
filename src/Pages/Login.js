@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../Api';
 import '../Styles/Login.css';
 import img from '../Assets/Imgs/png/loginImg.png';
 
@@ -17,7 +17,7 @@ const Login = () => {
 
         try {
             // axios를 사용한 로그인 요청
-            const response = await axios.post(
+            const response = await api.post(
                 `${API_URL}/login`,
                 { username, password }, // JSON 형식으로 전달
                 { withCredentials: true } // 쿠키 포함
