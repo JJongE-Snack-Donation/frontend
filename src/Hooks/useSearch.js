@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import testImages from '../Data/testImages';
 
 const useSearch = () => {
