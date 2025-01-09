@@ -1,26 +1,26 @@
 // Login.js
 import React from 'react';
-import LoginForm from '../Components/LoginForm';
 import '../Styles/Login.css'
-import {ReactComponent as Logo } from '../Assets/Imgs/etc/logo.svg';
+import img from '../Assets/Imgs/png/loginImg.png';
 
-const Login = ({ login }) => {
+const Login = () => {
     return (
-        <div className="Login">
-            <div className="Login-wrapper">
-                <div className="Login-left">
-                    <div className="Login-image-container">
-                    <Logo className='Logo-icon' />
-                        <span className='Logo-text'>쫑태통로</span>
-                    </div>
+        <div className="wrap login-wrap">
+            <h3>동물 보호를 위한 이미지 분석 시스템</h3>
+            <div className="login">
+                <div className="login-img">
+                    <img src={img} alt="login" />
                 </div>
-                <div className="Login-right">
-                    <div className="Login-header">
-                        <span className="login-text">관리자 로그인</span>
-                    </div>
-                    <LoginForm login={login} />
+                <div className="login-box">
+                    <p>관리자 로그인</p>
+                    <form>
+                        <input type="text" placeholder="아이디" />
+                        <input type="password" placeholder="비밀번호" />
+                        <button>로그인</button>
+                    </form>
                 </div>
             </div>
+            <h4>Team.쫑이까까후원재단</h4>
         </div>
     );
 };

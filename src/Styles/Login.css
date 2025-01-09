@@ -1,102 +1,98 @@
-/* Login.css */
-.Login {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #fff;
+.login-wrap {
+    justify-content: space-between;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
-.Login-wrapper {
-    display: flex;
-    width: 1200px;
-    height: 500px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
-.Login-left {
-    flex: 1;
-    background-color: #425df8;
-    padding: 40px;
-    border-radius: 10px 0 0 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-}
-
-.Login-image-container {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.Logo-icon {
-    width: 270px;
-    height: 270px;
-}
-
-.Logo-text {
-    font-size: 50px;
+.login-wrap h3 {
+    font-family: 'ClimateCrisisKR-1979';
+    background: linear-gradient(to right, #006D01, #ADBCAB);
+    -webkit-background-clip: text; /* 텍스트에만 배경 클립 적용 */
+    -webkit-text-fill-color: transparent; /* 텍스트 색상 투명 */
+    font-size: 40px;
     font-weight: bold;
 }
 
-.Login-right {
-    flex: 1;
-    padding: 40px;
+.login-wrap h4 {
+    color: #9a9a9a;
+    font-size: 12px;
 }
 
-.Login-header {
+.login {
     display: flex;
     justify-content: center;
-    margin-top: 40px;
-    margin-bottom: 55px;
+    align-items: center;
+    flex-direction: row;
+}
+
+.login-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.login-img img {
+    width: 300px;
+}
+
+.login-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 400px;
+}
+
+.login-box p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #006D01;
+}
+
+.login-box form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 80%;
+    gap: 5px;
 }
 
 .login-text {
-    color: #425df8;
+    color: #006D01;
     font-weight: bold;
     font-size: 35px;
     padding-left: 10px;
 }
 
-.Login-input-field {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.input-wrapper {
-    position: relative;
-}
-
-.Login-input {
-    width: 430px;
-    height: 20px;
-    padding: 12px 40px;
-    border: 1px solid #ddd;
+.login-box input {
+    width: 100%;
+    padding: 5px 10px;
     border-radius: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
     font-size: 14px;
+    outline: none;
 }
 
-.Login-button {
-    width: 515px;
-    height: 50px;
-    padding: 12px;
-    background-color: #425df8;
+.login-box input:focus {
+    border: 1px solid #006D01;
+}
+
+.login-box button {
+    width: 100%;
+    padding: 5px;
+    background-color: #ADBCAB;
     color: white;
     border: none;
     border-radius: 5px;
     margin-top: 20px;
     cursor: pointer;
+    font-size: 14px;
     font-weight: bold;
 }
 
-.Login-button:hover {
-    background-color: #425df8;
+.login-box button:hover {
+    background-color: #006D01;
 }

@@ -4,7 +4,7 @@ import SidebarLayout from "./Layouts/SidebarLayout";
 import AuthLayout from "./Layouts/AuthLayout";
 import Home from './Pages/Home.js';
 import Project from './Pages/Project.js';
-import Camera from './Pages/camera.js';
+import Camera from './Pages/Cam.js';
 import ImageInquiry from './Pages/ImageInquiry.js';
 import GeneralInspection from './Pages/GInspection.js';
 import ExceptionInspection from './Pages/ExInspection.js';
