@@ -5,16 +5,16 @@
   gap: 16px;
   padding: 20px;
   width: 1660px;
+  margin: 0 auto;
 }
 
 .image-card {
   flex: 0 0 calc(16.666% - 14px);
+  min-width: 250px;
   background: #ffffff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .image-card:hover {

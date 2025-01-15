@@ -9,13 +9,26 @@ import SearchBar from '../Components/Search/SearchBar';
 import useSearch from '../Hooks/useSearch';
 
 const GeneralInspection = () => {
-    const { images, totalItems, currentPage, itemsPerPage, handlePageChange } = useImagePagination();
+    const { currentPage, itemsPerPage, handlePageChange } = useImagePagination();
     const { searchResults, handleSearch } = useSearch();
-    const [displayImages, setDisplayImages] = useState(images);
+    const [filteredResults, setFilteredResults] = useState([]); // 필터링된 결과 저장
+    const [displayImages, setDisplayImages] = useState([]);
+    const [totalItems, setTotalItems] = useState(0);
 
+    // 검색 결과 저장
+    const handleSearchClick = (results) => {
+        setFilteredResults(results); // 전체 검색 결과 저장
+        setTotalItems(results.length);
+        handlePageChange(1); // 첫 페이지로 리셋
+    };
+
+    // 페이지 변경시 해당 페이지의 이미지만 표시
     useEffect(() => {
-        setDisplayImages(searchResults);
-    }, [searchResults]);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        setDisplayImages(filteredResults.slice(startIndex, endIndex));
+    }, [currentPage, filteredResults, itemsPerPage]);
+
 
     return (
         <div className="wrap">
@@ -28,7 +41,7 @@ const GeneralInspection = () => {
             />
 
             {/* 상단 필터 영역 */}
-            <SearchBar onSearch={setDisplayImages} />
+            <SearchBar onSearch={handleSearchClick} />
 
             {/* 이미지 그리드 */}
             <ImageGrid images={displayImages} />
