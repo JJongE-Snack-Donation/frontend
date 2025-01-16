@@ -22,17 +22,19 @@
     height: 30px;
 }
 
+.step-container .num.active {
+    background-color: #006D01;
+}
+
 .step-container p {
     font-size: 14px;
+    white-space: nowrap;
 }
 
 .step-container span {
     font-size: 12px;
     color: #B0B0B0;
-}
-
-.step-container .num.active {
-    background-color: #006D01;
+    white-space: nowrap;
 }
 
 .hr-basic {
