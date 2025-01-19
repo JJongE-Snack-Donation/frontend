@@ -1,0 +1,86 @@
+/* 테이블 전체 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* 모든 칸 중앙 정렬 */
+  }
+  
+  /* 각 셀에 얇은 회색 선 추가 */
+  table, th, td {
+    border: 1px solid #ddd; /* 각 셀 경계선 얇은 회색 */
+  }
+  
+  /* 테이블 헤더 스타일 */
+  thead th {
+    background-color: #FAFAFA; /* 헤더 배경색 */
+    color: #333;
+    padding: 10px 15px;
+    font-weight: bold;
+    text-align: center; /* 헤더도 중앙 정렬 */
+  }
+  
+  /* 테이블 본문 스타일 */
+  tbody tr {
+    background-color: #FFFFFF; /* 본문 배경색 */
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #FFFFFF; /* 본문 배경 통일 */
+  }
+  
+  tbody td {
+    padding: 10px 15px;
+    text-align: center; /* 본문 칸 중앙 정렬 */
+  }
+  
+  /* 상태 컬러 (동적) */
+  .status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
+  
+  .status.completed {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .status.in-progress {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .status.pending {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  /* 버튼 스타일 */
+  button {
+    border: none;
+    outline: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    opacity: 0.8;
+  }
+  
+  button.edit {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  button.delete {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  

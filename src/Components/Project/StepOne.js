@@ -1,7 +1,25 @@
 import React from "react";
+import "../../Styles/Project.css";
+import add from "../../Assets/Imgs/btn/project/add.svg";
+import change from "../../Assets/Imgs/btn/project/change.svg";
+
+import ProjectTable from "./ProjectTable";
+
 
 const StepOne = () => {
-    return <p>첫 번째 단계: 프로젝트를 선택하세요.</p>;
+    return (
+        <>
+            <div className="project-add-container">
+                <button className="add">
+                    <img src={add} alt="add" />
+                </button>
+                <button className="change">
+                    <img src={change} alt="change" />
+                </button>
+            </div>
+            <ProjectTable />
+        </>
+    );
 };
 
 export default StepOne;
