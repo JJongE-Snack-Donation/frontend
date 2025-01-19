@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../Styles/Table.css";
 
 const ProjectTable = () => {
   const [projects, setProjects] = useState([
