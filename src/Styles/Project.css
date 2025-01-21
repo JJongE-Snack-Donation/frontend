@@ -11,7 +11,7 @@
 .step-container .num {
     font-size: 12px;
     font-weight: bold;
-    color: #fff;
+    color: #a0a0a0;
     border-radius: 100%;
     background-color: #E6E6E6;
     justify-content: center;
@@ -25,6 +25,7 @@
 
 .step-container .num.active {
     background-color: #006D01;
+    color: #fff;
 }
 
 .step-container .num.completed {
@@ -38,7 +39,7 @@
 
 .step-container span {
     font-size: 12px;
-    color: #B0B0B0;
+    color: #A0A0A0;
     white-space: nowrap;
     min-width:30px;
 }

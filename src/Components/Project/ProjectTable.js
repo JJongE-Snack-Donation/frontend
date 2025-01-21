@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import "../../Styles/Table.css";
+import arrow from "../../Assets/Imgs/btn/project/arrow-right.svg";
+import write from "../../Assets/Imgs/btn/project/write.svg";
+import trash from "../../Assets/Imgs/btn/project/trash.svg";
 
 const ProjectTable = () => {
   const [projects, setProjects] = useState([
@@ -17,10 +20,9 @@ const ProjectTable = () => {
   ]);
 
   return (
-    <div style={{ margin: "20px" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table>
         <thead>
-          <tr style={{ borderBottom: "2px solid #ccc" }}>
+          <tr>
             <th>번호</th>
             <th>프로젝트 이름</th>
             <th>주소</th>
@@ -34,7 +36,7 @@ const ProjectTable = () => {
         </thead>
         <tbody>
           {projects.map((project) => (
-            <tr key={project.id} style={{ textAlign: "center" }}>
+            <tr key={project.id}>
               <td>{project.id}</td>
               <td>{project.name}</td>
               <td>{project.address}</td>
@@ -48,14 +50,22 @@ const ProjectTable = () => {
               <td>{project.createdDate}</td>
               <td>{project.user}</td>
               <td>
-                <button style={{ marginRight: "10px" }}>수정</button>
-                <button style={{ color: "red" }}>삭제</button>
+                <div className="tb-btn-container">
+                  <button className="select">
+                    <img src={arrow} alt="arrow" />
+                  </button>
+                  <button className="edit">
+                    <img src={write} alt="write" />
+                  </button>
+                  <button className="delete">
+                    <img src={trash} alt="trash" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
   );
 };
 

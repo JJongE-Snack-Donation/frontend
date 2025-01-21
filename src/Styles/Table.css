@@ -1,17 +1,15 @@
 /* 테이블 전체 스타일 */
 table {
-    width: 100%;
+    width: 98%;
     border-collapse: collapse;
     margin: 20px 0;
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
     text-align: center; /* 모든 칸 중앙 정렬 */
   }
   
   /* 각 셀에 얇은 회색 선 추가 */
   table, th, td {
-    border: 1px solid #ddd; /* 각 셀 경계선 얇은 회색 */
+    border: 1px solid #f0f0f0; /* 헤더 경계선 */
   }
   
   /* 테이블 헤더 스타일 */
@@ -41,7 +39,6 @@ table {
   .status {
     padding: 5px 10px;
     border-radius: 20px;
-    font-weight: bold;
   }
   
   .status.completed {
@@ -60,27 +57,38 @@ table {
   }
   
   /* 버튼 스타일 */
-  button {
+  .tb-btn-container button {
+    display: flex;
+    background-color: #fff;
+    align-items: center;
+    justify-content: center;
     border: none;
-    outline: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 100%;
     cursor: pointer;
-    font-size: 14px;
+    width: 30px;
+    height: 30px;
     transition: all 0.3s ease;
+    box-sizing: border-box;
   }
   
   button:hover {
     opacity: 0.8;
   }
   
-  button.edit {
-    background-color: #28a745;
-    color: #fff;
+  .tb-btn-container button.select {
+    background-color: #006A08;
   }
   
-  button.delete {
-    background-color: #dc3545;
-    color: #fff;
+  .tb-btn-container button.edit {
+    border: 1px solid #e9e9e9;
+  }
+
+  .tb-btn-container button.delete {
+    border: 1px solid #FF4E4E;
   }
   
+  .tb-btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
