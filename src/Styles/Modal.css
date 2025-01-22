@@ -1,0 +1,99 @@
+/* 모달 배경 (오버레이) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* 모달 창 */
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 90%;
+    height: 60%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-content h2 {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0;
+    margin: 0;
+  }
+
+  .modal-content p {
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+  }
+  .modal-content input {
+    width: 100%;
+    height: 30px;
+    margin-top: 10px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    box-sizing: border-box;
+    font-family: 'Pretendard';
+    font-size: 12px;
+  }
+
+  .modal-content input:focus {
+    outline: none;
+    border: 2px solid #006100;
+  }
+
+  .row-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .row-container img.asterisk {
+    margin-right: 5px;
+  }
+
+  .modal-header {
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  /* 닫기 버튼 */
+  .close-button {
+    border: none;
+    cursor: pointer;
+    background: none;
+  }
+  
+  /* 모달 내용 */
+  .modal-body {
+    margin: 20px 0;
+  }
+  
+  /* 간단한 애니메이션 */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  

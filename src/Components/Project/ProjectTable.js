@@ -16,8 +16,30 @@ const ProjectTable = () => {
       createdDate: "2024-11-07 01:01:34",
       user: "wkit",
     },
+    {
+      id: 2,
+      name: "테스트2",
+      address: "인천광역시 동구 송현1.2동",
+      status: "진행 중",
+      startDate: "2024-11-13",
+      endDate: "2024-12-18",
+      createdDate: "2024-11-07 01:01:34",
+      user: "wkit",
+    }
     // 필요시 데이터를 추가
   ]);
+
+  const handleDelete = (id) => {
+    setProjects(projects.filter((project) => project.id !== id));
+  };
+
+  const handleEdit = (id) => {
+    // 수정 기능 추가
+  };
+
+  const handleSelect = (id) => {
+    // 선택 기능 추가
+  };
 
   return (
       <table>
@@ -57,7 +79,7 @@ const ProjectTable = () => {
                   <button className="edit">
                     <img src={write} alt="write" />
                   </button>
-                  <button className="delete">
+                  <button className="delete" onClick={() => handleDelete(project.id)}>
                     <img src={trash} alt="trash" />
                   </button>
                 </div>
