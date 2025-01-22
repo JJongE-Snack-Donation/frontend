@@ -20,6 +20,7 @@ const StepOne = () => {
           endDate: "2024-12-18",
           createdDate: "2024-11-07 01:01:34",
           user: "wkit",
+          email: "0000@gmail.com",
         },
         {
           id: 2,
@@ -30,23 +31,28 @@ const StepOne = () => {
           endDate: "2024-12-18",
           createdDate: "2024-11-07 01:01:34",
           user: "wkit",
+          email: "0000@gmail.com",
         }
         // 필요시 데이터를 추가
       ]);
     
-      const handleDelete = (id) => {
+    const handleDelete = (id) => {
         setProjects(projects.filter((project) => project.id !== id));
-      };
+    };
     
-      const handleEdit = (id) => {
+    const handleEdit = (id) => {
         console.log(`Editing project with id: ${id}`);
         // 수정 기능 추가
-      };
+    };
     
-      const handleSelect = (id) => {
+    const handleSelect = (id) => {
         console.log(`Selecting project with id: ${id}`);
         // 선택 기능 추가
-      };
+    };
+    
+    const handleAdd = (project) => {
+        setProjects([...projects, project]);
+    };
 
     const openModal = () => setIsModalOpen(true); // 모달 열기
     const closeModal = () => setIsModalOpen(false); // 모달 닫기
@@ -72,6 +78,7 @@ const StepOne = () => {
             onClose={closeModal}
             account={account}
             email={email}
+            onAdd={handleAdd}
             />
         </>
     );
