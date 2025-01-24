@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import DatePicker from 'react-datepicker';
 import "../../Styles/Modal.css"; // 스타일 파일 연결
+import "../../Styles/DatePicker.css"; // 스타일 파일 연결
+import 'react-datepicker/dist/react-datepicker.css';
 import x from "../../Assets/Imgs/btn/project/x.svg";
 import asterisk from "../../Assets/Imgs/etc/asterisk.svg";
 
@@ -18,6 +21,10 @@ const Modal = ({ isOpen, onClose, account, email, onAdd, checkDuplicate }) => {
 
   const [isNameValid, setIsNameValid] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(null);
+
+  //임시
+  const [dateRange, setDateRange] = useState([null, null]); // 시작 날짜와 종료 날짜
+  const [startDate, endDate] = dateRange;
 
   const handleNameChange = (e) => {
     const name = e.target.value;
@@ -83,18 +90,17 @@ const Modal = ({ isOpen, onClose, account, email, onAdd, checkDuplicate }) => {
           <p>프로젝트 기간</p>
         </div>
         <div className="row-container input-container">
-          <input
-            type="date"
-            placeholder="시작 날짜"
-            value={project.startDate}
-            onChange={(e) => setProject({ ...project, startDate: e.target.value })}
-          />
-          <input
-            type="date"
-            placeholder="종료 날짜"
-            value={project.endDate}
-            onChange={(e) => setProject({ ...project, endDate: e.target.value })}
-          />
+          <DatePicker
+          selectsRange
+          startDate={startDate}
+          endDate={endDate}
+          onChange={(update) => setDateRange(update)} // 시작/끝 날짜 업데이트
+          isClearable={false} // 선택 취소 버튼 추가
+          dateFormat="yyyy-MM-dd" // 날짜 형식
+          placeholderText="날짜를 선택하세요"
+          monthsShown={2}
+          shouldCloseOnSelect={false}
+        />
         </div>
         <div className="row-container">
           <img src={asterisk} alt="asterisk" className="asterisk" />
