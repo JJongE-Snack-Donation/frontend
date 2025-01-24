@@ -22,10 +22,6 @@ const Modal = ({ isOpen, onClose, account, email, onAdd, checkDuplicate }) => {
   const [isNameValid, setIsNameValid] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(null);
 
-  //임시
-  const [dateRange, setDateRange] = useState([null, null]); // 시작 날짜와 종료 날짜
-  const [startDate, endDate] = dateRange;
-
   const handleNameChange = (e) => {
     const name = e.target.value;
     setProject({ ...project, name: name });
@@ -90,16 +86,23 @@ const Modal = ({ isOpen, onClose, account, email, onAdd, checkDuplicate }) => {
           <p>프로젝트 기간</p>
         </div>
         <div className="row-container input-container">
-          <DatePicker
+        <DatePicker
           selectsRange
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => setDateRange(update)} // 시작/끝 날짜 업데이트
-          isClearable={false} // 선택 취소 버튼 추가
+          startDate={project.startDate}
+          endDate={project.endDate}
+          onChange={(dates) => {
+            const [start, end] = dates; // 날짜 배열에서 시작 날짜와 끝 날짜 추출
+            setProject({
+              ...project,
+              startDate: start,
+              endDate: end,
+            });
+          }}
+          isClearable={false} // 선택 취소 버튼 비활성화
           dateFormat="yyyy-MM-dd" // 날짜 형식
           placeholderText="날짜를 선택하세요"
-          monthsShown={2}
-          shouldCloseOnSelect={false}
+          monthsShown={2} // 두 달 표시
+          shouldCloseOnSelect={false} // 선택 후 캘린더 닫히지 않음
         />
         </div>
         <div className="row-container">
