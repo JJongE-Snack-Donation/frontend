@@ -1,6 +1,6 @@
 /* 테이블 전체 스타일 */
 table {
-    width: 98%;
+    width: 96%;
     border-collapse: collapse;
     margin: 20px 0;
     font-size: 12px;
@@ -91,4 +91,61 @@ table {
     display: flex;
     justify-content: center;
     gap: 10px;
+  }
+
+  .delete-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .delete-confirm-popup {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: -80px;
+    left: 0;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 0 10px 10px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+  
+  .delete-confirm-popup p {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .popup-btn-container button.confirm-delete {
+    background-color: #006A08;
+    color: white;
+  }
+  
+  .cancel-delete:hover {
+    background-color: #e8e8e8;
+  }
+  
+  .popup-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    gap: 7px;
+  }
+
+  .popup-btn-container img {
+    width: 12px;
+    height: 12px;
+  }
+
+  .popup-btn-container button {
+    border-radius: 3px;
+    color: black;
+    padding: 5px 10px;
+    font-size: 12px;
+    width: auto;
+    height: auto;
   }
