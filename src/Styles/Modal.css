@@ -19,7 +19,6 @@
     border-radius: 5px;
     width: 400px;
     max-width: 90%;
-    height: 60%;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     animation: fadeIn 0.3s ease;
     display: flex;
@@ -53,6 +52,11 @@
   .modal-content input:focus {
     outline: none;
     border: 2px solid #006100;
+  }
+
+  .modal-content input:disabled {
+    background-color: #F4F4F4;
+    color: #A0A0A0;
   }
 
   .row-container {
@@ -104,6 +108,36 @@
     align-items: center;
     margin: 0 0 5px 0;
   }
+
+  .modal-footer {
+    align-items: center;
+    justify-content: flex-end; /* 자식 요소를 오른쪽 정렬 */
+    gap: 10px; /* 요소 간 간격 */
+  }
+
+  .modal-footer button {
+    padding: 0 15px;
+    height: 30px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Pretendard';
+  }
+
+  .modal-footer button.active {
+    background-color: #006100;
+    border: none;
+    color: white;
+  }
+
+  .modal-footer button:disabled {
+    background-color: #f4f4f4;
+    color: #A0A0A0;
+    border: 1px solid #A0A0A0;
+    cursor: not-allowed;
+  }
   
   /* 닫기 버튼 */
   .close-button {
@@ -127,4 +161,25 @@
       opacity: 1;
       transform: scale(1);
     }
+  }
+
+  .duplicate-message-container {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  .duplicate-message-content {
+    height: 40px;
+    padding: 10px 20px;
+    background-color: #fff;
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    gap: 10px;
   }

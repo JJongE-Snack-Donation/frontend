@@ -15,23 +15,27 @@ const StepOne = () => {
           id: 1,
           name: "테스트1",
           address: "인천광역시 동구 송현1.2동",
-          status: "진행 완료",
+          status: "준비 완료",
           startDate: "2024-11-13",
           endDate: "2024-12-18",
           createdDate: "2024-11-07 01:01:34",
           user: "wkit",
           email: "0000@gmail.com",
+          afffiliation: "테스트",
+          memo: "테스트",
         },
         {
           id: 2,
           name: "테스트2",
           address: "인천광역시 동구 송현1.2동",
-          status: "진행 중",
+          status: "준비 중",
           startDate: "2024-11-13",
           endDate: "2024-12-18",
           createdDate: "2024-11-07 01:01:34",
           user: "wkit",
           email: "0000@gmail.com",
+          afffiliation: "테스트",
+          memo: "테스트",
         }
         // 필요시 데이터를 추가
       ]);
@@ -51,8 +55,14 @@ const StepOne = () => {
     };
     
     const handleAdd = (project) => {
-        setProjects([...projects, project]);
-    };
+        // 기존 프로젝트 목록에서 최대 id를 가져옴
+        const maxId = projects.length > 0 ? Math.max(...projects.map(p => p.id)) : 0;
+        const newProject = {
+            ...project,
+            id: maxId + 1, // 새로운 id는 최대 id + 1
+        };
+        setProjects([...projects, newProject]); // 프로젝트 목록에 추가
+    };    
 
     const openModal = () => setIsModalOpen(true); // 모달 열기
     const closeModal = () => setIsModalOpen(false); // 모달 닫기
