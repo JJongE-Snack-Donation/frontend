@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
+import StatusMessage from "./StatusMessage"; // StatusMessage 가져오기
 import "../../Styles/Modal.css";
 import "../../Styles/DatePicker.css";
 import "react-datepicker/dist/react-datepicker.css";
 import x from "../../Assets/Imgs/btn/project/x.svg";
 import asterisk from "../../Assets/Imgs/etc/asterisk.svg";
-import checkReverse from "../../Assets/Imgs/etc/check_reverse.svg";
-import xReverse from "../../Assets/Imgs/etc/x_reverse.svg";
 
 const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
   const [project, setProject] = useState({
@@ -99,22 +98,18 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
             중복확인
           </button>
         </div>
-        {showMessage && (
-          <div className="duplicate-message-container">
-            <div className="duplicate-message-content">
-              {isDuplicate ? (
-                <img src={xReverse} alt="x" />
-              ) : (
-                <img src={checkReverse} alt="check" />
-              )}
-              <p className={`duplicate-message ${isDuplicate ? "error" : "success"}`}>
-                {isDuplicate
-                  ? "중복된 프로젝트 이름입니다."
-                  : "사용 가능한 프로젝트 이름입니다."}
-              </p>
-            </div>
-          </div>
-        )}
+
+        {/* 성공/실패 메시지 컴포넌트 */}
+        <StatusMessage
+          isSuccess={!isDuplicate} // 성공 여부
+          message={
+            isDuplicate
+              ? "중복된 프로젝트 이름입니다."
+              : "사용 가능한 프로젝트 이름입니다."
+          }
+          showMessage={showMessage}
+        />
+
         <div className="row-container">
           <img src={asterisk} alt="asterisk" className="asterisk" />
           <p>프로젝트 기간</p>
