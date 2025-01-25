@@ -3,17 +3,17 @@ import '../Styles/Home.css';
 import useImagePagination from '../Hooks/useImagePagination';
 import ImageGrid from '../Components/Pagination/ImageGrid';
 import PaginationComponent from '../Components/Pagination/PaginationComponent';
+import ImageModal from '../Components/Search/ImageModal';
 import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
-import useSearch from '../Hooks/useSearch';
 
 const GeneralInspection = () => {
     const { currentPage, itemsPerPage, handlePageChange } = useImagePagination();
-    const { searchResults, handleSearch } = useSearch();
     const [filteredResults, setFilteredResults] = useState([]); // 필터링된 결과 저장
     const [displayImages, setDisplayImages] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     // 검색 결과 저장
     const handleSearchClick = (results) => {
@@ -29,6 +29,9 @@ const GeneralInspection = () => {
         setDisplayImages(filteredResults.slice(startIndex, endIndex));
     }, [currentPage, filteredResults, itemsPerPage]);
 
+    const handleImageClick = (image) => {
+        setSelectedImage(image);
+    };
 
     return (
         <div className="wrap">
@@ -44,15 +47,23 @@ const GeneralInspection = () => {
             <SearchBar onSearch={handleSearchClick} />
 
             {/* 이미지 그리드 */}
-            <ImageGrid images={displayImages} />
+            <ImageGrid images={displayImages} onImageClick={handleImageClick}/>
+            {selectedImage && (
+                <ImageModal 
+                    image={selectedImage}
+                    onClose={() => setSelectedImage(null)}
+                />
+            )}
 
             {/* 페이지네이션 */}
-            <PaginationComponent
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                totalItems={totalItems}
-                onChange={handlePageChange}
-            />
+            {!selectedImage && (
+                <PaginationComponent
+                    currentPage={currentPage}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={totalItems}
+                    onChange={handlePageChange}
+                />
+            )}
         </div>
     );
 };

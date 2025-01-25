@@ -36,28 +36,33 @@ const useSearch = () => {
 
 
     const handleSearch = () => {
-        const filteredResults = testImages.filter(image => {
-            const conditions = [];
-            
-            if (projectName !== '' && projectName !== 'all') {
-                conditions.push(image.projectName === projectName);
+        // 프로젝트별로 그룹화하고 첫 번째 이미지만 선택
+        const groupedByProject = testImages.reduce((groups, image) => {
+            if (!groups[image.projectName]) {
+                // 첫 번째 이미지를 메인 이미지로 설정
+                const mainImage = { ...image };
+                // 같은 프로젝트의 나머지 이미지들을 relatedImages로 설정
+                mainImage.relatedImages = testImages.filter(img => 
+                    img.projectName === image.projectName && 
+                    img.imageId !== image.imageId
+                );
+                groups[image.projectName] = mainImage;
             }
-            if (cameraSerial !== 'all') {
-                conditions.push(image.SerialNumber === cameraSerial);
-            }
-            if (cameraLabel !== 'all') {
-                conditions.push(image.UserLabel === cameraLabel);
-            }
-            if (species !== '' && species !== 'all') {
-                conditions.push(image.species === species);
-            }
-            
-            return conditions.length === 0 || conditions.every(condition => condition);
-        });
-        
-        setSearchResults(filteredResults);
-        return filteredResults;
-    };
+            return groups;
+        }, {});
+    
+        // 필터링 조건 적용
+    const filteredResults = Object.values(groupedByProject).filter(image => {
+        if (projectName !== 'all' && image.projectName !== projectName) return false;
+        if (cameraSerial !== 'all' && image.SerialNumber !== cameraSerial) return false;
+        if (cameraLabel !== 'all' && image.UserLabel !== cameraLabel) return false;
+        if (species !== 'all' && image.species !== species) return false;
+        return true;
+    });
+
+    setSearchResults(filteredResults);
+    return filteredResults;
+};
 
     const getUniqueOptions = useMemo(() => {
         return {
