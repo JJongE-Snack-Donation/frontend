@@ -4,10 +4,13 @@ import add from "../../Assets/Imgs/btn/project/add.svg";
 import change from "../../Assets/Imgs/btn/project/change.svg";
 import ProjectTable from "./ProjectTable";
 import Modal from "./CreateModal";
+import EditModal from "./EditModal";
 import StatusMessage from "./StatusMessage";
 
 const StepOne = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
     const account = "current_user";
     const email = "current_user@example.com";
     const [projects, setProjects] = useState([
@@ -74,8 +77,24 @@ const StepOne = () => {
     };
 
     const handleEdit = (id) => {
-        console.log(`Editing project with id: ${id}`);
-        // 수정 기능 추가
+        const projectToEdit = projects.find((project) => project.id === id);
+        setSelectedProject(projectToEdit);
+        setIsEditModalOpen(true);
+    };
+      
+    const handleUpdate = (updatedProject) => {
+        setProjects((prev) =>
+          prev.map((project) =>
+            project.id === updatedProject.id ? updatedProject : project
+          )
+        );
+    
+        setStatusMessage("프로젝트가 성공적으로 수정되었습니다.");
+        setIsSuccess(true);
+        setShowMessage(true);
+    
+        setTimeout(() => setShowMessage(false), 3000); // 3초 후 메시지 숨김
+        setIsEditModalOpen(false); // 수정 모달 닫기
     };
 
     const handleSelect = (id) => {
@@ -116,6 +135,12 @@ const StepOne = () => {
                 email={email}
                 onAdd={handleAdd}
             />
+            <EditModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                projectData={selectedProject}
+                onUpdate={handleUpdate}
+            />          
         </>
     );
 };
