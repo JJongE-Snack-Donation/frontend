@@ -33,6 +33,26 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
     setIsDuplicate(null);
   };
 
+  //초기화
+  const handleReset = () => {
+    setProject({
+      id: "",
+      name: "",
+      address: "",
+      status: "준비 중",
+      startDate: null,
+      endDate: null,
+      createdDate: "",
+      user: account,
+      email: email,
+      afffiliation: "",
+      memo: "",
+    });
+    setIsNameValid(false);
+    setIsDuplicate(null);
+    setShowMessage(false);
+  };
+
   const handleCheckDuplicate = async () => {
     if (!isNameValid) return;
     try {
@@ -56,6 +76,7 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
         status: "준비 완료", // 상태 변경
         createdDate: currentDate, // 현재 시간 추가
       });
+      handleReset();
       onClose();
     }
   };
@@ -98,7 +119,6 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
             중복확인
           </button>
         </div>
-
         {/* 성공/실패 메시지 컴포넌트 */}
         <StatusMessage
           isSuccess={!isDuplicate} // 성공 여부
@@ -109,7 +129,6 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
           }
           showMessage={showMessage}
         />
-
         <div className="row-container">
           <img src={asterisk} alt="asterisk" className="asterisk" />
           <p>프로젝트 기간</p>

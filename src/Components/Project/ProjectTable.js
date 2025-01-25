@@ -44,9 +44,10 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
                 : "날짜 없음"}
             </td>
             <td>
-              {/* 생성일자 렌더링 */}
+              {/* 생성일자 렌더링 (날짜와 시간 포함) */}
               {project.createdDate
-                ? new Date(project.createdDate).toLocaleDateString("ko-KR")
+                ? `${new Date(project.createdDate).toLocaleDateString("ko-KR")} 
+                   ${new Date(project.createdDate).toLocaleTimeString("ko-KR")}`
                 : "날짜 없음"}
             </td>
             <td>{project.user ?? "사용자 없음"}</td>
