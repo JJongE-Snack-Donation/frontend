@@ -41,10 +41,9 @@ const useSearch = () => {
             if (!groups[image.projectName]) {
                 // 첫 번째 이미지를 메인 이미지로 설정
                 const mainImage = { ...image };
-                // 같은 프로젝트의 나머지 이미지들을 relatedImages로 설정
                 mainImage.relatedImages = testImages.filter(img => 
-                    img.projectName === image.projectName && 
-                    img.imageId !== image.imageId
+                    img.projectName === image.projectName
+                    // imageId 비교 조건 제거
                 );
                 groups[image.projectName] = mainImage;
             }
