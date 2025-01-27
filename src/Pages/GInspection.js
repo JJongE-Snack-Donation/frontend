@@ -3,7 +3,7 @@ import '../Styles/Home.css';
 import useImagePagination from '../Hooks/useImagePagination';
 import ImageGrid from '../Components/Pagination/ImageGrid';
 import PaginationComponent from '../Components/Pagination/PaginationComponent';
-import ImageModal from '../Components/Search/ImageModal';
+import ImageModal from '../Components/ImageModal/ImageModal';
 import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
@@ -14,13 +14,39 @@ const GeneralInspection = () => {
     const [displayImages, setDisplayImages] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [deletedImageIds, setDeletedImageIds] = useState(new Set());
+
+
+    const handleImagesUpdate = (updatedImages, deletedId) => {
+        setDeletedImageIds(prev => new Set([...prev, deletedId]));
+        setFilteredResults(prev => 
+            prev.map(img => 
+                img.imageId === selectedImage.imageId 
+                    ? { ...img, relatedImages: updatedImages }
+                    : img
+            )
+        );
+    };
+    
+
+    const handleClose = () => {
+        setIsModalOpen(false);
+        setSelectedImage(null); // 모달 닫을 때 선택된 이미지도 초기화
+    };
 
     // 검색 결과 저장
     const handleSearchClick = (results) => {
-        setFilteredResults(results); // 전체 검색 결과 저장
-        setTotalItems(results.length);
-        handlePageChange(1); // 첫 페이지로 리셋
+        // 삭제된 이미지를 제외한 결과만 표시
+        const filteredResults = results.filter(img => 
+            !deletedImageIds.has(img.imageId) && 
+            (!img.relatedImages || img.relatedImages.every(related => !deletedImageIds.has(related.imageId)))
+        );
+        setFilteredResults(filteredResults);
+        setTotalItems(filteredResults.length);
+        handlePageChange(1);
     };
+    
 
     // 페이지 변경시 해당 페이지의 이미지만 표시
     useEffect(() => {
@@ -31,6 +57,7 @@ const GeneralInspection = () => {
 
     const handleImageClick = (image) => {
         setSelectedImage(image);
+        setIsModalOpen(true);
     };
 
     return (
@@ -48,12 +75,14 @@ const GeneralInspection = () => {
 
             {/* 이미지 그리드 */}
             <ImageGrid images={displayImages} onImageClick={handleImageClick}/>
-            {selectedImage && (
+            {isModalOpen && selectedImage && (
                 <ImageModal 
                     image={selectedImage}
-                    onClose={() => setSelectedImage(null)}
+                    onClose={handleClose}
+                    onImagesUpdate={handleImagesUpdate}
                 />
             )}
+
 
             {/* 페이지네이션 */}
             {!selectedImage && (
