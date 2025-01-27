@@ -14,20 +14,16 @@ import StepFour from "../Components/Project/StepFour";
 const Project = () => {
     const [currentStep, setCurrentStep] = useState(1);
 
-    const handleNextStep = () => {
-        setCurrentStep((prevStep) => Math.min(prevStep + 1, 4)); // 최대 단계 제한
-    };
-
     const renderContent = () => {
         switch (currentStep) {
             case 1:
-                return <StepOne />;
+                return <StepOne nextStep={() => setCurrentStep(2)} />; // 다음 단계 함수 전달
             case 2:
-                return <StepTwo />;
+                return <StepTwo nextStep={() => setCurrentStep(3)} />;
             case 3:
-                return <StepThree />;
+                return <StepThree nextStep={() => setCurrentStep(4)} />;
             case 4:
-                return <StepFour />;
+                return <StepFour nextStep={() => setCurrentStep(1)} />; // 다시 1단계로 돌아감
             default:
                 return null;
         }
@@ -39,7 +35,6 @@ const Project = () => {
             <Title title="프로젝트" desc="프로젝트 관리, 업로드 및 분석" />
             <Step currentStep={currentStep} />
             {renderContent()} {/* 단계별로 분리된 컴포넌트 렌더링 */}
-            <button onClick={handleNextStep}>다음 단계</button>
         </div>
     );
 };

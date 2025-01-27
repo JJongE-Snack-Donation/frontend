@@ -7,7 +7,7 @@ import Modal from "./CreateModal";
 import EditModal from "./EditModal";
 import StatusMessage from "./StatusMessage";
 
-const StepOne = () => {
+const StepOne = (nextStep) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -99,7 +99,10 @@ const StepOne = () => {
 
     const handleSelect = (id) => {
         console.log(`Selecting project with id: ${id}`);
-        // 선택 기능 추가
+    };
+
+    const handleReverseOrder = () => {
+        setProjects((prevProjects) => [...prevProjects].reverse());
     };
 
     const openModal = () => setIsModalOpen(true);
@@ -118,7 +121,7 @@ const StepOne = () => {
                 <button className="add" onClick={openModal}>
                     <img src={add} alt="add" />
                 </button>
-                <button className="change">
+                <button className="change" onClick={handleReverseOrder}>
                     <img src={change} alt="change" />
                 </button>
             </div>
