@@ -127,8 +127,13 @@
   stroke: #ccc;
 }
 
-.upload-box.active {
+.upload-box.focused {
   border: 1px solid #006100;
+}
+
+.upload-box.focused svg {
+  fill: #006100;
+  stroke: #006100;
 }
 
 .upload-type-container {

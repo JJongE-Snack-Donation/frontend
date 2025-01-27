@@ -6,6 +6,7 @@ const StepTwo = () => {
   const [progress, setProgress] = useState(0); // 업로드 진행률
   const [uploadedFiles, setUploadedFiles] = useState([]); // 업로드된 파일 리스트
   const [uploadType, setUploadType] = useState("file"); // 'file' or 'folder'
+  const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false); // 포커스 상태
 
   const handleUploadTypeChange = (event) => {
     setUploadType(event.target.value); // 파일 형식 변경
@@ -66,14 +67,16 @@ const StepTwo = () => {
               multiple
               style={{ display: "none" }}
               onChange={handleFileChange}
-              webkitdirectory={uploadType === "folder" ? "true" : undefined} // 폴더 업로드 설정
+              webkitdirectory={uploadType === "folder" ? "true" : undefined}
             />
-            <div className="upload-box">
-              <Upload/>
-              <p>
-                업로드 할 파일/폴더를 이 영역에
-                끌어 놓거나 클릭합니다
-              </p>
+            <div
+              className={`upload-box ${isUploadBoxFocused ? "focused" : ""}`}
+              onClick={() => setIsUploadBoxFocused(true)} // 클릭 시 포커스 상태 설정
+              onMouseEnter={() => setIsUploadBoxFocused(true)} // 마우스 진입 시 포커스 설정
+              onMouseLeave={() => setIsUploadBoxFocused(false)} // 마우스 나가면 포커스 해제
+            >
+              <Upload />
+              <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
             </div>
           </label>
         </div>
@@ -161,7 +164,7 @@ const CircularProgress = ({ value }) => {
         strokeDasharray={circumference + " " + circumference}
         strokeDashoffset={strokeDashoffset}
         strokeLinecap="round"
-        transform={`rotate(-90 ${radius} ${radius})`} // 위쪽부터 시작
+        transform={`rotate(-90 ${radius} ${radius})`}
       />
       <text
         x="50%"
