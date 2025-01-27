@@ -12,31 +12,47 @@ import StepThree from "../Components/Project/StepThree";
 import StepFour from "../Components/Project/StepFour";
 
 const Project = () => {
-    const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
-    const renderContent = () => {
-        switch (currentStep) {
-            case 1:
-                return <StepOne nextStep={() => setCurrentStep(2)} />; // 다음 단계 함수 전달
-            case 2:
-                return <StepTwo nextStep={() => setCurrentStep(3)} />;
-            case 3:
-                return <StepThree nextStep={() => setCurrentStep(4)} />;
-            case 4:
-                return <StepFour nextStep={() => setCurrentStep(1)} />; // 다시 1단계로 돌아감
-            default:
-                return null;
-        }
-    };
+  const renderContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <StepOne
+            nextStep={() => setCurrentStep(2)}
+            setSelectedProjectId={setSelectedProjectId}
+          />
+        );
+      case 2:
+        return (
+          <StepTwo
+            nextStep={() => setCurrentStep(3)}
+            projectId={selectedProjectId}
+          />
+        );
+      case 3:
+        return (
+          <StepThree
+            nextStep={() => setCurrentStep(4)}
+            projectId={selectedProjectId}
+          />
+        );
+      case 4:
+        return <StepFour />;
+      default:
+        return null;
+    }
+  };
 
-    return (
-        <div className="wrap">
-            <NameTag />
-            <Title title="프로젝트" desc="프로젝트 관리, 업로드 및 분석" />
-            <Step currentStep={currentStep} />
-            {renderContent()} {/* 단계별로 분리된 컴포넌트 렌더링 */}
-        </div>
-    );
+  return (
+    <div className="wrap">
+      <NameTag />
+      <Title title="프로젝트" desc="프로젝트 관리, 업로드 및 분석" />
+      <Step currentStep={currentStep} setCurrentStep={setCurrentStep} />
+      {renderContent()}
+    </div>
+  );
 };
 
 export default Project;

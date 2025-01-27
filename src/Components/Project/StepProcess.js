@@ -1,6 +1,6 @@
 import React from "react";
 
-const Step = ({ currentStep }) => {
+const Step = ({ currentStep, setCurrentStep }) => {
   const steps = [
     { id: 1, title: "선택" },
     { id: 2, title: "업로드" },
@@ -20,6 +20,12 @@ const Step = ({ currentStep }) => {
                 ? "active"
                 : ""
             }`}
+            onClick={() => {
+              if (index + 1 < currentStep) {
+                setCurrentStep(index + 1); // 이전 스탭으로 이동
+              }
+            }}
+            style={{ cursor: index + 1 < currentStep ? "pointer" : "default" }} // 이전 스탭만 클릭 가능
           >
             {index + 1 < currentStep ? (
               <svg

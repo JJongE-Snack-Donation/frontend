@@ -7,7 +7,7 @@ import Modal from "./CreateModal";
 import EditModal from "./EditModal";
 import StatusMessage from "./StatusMessage";
 
-const StepOne = (nextStep) => {
+const StepOne = ({ nextStep, setSelectedProjectId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -98,7 +98,8 @@ const StepOne = (nextStep) => {
     };
 
     const handleSelect = (id) => {
-        console.log(`Selecting project with id: ${id}`);
+        setSelectedProjectId(id); // 선택된 프로젝트 ID 저장
+        nextStep(); // 다음 단계로 이동
     };
 
     const handleReverseOrder = () => {
