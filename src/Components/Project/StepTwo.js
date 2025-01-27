@@ -6,7 +6,7 @@ const StepTwo = () => {
   const [progress, setProgress] = useState(0); // 업로드 진행률
   const [uploadedFiles, setUploadedFiles] = useState([]); // 업로드된 파일 리스트
   const [uploadType, setUploadType] = useState("file"); // 'file' or 'folder'
-  const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false); // 포커스 상태
+  const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false); // 드래그 상태
 
   const handleUploadTypeChange = (event) => {
     setUploadType(event.target.value); // 파일 형식 변경
@@ -14,6 +14,17 @@ const StepTwo = () => {
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
+    processFiles(files);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault(); // 기본 브라우저 동작 막기
+    const files = Array.from(event.dataTransfer.files);
+    processFiles(files);
+    setIsUploadBoxFocused(false); // 드래그 상태 해제
+  };
+
+  const processFiles = (files) => {
     if (!files || files.length === 0) return;
 
     setUploadedFiles(files.map((file) => file.name));
@@ -60,7 +71,15 @@ const StepTwo = () => {
             폴더
           </label>
         </div>
-        <div>
+        <div
+          className={`upload-box ${isUploadBoxFocused ? "focused" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault(); // 드래그 중 기본 동작 방지
+            setIsUploadBoxFocused(true); // 드래그 상태 활성화
+          }}
+          onDragLeave={() => setIsUploadBoxFocused(false)} // 드래그 상태 해제
+          onDrop={handleDrop} // 파일 드롭 이벤트 처리
+        >
           <label>
             <input
               type="file"
@@ -69,15 +88,8 @@ const StepTwo = () => {
               onChange={handleFileChange}
               webkitdirectory={uploadType === "folder" ? "true" : undefined}
             />
-            <div
-              className={`upload-box ${isUploadBoxFocused ? "focused" : ""}`}
-              onClick={() => setIsUploadBoxFocused(true)} // 클릭 시 포커스 상태 설정
-              onMouseEnter={() => setIsUploadBoxFocused(true)} // 마우스 진입 시 포커스 설정
-              onMouseLeave={() => setIsUploadBoxFocused(false)} // 마우스 나가면 포커스 해제
-            >
-              <Upload />
-              <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
-            </div>
+            <Upload />
+            <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
           </label>
         </div>
       </>
