@@ -106,6 +106,40 @@
   margin: 10px 0;
 }
 
+.step-two-container h5 {
+  font-size: 10px;
+  font-weight: 400;
+  margin-bottom: 20px;
+  color: #A0A0A0;
+  padding: 0;
+  margin: 10px 0;
+  display: flex;
+  width: 640px;
+  justify-content: flex-end;
+}
+
+.step-two-container span {
+  font-size: 12px;
+  font-weight: 400;
+  color: #A0A0A0;
+  padding: 0;
+}
+
+.step-two-container button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "pretendard";
+  background-color: #fff;
+  border: none;
+  margin: 10px 0;
+}
+
 .upload-box {
   border: 1px solid #ccc;
   border-radius: 10px;

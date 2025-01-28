@@ -1,12 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 
 const StepTwo = () => {
-  const [currentPart, setCurrentPart] = useState("upload"); // 'upload', 'uploading', 'review'
+  const [currentPart, setCurrentPart] = useState("uploading"); // 'upload', 'uploading', 'review'
   const [progress, setProgress] = useState(0); // 업로드 진행률
   const [uploadedFiles, setUploadedFiles] = useState([]); // 업로드된 파일 리스트
   const [uploadType, setUploadType] = useState("file"); // 'file' or 'folder'
   const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false); // 드래그 상태
+  const [elapsedTime, setElapsedTime] = useState(0); // 경과 시간 (초)
+  const [remainingTime, setRemainingTime] = useState(null); // 예상 완료 시간
+  
+  useEffect(() => {
+    let interval;
+    if (currentPart === "uploading") {
+      setElapsedTime(0);
+      interval = setInterval(() => {
+        setElapsedTime((prev) => prev + 1); // 1초씩 증가
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [currentPart]);
 
   const handleUploadTypeChange = (event) => {
     setUploadType(event.target.value); // 파일 형식 변경
@@ -31,6 +44,9 @@ const StepTwo = () => {
     setProgress(0); // 진행률 초기화
     setCurrentPart("uploading");
 
+    // 예상 총 업로드 시간 (테스트용, 실시간 처리라면 서버 응답 기반으로 수정 가능)
+    const totalUploadTime = 30; // 30초에 100% 도달한다고 가정
+
     // 테스트용 진행률 증가 로직
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -39,9 +55,18 @@ const StepTwo = () => {
           setTimeout(() => setCurrentPart("review"), 500); // 검수 단계로 이동
           return 100;
         }
-        return prev + 10; // 10%씩 증가
+        const newProgress = prev + 10; // 10%씩 증가
+        const remaining = ((100 - newProgress) / 10) * 3; // 예상 남은 시간 (30초 기준)
+        setRemainingTime(remaining);
+        return newProgress;
       });
-    }, 500); // 0.5초마다 진행률 업데이트
+    }, 3000); // 3초마다 진행률 업데이트
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
   const renderUploadSection = () => {
@@ -92,22 +117,39 @@ const StepTwo = () => {
             <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
           </label>
         </div>
+        <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
       </>
     );
   };
 
   const renderUploadingSection = () => {
     return (
-      <div>
+      <>
+        <CircularProgress value={progress} />
         <h2>파일을 안전하게 업로드하고 있습니다...</h2>
-        <div className="progress-container">
-          <CircularProgress value={progress} />
-        </div>
+        <span>
+          경과 시간: {formatTime(elapsedTime)}
+          {remainingTime !== null && `, 완료까지 약 ${formatTime(remainingTime)}`}
+        </span>
         <button onClick={() => setCurrentPart("upload")}>업로드 취소</button>
-      </div>
+        <div className="upload-box">
+          <label>
+            <input
+              type="file"
+              multiple
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+              webkitdirectory={uploadType === "folder" ? "true" : undefined}
+            />
+            <Upload />
+            <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
+          </label>
+        </div>
+        <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
+      </>
     );
   };
-
+  
   const renderReviewSection = () => {
     return (
       <div>
