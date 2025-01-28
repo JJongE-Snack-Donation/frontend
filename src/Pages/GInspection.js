@@ -7,6 +7,8 @@ import ImageModal from '../Components/ImageModal/ImageModal';
 import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
+import useSearch from '../Hooks/useSearch';
+
 
 const GeneralInspection = () => {
     const { currentPage, itemsPerPage, handlePageChange } = useImagePagination();
@@ -16,18 +18,23 @@ const GeneralInspection = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deletedImageIds, setDeletedImageIds] = useState(new Set());
+    const { updateExceptionStatus, testImageData, setTestImageData } = useSearch();
 
 
-    const handleImagesUpdate = (updatedImages, deletedId) => {
-        setDeletedImageIds(prev => new Set([...prev, deletedId]));
+
+    const handleImagesUpdate = (updatedImages, checkedIds) => {
+        updateExceptionStatus(checkedIds);  // useSearch의 함수만 사용
+        
+        // 필요한 경우 relatedImages 업데이트
         setFilteredResults(prev => 
-            prev.map(img => 
-                img.imageId === selectedImage.imageId 
-                    ? { ...img, relatedImages: updatedImages }
-                    : img
-            )
+            prev.map(img => ({
+                ...img,
+                relatedImages: updatedImages
+            }))
         );
     };
+    
+    
     
 
     const handleClose = () => {

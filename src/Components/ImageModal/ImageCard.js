@@ -2,6 +2,7 @@ import React from 'react';
 import downloadIcon from '../../Assets/Imgs/btn/download.svg';
 import trashbinIcon from '../../Assets/Imgs/btn/trash_bin.svg';
 import starIcon from '../../Assets/Imgs/etc/star.svg';
+import '../../Styles/ImageModal.css'
 
 const ImageCard = ({ 
     image, 
@@ -41,6 +42,9 @@ const ImageCard = ({
         </div>
         <div className="modal__all_image-content">
             <img src={image.FilePath} alt="" />
+            {image.isException && (
+                <div className="exception-overlay">예외</div>
+            )}
             <button 
                 className="modal__favorite-btn"
                 onClick={(e) => e.stopPropagation()}
@@ -48,7 +52,9 @@ const ImageCard = ({
                 <img src={starIcon} alt="Favorite" />
             </button>
         </div>
+
     </div>
 );
+
 
 export default ImageCard;

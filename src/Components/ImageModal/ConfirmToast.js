@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ConfirmToast = ({ onConfirm, onCancel }) => (
-    <div className="confirm-toast">
+    <div className="confirm-toast" onClick={e => e.stopPropagation()}>
         <div className="confirm-toast__content">
             <span>이벤트를 예외 검수로 설정하시겠습니까?</span>
             <div className="confirm-toast__btn">
