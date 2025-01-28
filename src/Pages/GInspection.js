@@ -18,7 +18,7 @@ const GeneralInspection = () => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deletedImageIds, setDeletedImageIds] = useState(new Set());
-    const { updateExceptionStatus, testImageData, setTestImageData } = useSearch();
+    const { updateExceptionStatus, testImageData, setTestImageData, searchResults } = useSearch();
 
 
 
@@ -44,15 +44,34 @@ const GeneralInspection = () => {
 
     // 검색 결과 저장
     const handleSearchClick = (results) => {
-        // 삭제된 이미지를 제외한 결과만 표시
-        const filteredResults = results.filter(img => 
+        // 현재 상태(예외 처리 등)를 유지하면서 검색 결과 필터링
+        const updatedResults = results.map(img => {
+            // 기존 filteredResults에서 동일한 이미지 찾기
+            const existingImg = filteredResults.find(f => f.imageId === img.imageId);
+            return {
+                ...img,
+                isException: existingImg?.isException || false,
+                relatedImages: img.relatedImages?.map(related => {
+                    const existingRelated = existingImg?.relatedImages?.find(r => r.imageId === related.imageId);
+                    return {
+                        ...related,
+                        isException: existingRelated?.isException || false
+                    };
+                })
+            };
+        });
+    
+        // 삭제된 이미지 필터링
+        const filtered = updatedResults.filter(img => 
             !deletedImageIds.has(img.imageId) && 
             (!img.relatedImages || img.relatedImages.every(related => !deletedImageIds.has(related.imageId)))
         );
-        setFilteredResults(filteredResults);
-        setTotalItems(filteredResults.length);
+    
+        setFilteredResults(filtered);
+        setTotalItems(filtered.length);
         handlePageChange(1);
     };
+    
     
 
     // 페이지 변경시 해당 페이지의 이미지만 표시

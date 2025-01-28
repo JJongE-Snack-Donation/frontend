@@ -38,28 +38,15 @@ const useSearch = () => {
 
     // 예외 검수 상태 업데이트 함수
     const updateExceptionStatus = (checkedIds) => {
-        const updatedData = prev => 
+        setTestImageData(prev => 
             prev.map(img => 
                 checkedIds.includes(img.imageId) 
                     ? { ...img, isException: true }
                     : img
-            );
-        
-        setTestImageData(updatedData);
-        setSearchResults(prev => 
-            prev.map(img => ({
-                ...img,
-                isException: checkedIds.includes(img.imageId) ? true : img.isException,
-                relatedImages: img.relatedImages?.map(related => 
-                    checkedIds.includes(related.imageId)
-                        ? { ...related, isException: true }
-                        : related
-                )
-            }))
+            )
         );
     };
-    
-    
+
 
     const handleSearch = () => {
         // 프로젝트별로 그룹화하고 첫 번째 이미지만 선택
