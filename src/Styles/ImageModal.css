@@ -53,6 +53,7 @@
   padding: 5px 16px;
   border-radius: 4px;
   margin-bottom: 5px;
+  position: relative;
 }
 
 .modal__option-bar-right {
@@ -61,51 +62,83 @@
 }
 
 .modal__inspection-btn,
-.modal__bulk-action-btn {
+.modal__bulk-action-btn {  /* .modal__bulk-action을 .modal__bulk-action-btn으로 변경 */
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 500;
+    background-color: #f3f3f3;
+    color: #333;
     margin-left: 5px;
+}
+
+.modal__inspection-btn:disabled {
+background-color: #e9e9e9;
+cursor: not-allowed;
+color: rgb(204, 204, 204);
+}
+
+
+.modal__bulk-action-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  z-index: 1000;
+}
+
+.modal__bulk-action-dropdown button {
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.modal__bulk-action-dropdown button:hover {
+  background-color: #f5f5f5;
+}
+
+.modal__bulk-action-btn {
+  background-color: #f3f3f3;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal_bulk-action-delete-image-btn {
+  color: #ff4d4f;
 }
 
 .modal__select_all-checkbox {
     border: 1px solid #e0e0e0;
 }
 
-.modal__inspection-btn {
-    background-color: #f3f3f3;
-    color: #333;
-}
-
-.modal__inspection-btn:disabled {
-  background-color: #e9e9e9;
-  cursor: not-allowed;
-  color: rgb(204, 204, 204);
-}
-
-
 
 
 .modal__all {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background-color: #f8f8f8;
   height: 50%;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 7px;
-  padding: 8px;
-  border-radius: 2px;
-  overflow-y: auto; /* 세로 스크롤 추가 */
-  max-height: 300px; /* 또는 원하는 높이 값 */
+  overflow-y: auto;
 }
 
 .modal__all_image-item {
+  flex: 0 0 calc(25% - 4px); /* 4개의 열로 나누고 gap 고려 */
   background: white;
-  height: 130px;
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border: 2px solid transparent; /* 투명한 테두리 추가 */
+  position: relative;
 }
 
 .modal__all_image-item.selected {
@@ -302,3 +335,6 @@ input[type="checkbox"] {
   animation: fadeInOut 5s ease-in-out;
 }
 
+.modal__image_edit-btn{
+
+}

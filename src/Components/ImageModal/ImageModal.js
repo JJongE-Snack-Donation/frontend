@@ -2,14 +2,14 @@ import React from 'react';
 import '../../Styles/ImageModal.css';
 import { useState } from 'react';
 import { useImageSelection } from '../../Hooks/useImageSelection';
-import { useImageActions } from '../../Hooks/useImageActions';
+import useImageActions from '../../Hooks/useImageActions';
 import ImageViewer from './ImageViewer';
 import ImageCard from './ImageCard';
 import ImageInfo from './ImageInfo';
 import ConfirmToast from './ConfirmToast';
 import checkIcon from '../../Assets/Imgs/etc/check_message.svg'
 
-const ImageModal = ({ image, onClose, onImagesUpdate }) => {
+const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
     const [showCompletionMessage, setShowCompletionMessage] = useState(false);
 
     const {
@@ -33,8 +33,12 @@ const ImageModal = ({ image, onClose, onImagesUpdate }) => {
         setIsDropdownOpen,
         setShowConfirmToast,
         handleDelete,
-        handleDownload
-    } = useImageActions(relatedImages, setRelatedImages, onImagesUpdate);
+        handleDownload,
+        handleBulkEdit,          
+        handleBulkInfoDownload,  
+        handleBulkImageDownload, 
+        handleBulkDelete         
+    } = useImageActions(relatedImages, setRelatedImages, onImagesUpdate, onDelete);
 
     const handleConfirmInspection = () => {
         if (onImagesUpdate) {
@@ -57,8 +61,6 @@ const ImageModal = ({ image, onClose, onImagesUpdate }) => {
             setShowCompletionMessage(false);
         }, 3000);
     };
-    
-    
     
     
 
@@ -96,8 +98,18 @@ const ImageModal = ({ image, onClose, onImagesUpdate }) => {
                                         </button>
                                         {isDropdownOpen && (
                                             <div className="modal__bulk-action-dropdown">
-                                                <button onClick={() => setShowConfirmToast(true)}>일괄 예외 검수</button>
-                                                <button onClick={() => checkedBoxes.forEach(id => handleDownload(id))}>일괄 다운로드</button>
+                                                <button >수정</button>
+                                                <button >정보 다운로드</button>
+                                                <button >이미지 다운로드</button>
+                                                <button 
+                                                    style={{ color: '#ff4d4f' }}
+                                                    onClick={() => {
+                                                        handleBulkDelete(checkedBoxes);
+                                                        setShowConfirmToast(false);  // 토스트 메시지 닫기
+                                                    }}
+                                                >
+                                                    이미지 삭제
+                                                </button>
                                             </div>
                                         )}
                                     </div>

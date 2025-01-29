@@ -44,14 +44,15 @@ const GeneralInspection = () => {
 
     // 검색 결과 저장
     const handleSearchClick = (results) => {
-        // 현재 상태(예외 처리 등)를 유지하면서 검색 결과 필터링
         const updatedResults = results.map(img => {
-            // 기존 filteredResults에서 동일한 이미지 찾기
             const existingImg = filteredResults.find(f => f.imageId === img.imageId);
             return {
                 ...img,
                 isException: existingImg?.isException || false,
-                relatedImages: img.relatedImages?.map(related => {
+                // 여기서 삭제된 관련 이미지만 필터링
+                relatedImages: img.relatedImages?.filter(related => 
+                    !deletedImageIds.has(related.imageId)
+                ).map(related => {
                     const existingRelated = existingImg?.relatedImages?.find(r => r.imageId === related.imageId);
                     return {
                         ...related,
@@ -61,16 +62,15 @@ const GeneralInspection = () => {
             };
         });
     
-        // 삭제된 이미지 필터링
-        const filtered = updatedResults.filter(img => 
-            !deletedImageIds.has(img.imageId) && 
-            (!img.relatedImages || img.relatedImages.every(related => !deletedImageIds.has(related.imageId)))
-        );
+        // 메인 이미지만 삭제 여부 확인
+        const filtered = updatedResults.filter(img => !deletedImageIds.has(img.imageId));
     
         setFilteredResults(filtered);
         setTotalItems(filtered.length);
         handlePageChange(1);
     };
+    
+    
     
     
 
@@ -103,10 +103,14 @@ const GeneralInspection = () => {
             <ImageGrid images={displayImages} onImageClick={handleImageClick}/>
             {isModalOpen && selectedImage && (
                 <ImageModal 
-                    image={selectedImage}
-                    onClose={handleClose}
-                    onImagesUpdate={handleImagesUpdate}
-                />
+                image={selectedImage}
+                onClose={handleClose}
+                onImagesUpdate={handleImagesUpdate}
+                onDelete={(imageIds) => {
+                    setDeletedImageIds(prev => new Set([...prev, ...imageIds]));
+                }}
+            />
+            
             )}
 
 
