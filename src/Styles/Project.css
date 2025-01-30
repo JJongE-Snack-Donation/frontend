@@ -88,14 +88,23 @@
     border: 1px solid #e9e9e9;
 }
 
+.step-two-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+}
+
 .step-two-container {
   display: flex;
   text-align: center;
   justify-content: center;
   align-items: center;
-  width: 100%;
   flex-direction: column;
   margin-top: 20px;
+  width: 50%;
 }
 
 .step-two-container h2 {
@@ -114,7 +123,7 @@
   padding: 0;
   margin: 10px 0;
   display: flex;
-  width: 640px;
+  width: 100%;
   justify-content: flex-end;
 }
 
@@ -151,11 +160,12 @@
   cursor: pointer;
   font-size: 12px;
   gap: 10px;
+  width: 100%;
 }
 
 .upload-box label {
   display: flex;
-  width: 600px;
+  width: 100%;
   height: 200px;
   padding: 20px;
   justify-content: center;
@@ -213,4 +223,12 @@ input[type='radio'] {
 input[type='radio']:checked {
   background: none;
   border: 4px solid #006100; /*라인이 아닌, 라인과 원 사이 색상*/
+}
+
+.review-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 45%;
 }

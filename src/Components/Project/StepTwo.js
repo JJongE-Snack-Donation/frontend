@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
+import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg"; // 체크 아이콘 추가
 
 const StepTwo = () => {
-  const [currentPart, setCurrentPart] = useState("uploading"); // 'upload', 'uploading', 'review'
+  const [currentPart, setCurrentPart] = useState("upload"); // 'upload', 'uploading', 'review'
   const [progress, setProgress] = useState(0); // 업로드 진행률
   const [uploadedFiles, setUploadedFiles] = useState([]); // 업로드된 파일 리스트
   const [uploadType, setUploadType] = useState("file"); // 'file' or 'folder'
   const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false); // 드래그 상태
   const [elapsedTime, setElapsedTime] = useState(0); // 경과 시간 (초)
   const [remainingTime, setRemainingTime] = useState(null); // 예상 완료 시간
-  
+
   useEffect(() => {
     let interval;
     if (currentPart === "uploading") {
@@ -22,7 +23,7 @@ const StepTwo = () => {
   }, [currentPart]);
 
   const handleUploadTypeChange = (event) => {
-    setUploadType(event.target.value); // 파일 형식 변경
+    setUploadType(event.target.value);
   };
 
   const handleFileChange = (event) => {
@@ -31,36 +32,41 @@ const StepTwo = () => {
   };
 
   const handleDrop = (event) => {
-    event.preventDefault(); // 기본 브라우저 동작 막기
+    event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
     processFiles(files);
-    setIsUploadBoxFocused(false); // 드래그 상태 해제
+    setIsUploadBoxFocused(false);
+  };
+
+  const handleCancelUpload = () => {
+    setCurrentPart("upload");
+    setProgress(0);
+    setUploadedFiles([]);
+    setElapsedTime(0);
+    setRemainingTime(null);
   };
 
   const processFiles = (files) => {
     if (!files || files.length === 0) return;
 
     setUploadedFiles(files.map((file) => file.name));
-    setProgress(0); // 진행률 초기화
+    setProgress(0);
     setCurrentPart("uploading");
 
-    // 예상 총 업로드 시간 (테스트용, 실시간 처리라면 서버 응답 기반으로 수정 가능)
-    const totalUploadTime = 30; // 30초에 100% 도달한다고 가정
-
-    // 테스트용 진행률 증가 로직
+    // 진행률 증가 (테스트 코드)
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval); // 100%에 도달하면 진행률 증가 중단
-          setTimeout(() => setCurrentPart("review"), 500); // 검수 단계로 이동
+          clearInterval(interval);
+          setTimeout(() => setCurrentPart("review"), 500);
           return 100;
         }
-        const newProgress = prev + 10; // 10%씩 증가
-        const remaining = ((100 - newProgress) / 10) * 3; // 예상 남은 시간 (30초 기준)
+        const newProgress = prev + 10;
+        const remaining = ((100 - newProgress) / 10) * 3;
         setRemainingTime(remaining);
         return newProgress;
       });
-    }, 3000); // 3초마다 진행률 업데이트
+    }, 3000);
   };
 
   const formatTime = (seconds) => {
@@ -69,137 +75,113 @@ const StepTwo = () => {
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-  const renderUploadSection = () => {
+  const UploadProcess = () => {
     return (
       <>
-        <CircularProgress value={progress} />
-        <h2>분석할 이미지 파일을 업로드 하세요</h2>
-        <div className="upload-type-container">
-          <label>
-            <input
-              type="radio"
-              name="uploadType"
-              value="file"
-              checked={uploadType === "file"}
-              onChange={handleUploadTypeChange}
-            />
-            파일
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="uploadType"
-              value="folder"
-              checked={uploadType === "folder"}
-              onChange={handleUploadTypeChange}
-            />
-            폴더
-          </label>
+        <div className={`step-two-container ${currentPart === "review" ? "review-container" : ""}`}>
+          <CircularProgress value={progress} isCompleted={currentPart === "review"} />
+            <h2>
+              {currentPart === "upload"
+                ? "분석할 이미지 파일을 업로드 하세요"
+                : currentPart === "uploading"
+                ? "파일을 안전하게 업로드하고 있습니다..."
+                : `${uploadedFiles.length}개의 이미지가 업로드 되었습니다.`}
+            </h2>
+
+            {currentPart === "uploading" && (
+              <span>
+                경과 시간: {formatTime(elapsedTime)}
+                {remainingTime !== null && `, 완료까지 약 ${formatTime(remainingTime)}`}
+              </span>
+            )}
+
+            {currentPart !== "uploading" && (
+              <div className="upload-type-container">
+                <label>
+                  <input
+                    type="radio"
+                    name="uploadType"
+                    value="file"
+                    checked={uploadType === "file"}
+                    onChange={handleUploadTypeChange}
+                  />
+                  파일
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="uploadType"
+                    value="folder"
+                    checked={uploadType === "folder"}
+                    onChange={handleUploadTypeChange}
+                  />
+                  폴더
+                </label>
+              </div>
+            )}
+            {currentPart === "uploading" && <button onClick={handleCancelUpload}>업로드 취소</button>}
+            <div
+              className={`upload-box ${isUploadBoxFocused ? "focused" : ""}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsUploadBoxFocused(true);
+              }}
+              onDragLeave={() => setIsUploadBoxFocused(false)}
+              onDrop={handleDrop}
+            >
+              <label>
+                <input
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                  webkitdirectory={uploadType === "folder" ? "true" : undefined}
+                />
+                <Upload />
+                <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
+              </label>
+            </div>
+
+
+            <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
         </div>
-        <div
-          className={`upload-box ${isUploadBoxFocused ? "focused" : ""}`}
-          onDragOver={(e) => {
-            e.preventDefault(); // 드래그 중 기본 동작 방지
-            setIsUploadBoxFocused(true); // 드래그 상태 활성화
-          }}
-          onDragLeave={() => setIsUploadBoxFocused(false)} // 드래그 상태 해제
-          onDrop={handleDrop} // 파일 드롭 이벤트 처리
-        >
-          <label>
-            <input
-              type="file"
-              multiple
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-              webkitdirectory={uploadType === "folder" ? "true" : undefined}
-            />
-            <Upload />
-            <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
-          </label>
-        </div>
-        <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
+        {currentPart === "review" && 
+          <div className="review-container">
+            <div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>파일 이름</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {uploadedFiles.map((file, index) => (
+                    <tr key={index}>
+                      <td>{file}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>}
       </>
     );
   };
 
-  const renderUploadingSection = () => {
-    return (
-      <>
-        <CircularProgress value={progress} />
-        <h2>파일을 안전하게 업로드하고 있습니다...</h2>
-        <span>
-          경과 시간: {formatTime(elapsedTime)}
-          {remainingTime !== null && `, 완료까지 약 ${formatTime(remainingTime)}`}
-        </span>
-        <button onClick={() => setCurrentPart("upload")}>업로드 취소</button>
-        <div className="upload-box">
-          <label>
-            <input
-              type="file"
-              multiple
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-              webkitdirectory={uploadType === "folder" ? "true" : undefined}
-            />
-            <Upload />
-            <p>업로드 할 파일/폴더를 이 영역에 끌어 놓거나 클릭합니다</p>
-          </label>
-        </div>
-        <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
-      </>
-    );
-  };
-  
-  const renderReviewSection = () => {
-    return (
-      <div>
-        <h2>{uploadedFiles.length}개의 파일이 업로드되었습니다</h2>
-        <div>
-          <table>
-            <thead>
-              <tr>
-                <th>파일 이름</th>
-              </tr>
-            </thead>
-            <tbody>
-              {uploadedFiles.map((file, index) => (
-                <tr key={index}>
-                  <td>{file}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <button onClick={() => setCurrentPart("upload")}>다시 업로드하기</button>
-      </div>
-    );
-  };
-
-  const renderContent = () => {
-    switch (currentPart) {
-      case "upload":
-        return renderUploadSection();
-      case "uploading":
-        return renderUploadingSection();
-      case "review":
-        return renderReviewSection();
-      default:
-        return null;
-    }
-  };
-
-  return <div className="step-two-container">{renderContent()}</div>;
+  return <div className="step-two-wrap">{UploadProcess()}</div>;
 };
 
-const CircularProgress = ({ value }) => {
-  const radius = 40; // 원의 반지름
-  const stroke = 4; // 선 두께
+/** ✅ **업로드 완료 시 색상 변경 & 체크 표시 추가** **/
+const CircularProgress = ({ value, isCompleted }) => {
+  const radius = 40;
+  const stroke = 4;
   const normalizedRadius = radius - stroke / 2;
   const circumference = 2 * Math.PI * normalizedRadius;
   const strokeDashoffset = circumference - (value / 100) * circumference;
 
   return (
     <svg height={radius * 2} width={radius * 2}>
+      {/* 배경 원 */}
       <circle
         stroke="#e6e6e6"
         fill="transparent"
@@ -208,8 +190,9 @@ const CircularProgress = ({ value }) => {
         cx={radius}
         cy={radius}
       />
+      {/* 진행률 원 (완료 시 색 변경) */}
       <circle
-        stroke="#0F52A7"
+        stroke={isCompleted ? "#4B8F2A" : "#0F52A7"} // 완료 시 초록색 (#2ECC71)
         fill="transparent"
         strokeWidth={stroke}
         r={normalizedRadius}
@@ -220,15 +203,23 @@ const CircularProgress = ({ value }) => {
         strokeLinecap="round"
         transform={`rotate(-90 ${radius} ${radius})`}
       />
-      <text
-        x="50%"
-        y="50%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize="14"
-      >
-        {value}%
-      </text>
+      {/* 업로드 완료 시 체크 아이콘 */}
+      {isCompleted ? (
+        <g transform={`translate(${radius - 8}, ${radius - 8})`}>
+          <CheckIcon width="16px" height="16px" />
+        </g>
+      ) : (
+        <text
+          x="50%"
+          y="50%"
+          dominantBaseline="middle"
+          textAnchor="middle"
+          fontSize="14"
+          fill="#000"
+        >
+          {value}%
+        </text>
+      )}
     </svg>
   );
 };
