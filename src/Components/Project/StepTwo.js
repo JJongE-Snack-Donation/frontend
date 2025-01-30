@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg"; // 체크 아이콘 추가
+import trash from "../../Assets/Imgs/btn/project/trash.svg";
 
 const StepTwo = () => {
   const [currentPart, setCurrentPart] = useState("upload"); // 'upload', 'uploading', 'review'
@@ -147,7 +148,12 @@ const StepTwo = () => {
         </div>
         {currentPart === "review" && 
           <div className="review-container">
-            <div>
+            <div className="row-header">
+              <h2>업로드 성공</h2>
+              <button onClick={handleCancelUpload}>
+                <img src={trash} alt="trash" />
+              </button>
+            </div>
               <table>
                 <thead>
                   <tr>
@@ -162,7 +168,6 @@ const StepTwo = () => {
                   ))}
                 </tbody>
               </table>
-            </div>
           </div>}
       </>
     );
