@@ -263,3 +263,40 @@ input[type='radio']:checked {
   align-items: center;
   width: 100%;
 }
+
+.upload-summary {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.upload-summary thead {
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  background-color: #eeeeee;
+  border-right: 1px solid #ccc;
+}
+
+.upload-summary th {
+  flex-grow: 1;
+  background: none;
+}
+
+.upload-summary tr {
+  background: none;
+}
+
+.file-list td {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.file-list input {
+  display: flex;
+  position: absolute;
+  left: 5px;
+}
