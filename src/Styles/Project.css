@@ -106,6 +106,15 @@
   width: 50%;
 }
 
+.step-three-container {
+  margin-top: 70px;
+  width: 35%;
+}
+
+.step-four-container {
+  height: 100%;
+}
+
 .step-two-container h2 {
   font-size: 18px;
   font-weight: 400;
@@ -138,6 +147,15 @@
   font-weight: 400;
   color: #A0A0A0;
   padding: 0;
+}
+
+.step-four-container h2 {
+  padding: 0;
+  margin: 10px 0 5px 0;
+}
+
+.step-four-container span {
+  font-size: 10px;
 }
 
 .step-two-container button {
@@ -339,4 +357,17 @@ input[type='radio']:checked {
 [type="checkbox"]:checked {
   background-color: #88B389;
   border: 1px solid #4a774b;
+}
+
+.row-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-direction: row;
+}
+
+.row-btn .move-btn {
+  background-color: #006D01;
+  color: #fff;
 }

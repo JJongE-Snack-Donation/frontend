@@ -3,7 +3,7 @@ import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import trash from "../../Assets/Imgs/btn/project/trash.svg";
 
-const StepTwo = () => {
+const StepTwo = ({nextStep}) => {
   const [currentPart, setCurrentPart] = useState("upload");
   const [progress, setProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -99,6 +99,10 @@ const StepTwo = () => {
     } else {
       setSelectedFiles([]);
     }
+  };
+
+  const handleStartAnalysis = () => {
+    nextStep();
   };
 
   const UploadProcess = () => {
@@ -243,7 +247,10 @@ const StepTwo = () => {
               </tbody>
             </table>
             <div className="start-btn-container">
-              <button className="start-btn">분석 시작</button>
+              <button 
+              className="start-btn"
+              onClick={handleStartAnalysis}
+              >분석 시작</button>
             </div>
           </div>
         )}

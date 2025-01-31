@@ -39,7 +39,10 @@ const Project = () => {
           />
         );
       case 4:
-        return <StepFour />;
+        return <StepFour 
+                nextStep={() => setCurrentStep(1)}
+                upload={() => setCurrentStep(2)}
+                />;
       default:
         return null;
     }
