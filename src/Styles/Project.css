@@ -322,3 +322,21 @@ input[type='radio']:checked {
   position: absolute;
   left: 5px;
 }
+
+.file-list .selected td {
+  background-color: #E8F2E9;
+}
+
+[type="checkbox"] {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+[type="checkbox"]:checked {
+  background-color: #88B389;
+  border: 1px solid #4a774b;
+}

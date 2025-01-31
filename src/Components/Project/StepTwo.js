@@ -222,19 +222,20 @@ const StepTwo = () => {
                       onChange={handleSelectAll}
                       checked={uploadedFiles.length > 0 && selectedFiles.length === uploadedFiles.length}
                     />
-                    전체 선택
+                    파일 이름
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {uploadedFiles.map((file, index) => (
-                  <tr key={index}>
+                  <tr key={index} className={selectedFiles.includes(file) ? "selected" : ""}>
                     <td>
                       <input
                         type="checkbox"
                         checked={selectedFiles.includes(file)}
                         onChange={() => handleCheckboxChange(file)}
                       />
+                      <span className="custom-checkbox"></span>
                       {file}
                     </td>
                   </tr>
