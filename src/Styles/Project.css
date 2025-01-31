@@ -243,7 +243,7 @@ input[type='radio']:checked {
   border-collapse: collapse;
 }
 
-.review-container button {
+.review-container .delete-btn {
   display: flex;
   background-color: #fff;
   align-items: center;
@@ -255,6 +255,29 @@ input[type='radio']:checked {
   height: 30px;
   transition: all 0.3s ease;
   box-sizing: border-box; 
+}
+
+.start-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.review-container .start-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #006D01;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 7px 15px;
+  font-size: 12px;
+  font-weight: 400;
+  border-radius: 5px;
+  box-sizing: border-box;
 }
 
 .row-header {
@@ -287,12 +310,11 @@ input[type='radio']:checked {
   background: none;
 }
 
-.file-list td {
+.file-list td, .file-list th {
   display: flex;
   position: relative;
   align-items: center;
   justify-content: center;
-  width: 100%;
 }
 
 .file-list input {

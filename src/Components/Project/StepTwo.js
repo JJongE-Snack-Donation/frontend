@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
-import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg"; 
+import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import trash from "../../Assets/Imgs/btn/project/trash.svg";
 
 const StepTwo = () => {
@@ -12,7 +12,7 @@ const StepTwo = () => {
   const [isUploadBoxFocused, setIsUploadBoxFocused] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [remainingTime, setRemainingTime] = useState(null);
-  const [failedUploads, setFailedUploads] = useState(0); // 실패한 업로드 수 추가
+  const [failedUploads, setFailedUploads] = useState(0);
 
   useEffect(() => {
     let interval;
@@ -79,19 +79,26 @@ const StepTwo = () => {
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-   // ✅ 선택된 파일 관리
-   const handleCheckboxChange = (fileName) => {
+  const handleCheckboxChange = (fileName) => {
     setSelectedFiles((prevSelected) =>
       prevSelected.includes(fileName)
-        ? prevSelected.filter((file) => file !== fileName) // 선택 해제
-        : [...prevSelected, fileName] // 선택 추가
+        ? prevSelected.filter((file) => file !== fileName)
+        : [...prevSelected, fileName]
     );
   };
 
-  // ✅ 선택된 파일 삭제
   const handleDeleteSelectedFiles = () => {
     setUploadedFiles((prevFiles) => prevFiles.filter((file) => !selectedFiles.includes(file)));
-    setSelectedFiles([]); // 선택 목록 초기화
+    setSelectedFiles([]);
+  };
+
+  // ✅ 전체 선택 체크박스의 상태 관리
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedFiles(uploadedFiles);
+    } else {
+      setSelectedFiles([]);
+    }
   };
 
   const UploadProcess = () => {
@@ -202,14 +209,21 @@ const StepTwo = () => {
             </table>
             <div className="row-header">
               <h2>업로드 성공</h2>
-              <button onClick={handleDeleteSelectedFiles} disabled={selectedFiles.length === 0}>
+              <button className="delete-btn" onClick={handleDeleteSelectedFiles} disabled={selectedFiles.length === 0}>
                 <img src={trash} alt="trash" />
               </button>
             </div>
             <table className="file-list">
-            <thead>
+              <thead>
                 <tr>
-                  <th>파일 이름</th>
+                  <th>
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={uploadedFiles.length > 0 && selectedFiles.length === uploadedFiles.length}
+                    />
+                    전체 선택
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -217,16 +231,19 @@ const StepTwo = () => {
                   <tr key={index}>
                     <td>
                       <input
-                          type="checkbox"
-                          checked={selectedFiles.includes(file)}
-                          onChange={() => handleCheckboxChange(file)}
-                        />
+                        type="checkbox"
+                        checked={selectedFiles.includes(file)}
+                        onChange={() => handleCheckboxChange(file)}
+                      />
                       {file}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            <div className="start-btn-container">
+              <button className="start-btn">분석 시작</button>
+            </div>
           </div>
         )}
       </>
