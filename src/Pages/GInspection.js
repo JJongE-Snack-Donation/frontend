@@ -17,8 +17,15 @@ const GeneralInspection = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [deletedImageIds, setDeletedImageIds] = useState(new Set());
-    const { updateExceptionStatus, testImageData, setTestImageData, searchResults } = useSearch();
+    
+    const { 
+        updateExceptionStatus, 
+        testImageData, 
+        setTestImageData, 
+        searchResults,
+        deletedImageIds,
+        setDeletedImageIds
+    } = useSearch();
 
 
 
@@ -106,10 +113,10 @@ const GeneralInspection = () => {
                 image={selectedImage}
                 onClose={handleClose}
                 onImagesUpdate={handleImagesUpdate}
-                onDelete={(imageIds) => {
-                    setDeletedImageIds(prev => new Set([...prev, ...imageIds]));
-                }}
+                deletedImageIds={deletedImageIds}
+                setDeletedImageIds={setDeletedImageIds}
             />
+            
             
             )}
 

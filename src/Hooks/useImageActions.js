@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDelete) => {
+const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDelete, setDeletedImageIds) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showConfirmToast, setShowConfirmToast] = useState(false);
 
@@ -8,6 +8,9 @@ const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDele
         if (e) {
             e.stopPropagation();
         }
+        // 단일 이미지 삭제 시에도 deletedImageIds 업데이트
+        setDeletedImageIds(prev => new Set([...prev, imageId]));
+        
         const updatedImages = relatedImages.filter(img => img.imageId !== imageId);
         setRelatedImages(updatedImages);
         if (onImagesUpdate) {
@@ -56,13 +59,13 @@ const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDele
     };
 
     const handleBulkDelete = (checkedIds) => {
+        setDeletedImageIds(prev => new Set([...prev, ...checkedIds]));
+        
         const updatedImages = relatedImages.filter(img => !checkedIds.includes(img.imageId));
         setRelatedImages(updatedImages);
+        
         if (onImagesUpdate) {
             onImagesUpdate(updatedImages, checkedIds);
-        }
-        if (onDelete) {
-            onDelete(checkedIds);  // deletedImageIds 업데이트
         }
         setIsDropdownOpen(false);
     };

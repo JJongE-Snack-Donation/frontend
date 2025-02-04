@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import axios from 'axios';
 import testImages from '../Data/testImages';
@@ -11,29 +12,8 @@ const useSearch = () => {
     const [species, setSpecies] = useState('all');
     const [searchResults, setSearchResults] = useState(testImages);
     const [testImageData, setTestImageData] = useState(testImages);
+    const [deletedImageIds, setDeletedImageIds] = useState(new Set());
 
-    // 백엔드 연결 시 수정 
-    // const handleSearch = async () => {
-    //     setIsLoading(true);
-    //     setError(null);
-    //     try {
-    //         const response = await axios.get('YOUR_API_ENDPOINT', {
-    //             params: {
-    //                 projectName,
-    //                 date,
-    //                 cameraSerial,
-    //                 cameraLabel,
-    //                 species
-    //             }
-    //         });
-    //         setSearchResults(response.data);
-    //     } catch (err) {
-    //         setError('검색 중 오류가 발생했습니다.');
-    //         console.error('Search error:', err);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
 
 
     // 예외 검수 상태 업데이트 함수
@@ -48,33 +28,56 @@ const useSearch = () => {
     };
 
 
-    const handleSearch = () => {
-        // 프로젝트별로 그룹화하고 첫 번째 이미지만 선택
-        const groupedByProject = testImages.reduce((groups, image) => {
-            if (!groups[image.projectName]) {
-                // 첫 번째 이미지를 메인 이미지로 설정
-                const mainImage = { ...image };
-                mainImage.relatedImages = testImages.filter(img => 
-                    img.projectName === image.projectName
-                    // imageId 비교 조건 제거
-                );
-                groups[image.projectName] = mainImage;
-            }
-            return groups;
-        }, {});
-    
-        // 필터링 조건 적용
-    const filteredResults = Object.values(groupedByProject).filter(image => {
-        if (projectName !== 'all' && image.projectName !== projectName) return false;
-        if (cameraSerial !== 'all' && image.SerialNumber !== cameraSerial) return false;
-        if (cameraLabel !== 'all' && image.UserLabel !== cameraLabel) return false;
-        if (species !== 'all' && image.species !== species) return false;
-        return true;
+    // useSearch.js
+const handleSearch = () => {
+    console.log("=== Search Start ===");
+    console.log("Current filters:", { projectName, cameraSerial, cameraLabel, species });
+    console.log("Current deletedImageIds:", Array.from(deletedImageIds));
+
+    // 먼저 필터 조건 적용
+    let filteredImages = testImages.filter(image => {
+        const matchesFilters = (
+            (projectName === 'all' || image.projectName === projectName) &&
+            (cameraSerial === 'all' || image.SerialNumber === cameraSerial) &&
+            (cameraLabel === 'all' || image.UserLabel === cameraLabel) &&
+            (species === 'all' || image.species === species)
+        );
+        return matchesFilters && !deletedImageIds.has(image.imageId);
     });
 
-    setSearchResults(filteredResults);
-    return filteredResults;
+    console.log("Images after filter conditions:", filteredImages);
+
+    // 프로젝트별로 그룹화
+    const groupedByProject = {};
+    
+    filteredImages.forEach(image => {
+        const projectName = image.projectName;
+        if (!groupedByProject[projectName]) {
+            // 같은 프로젝트의 이미지들 찾기
+            const projectImages = filteredImages.filter(img => 
+                img.projectName === projectName
+            );
+            
+            if (projectImages.length > 0) {
+                const mainImage = { ...projectImages[0] };
+                mainImage.relatedImages = projectImages;
+                groupedByProject[projectName] = mainImage;
+                console.log(`Set main image for ${projectName}:`, mainImage.imageId);
+            }
+        }
+    });
+
+    console.log("Final grouped results:", groupedByProject);
+    
+    const results = Object.values(groupedByProject);
+    setSearchResults(results);
+    return results;
 };
+
+    
+    
+    
+    
 
     const getUniqueOptions = useMemo(() => {
         return {
@@ -99,7 +102,9 @@ const useSearch = () => {
         handleSearch,
         updateExceptionStatus, 
         testImageData,         
-        setTestImageData,      
+        setTestImageData,  
+        deletedImageIds,    
+        setDeletedImageIds,         
         ...getUniqueOptions
     };
 }; 
