@@ -10,8 +10,6 @@ const Login = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const API_URL = process.env.REACT_APP_API_URL;
-
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -20,12 +18,19 @@ const Login = () => {
             const response = await api.post(
                 `/admin/login`,
                 { username, password }, // JSON 형식으로 전달
-                { withCredentials: true } // 쿠키 포함
+                //{ withCredentials: true } // 쿠키 포함
             );
-
+            console.log(response);
             // 로그인 성공 처리
             if (response.status === 200) {
-                alert('로그인 성공!');
+                alert('로그인이 완료되었습니다.');
+                const data = response.data.data;
+                // 로컬 스토리지에 토큰 저장
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('username', data.admin.username);
+                localStorage.setItem('email', data.admin.email);
+                localStorage.setItem('role', data.admin.role);
+                console.log(localStorage.getItem('token'));
                 navigate('/project'); // 페이지 이동
             }
         } catch (err) {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
 import { Link, useLocation } from 'react-router-dom';
+import api from '../Api';
 import { ReactComponent as Icon1 } from "../Assets/Imgs/btn/project_btn.svg";
 import { ReactComponent as Icon2 } from "../Assets/Imgs/btn/inspection_btn.svg";
 import { ReactComponent as Arrow } from "../Assets/Imgs/btn/arrow_down.svg";
@@ -19,6 +20,19 @@ const Sidebar = () => {
 
   const toggleSubMenu = () => {
     setIsSubMenuOpen((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/admin/logout',
+        null,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      localStorage.clear();
+      window.location.href = '/login';
+    } catch (err) {
+      console.error('로그아웃 에러:', err);
+    }
   };
 
   return (
@@ -65,7 +79,7 @@ const Sidebar = () => {
               카메라 정보
             </Link>
           </li>
-          <li>
+          <li onClick={handleLogout}>
             <Icon7 className="menu-icon" />
             로그아웃
           </li>
