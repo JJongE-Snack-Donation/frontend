@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../Api';
 import { ReactComponent as Icon1 } from "../Assets/Imgs/btn/project_btn.svg";
 import { ReactComponent as Icon2 } from "../Assets/Imgs/btn/inspection_btn.svg";
@@ -14,6 +14,7 @@ import { ReactComponent as Icon7 } from "../Assets/Imgs/btn/logout_btn.svg";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
@@ -39,7 +40,7 @@ const Sidebar = () => {
         }
       );
       localStorage.clear();
-      window.location.href = '/login';
+      navigate('/login');
     } catch (err) {
       console.error(`Bearer ${token}`);  // 토큰을 다시 확인
       console.error('로그아웃 에러:', err);
