@@ -23,17 +23,29 @@ const Sidebar = () => {
   };
 
   const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.error('로그아웃 실패: 토큰이 없습니다.');
+      return;
+    }
+  
     try {
-      await api.post('/admin/logout',
+      await api.post(
+        '/admin/logout',
         null,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
       localStorage.clear();
       window.location.href = '/login';
     } catch (err) {
+      console.error(`Bearer ${token}`);  // 토큰을 다시 확인
       console.error('로그아웃 에러:', err);
     }
   };
+  
 
   return (
     <div className="sidebar">

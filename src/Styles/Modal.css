@@ -163,23 +163,4 @@
     }
   }
 
-  .duplicate-message-container {
-    position: absolute;
-    top: 15px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-  }
-
-  .duplicate-message-content {
-    height: 40px;
-    padding: 10px 20px;
-    background-color: #fff;
-    display: flex;
-    box-sizing: border-box;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    gap: 10px;
-  }
+ 

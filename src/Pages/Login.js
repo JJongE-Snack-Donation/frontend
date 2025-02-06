@@ -30,7 +30,6 @@ const Login = () => {
                 localStorage.setItem('username', data.admin.username);
                 localStorage.setItem('email', data.admin.email);
                 localStorage.setItem('role', data.admin.role);
-                console.log(localStorage.getItem('token'));
                 navigate('/project'); // 페이지 이동
             }
         } catch (err) {
