@@ -98,8 +98,9 @@ const StepOne = ({ nextStep, setSelectedProjectId }) => {
         setTimeout(() => setShowMessage(false), 3000);
     };
 
-    const handleEdit = (id) => {
-        const projectToEdit = projects.find((project) => project.id === id);
+    const handleEdit = (_id) => {
+        const projectToEdit = projects.find((project) => project._id === _id);
+        console.log("편집할 프로젝트:", projectToEdit);
         setSelectedProject(projectToEdit);
         setIsEditModalOpen(true);
     };

@@ -8,27 +8,37 @@ import asterisk from "../../Assets/Imgs/etc/asterisk.svg";
 
 const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
   const [project, setProject] = useState({
-    id: "",
-    name: "",
+    project_name: "",
     address: "",
-    status: "",
-    startDate: null,
-    endDate: null,
-    createdDate: "",
-    user: "",
-    email: "",
-    afffiliation: "",
+    start_date: null,
+    end_date: null,
+    manager_organization: "",
+    user: localStorage.getItem("username"),
+    email: localStorage.getItem("email"),
     memo: "",
   });
 
   const [isNameValid, setIsNameValid] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
 
   // 모달 열릴 때 프로젝트 데이터를 상태에 로드
   useEffect(() => {
     if (projectData) {
-      setProject({ ...projectData });
-      setIsNameValid(projectData.name.trim().length > 0);
+      // 정확한 프로퍼티 명으로 데이터 설정
+      setProject({
+        project_name: projectData.project_name || "",
+        address: projectData.address || "",
+        start_date: projectData.start_date || null,
+        end_date: projectData.end_date || null,
+        manager_organization: projectData.manager_organization || "",
+        user: localStorage.getItem("username"),
+        email: localStorage.getItem("email"),
+        memo: projectData.memo || "",
+      });
+
+      // project_name을 기준으로 유효성 검사
+      setIsNameValid((projectData.project_name || "").trim().length > 0);
     }
   }, [projectData]);
 
@@ -36,7 +46,7 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
     setProject((prev) => ({ ...prev, [field]: value }));
 
     // 이름 유효성 검사
-    if (field === "name") {
+    if (field === "project_name") {
       setIsNameValid(value.trim().length > 0);
     }
   };
@@ -51,10 +61,10 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
   // 폼 유효성 검사
   useEffect(() => {
     setIsFormValid(
-      project.name.trim() &&
+      project.project_name.trim() &&
       project.address.trim() &&
-      project.startDate &&
-      project.endDate
+      project.start_date &&
+      project.end_date
     );
   }, [project]);
 
@@ -77,7 +87,7 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
           <input
             type="text"
             placeholder="프로젝트 이름을 입력하세요"
-            value={project.name}
+            value={project.project_name}
             onChange={(e) => handleInputChange("name", e.target.value)}
           />
         </div>
@@ -88,8 +98,8 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
         <div className="row-container input-container">
           <DatePicker
             selectsRange
-            startDate={project.startDate}
-            endDate={project.endDate}
+            startDate={project.start_date}
+            endDate={project.end_date}
             onChange={(dates) => {
               const [start, end] = dates;
               handleInputChange("startDate", start);
@@ -122,8 +132,8 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
           <input
             type="text"
             placeholder="소속을 입력하세요"
-            value={project.afffiliation}
-            onChange={(e) => handleInputChange("afffiliation", e.target.value)}
+            value={project.manager_organization}
+            onChange={(e) => handleInputChange("manager_organization", e.target.value)}
           />
         </div>
         <div className="row-container">
