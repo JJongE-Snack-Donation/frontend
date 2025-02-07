@@ -1,19 +1,20 @@
+
 .image-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
   padding: 20px;
   width: 1660px;
+  margin: 0 auto;
 }
 
 .image-card {
   flex: 0 0 calc(16.666% - 14px);
+  min-width: 250px;
   background: #ffffff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .image-card:hover {
@@ -26,59 +27,59 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.image-header {
+.image-card__header {
   display: flex;
-  padding: 0px 5px;
+  padding: 0 5px;
+  align-items: center;
 }
 
-.image-title {
+.image-card__title {
   margin: 10px;
   font-size: 14px;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.image-delete {
+.image-card__delete-btn {
   background-color: #fff;
   border: none;
+  padding: 5px;
+  margin-left: auto;
 }
 
-.image-wrapper {
+.image-card__content {
   position: relative;
   padding-top: 60%;
 }
 
-.image-wrapper img {
+.image-card__img {
   position: absolute;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.image-overlay {
+.image-card__favorite-btn {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 8px;
-  text-align: center;
+  bottom: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  padding: 5px;
 }
 
-.image-overlay h3 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.image-info {
+.image-card__info {
   padding: 12px;
   background: #ffffff;
   font-size: 12px;
   color: #333;
 }
 
-.image-info p {
+.image-card__info-item {
   margin: 4px 0;
   white-space: nowrap;
   overflow: hidden;
