@@ -42,7 +42,6 @@ const Sidebar = () => {
       localStorage.clear();
       navigate('/login');
     } catch (err) {
-      console.error(`Bearer ${token}`);  // 토큰을 다시 확인
       console.error('로그아웃 에러:', err);
     }
   };

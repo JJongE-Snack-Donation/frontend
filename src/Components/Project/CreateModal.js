@@ -1,24 +1,23 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import StatusMessage from "./StatusMessage"; // StatusMessage 가져오기
+import api from "../../Api";
 import "../../Styles/Modal.css";
 import "../../Styles/DatePicker.css";
 import "react-datepicker/dist/react-datepicker.css";
 import x from "../../Assets/Imgs/btn/project/x.svg";
 import asterisk from "../../Assets/Imgs/etc/asterisk.svg";
 
-const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
+const Modal = ({ isOpen, onClose, onAdd }) => {
   const [project, setProject] = useState({
-    id: "",
-    name: "",
+    project_name: "",
     address: "",
     status: "준비 중",
-    startDate: null,
-    endDate: null,
-    createdDate: "",
-    user: account,
-    email: email,
-    afffiliation: "",
+    start_date: null,
+    end_date: null,
+    user: localStorage.getItem("username"),
+    email: localStorage.getItem("email"),
+    manager_organization: "",
     memo: "",
   });
 
@@ -27,25 +26,23 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
   const [showMessage, setShowMessage] = useState(false);
 
   const handleNameChange = (e) => {
-    const name = e.target.value;
-    setProject({ ...project, name: name });
-    setIsNameValid(name.trim().length > 0);
+    const project_name = e.target.value;
+    setProject({ ...project, project_name: project_name });
+    setIsNameValid(project_name.trim().length > 0);
     setIsDuplicate(null);
   };
 
   //초기화
   const handleReset = () => {
     setProject({
-      id: "",
-      name: "",
+      project_name: "",
       address: "",
       status: "준비 중",
-      startDate: null,
-      endDate: null,
-      createdDate: "",
-      user: account,
-      email: email,
-      afffiliation: "",
+      start_date: null,
+      end_date: null,
+      user: localStorage.getItem("username"),
+      email: localStorage.getItem("email"),
+      manager_organization: "",
       memo: "",
     });
     setIsNameValid(false);
@@ -56,37 +53,64 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
   const handleCheckDuplicate = async () => {
     if (!isNameValid) return;
     try {
-      console.log("Checking duplicate:", project.name);
-      const isDuplicate = false; // 차후 중복 여부 확인 로직 추가
-      setIsDuplicate(isDuplicate);
-      setShowMessage(true);
-
-      // 2초 후 메시지를 숨김
-      setTimeout(() => setShowMessage(false), 2000);
-    } catch (error) {
-      console.error("Error checking duplicate:", error);
+      const response = await api.get(`/project/check-name`,
+        { 
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          params: { name: project.project_name } 
+        }
+      );
+      if (response.status === 200) {
+        setIsDuplicate(false);
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error checking duplicate:", err);
     }
   };
 
-  const handleAdd = () => {
+  const formattedProject = {
+    ...project,
+    start_date: project.start_date ? project.start_date.toISOString().split("T")[0] : null,
+    end_date: project.end_date ? project.end_date.toISOString().split("T")[0] : null,
+  };
+
+  const handleAdd = async () => {
     if (isDuplicate === false) {
-      const currentDate = new Date().toISOString(); // 현재 시간을 ISO 형식으로 생성
-      onAdd({
-        ...project,
-        status: "준비 완료", // 상태 변경
-        createdDate: currentDate, // 현재 시간 추가
-      });
-      handleReset();
-      onClose();
+      try {
+        // 프로젝트 추가 요청
+        console.log(formattedProject);
+        const response = await api.post(
+          "/project",
+          JSON.stringify({
+            ...formattedProject,
+            status: "준비 완료", // 상태 변경
+          }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+  
+        if (response.status === 200) {
+          handleReset();
+          onClose();
+          onAdd();
+        }
+      } catch (error) {
+        console.error("프로젝트 추가 요청 중 오류 발생:", error);
+      }
     }
-  };
+  };  
 
   // 등록 버튼 활성화 조건
   const isFormValid =
-    project.name.trim() &&
+    project.project_name.trim() &&
     project.address.trim() &&
-    project.startDate &&
-    project.endDate &&
+    project.start_date &&
+    project.end_date &&
     isDuplicate === false;
 
   if (!isOpen) return null;
@@ -108,7 +132,7 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
           <input
             type="text"
             placeholder="프로젝트 이름을 입력하세요"
-            value={project.name}
+            value={project.project_name}
             onChange={handleNameChange}
           />
           <button
@@ -136,11 +160,11 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
         <div className="row-container input-container">
           <DatePicker
             selectsRange
-            startDate={project.startDate}
-            endDate={project.endDate}
+            startDate={project.start_date}
+            endDate={project.end_date}
             onChange={(dates) => {
               const [start, end] = dates;
-              setProject({ ...project, startDate: start, endDate: end });
+              setProject({ ...project, start_date: start, end_date: end });
             }}
             isClearable={false}
             dateFormat="yyyy-MM-dd"
@@ -169,8 +193,8 @@ const Modal = ({ isOpen, onClose, account, email, onAdd }) => {
           <input
             type="text"
             placeholder="소속을 입력하세요"
-            value={project.afffiliation}
-            onChange={(e) => setProject({ ...project, afffiliation: e.target.value })}
+            value={project.manager_organization}
+            onChange={(e) => setProject({ ...project, manager_organization: e.target.value })}
           />
         </div>
         <div className="row-container">

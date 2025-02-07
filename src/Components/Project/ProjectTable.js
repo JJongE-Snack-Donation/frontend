@@ -16,8 +16,8 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
     setConfirmingDeleteId(null); // 삭제 확인 취소
   };
 
-  const handleConfirmDelete = (id) => {
-    onDelete(id); // 부모 컴포넌트에서 삭제 처리
+  const handleConfirmDelete = (_id) => {
+    onDelete(_id); // 부모 컴포넌트에서 삭제 처리
     setConfirmingDeleteId(null); // 삭제 확인 창 닫기
   };
 
@@ -40,7 +40,7 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
         {projects.map((project) => (
           <tr key={project.id}>
             <td>{project.id ?? "-"}</td>
-            <td>{project.name ?? "없음"}</td>
+            <td>{project.project_name ?? "없음"}</td>
             <td>{project.address ?? "주소 없음"}</td>
             <td>
               <span
@@ -52,23 +52,23 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
               </span>
             </td>
             <td>
-              {project.startDate
-                ? new Date(project.startDate).toLocaleDateString("ko-KR")
+              {project.start_date
+                ? new Date(project.start_date).toLocaleDateString("ko-KR")
                 : "날짜 없음"}
             </td>
             <td>
-              {project.endDate
-                ? new Date(project.endDate).toLocaleDateString("ko-KR")
+              {project.end_date
+                ? new Date(project.end_date).toLocaleDateString("ko-KR")
                 : "날짜 없음"}
             </td>
             <td>
-              {project.createdDate
-                ? `${new Date(project.createdDate).toLocaleDateString(
+              {project.created_at
+                ? `${new Date(project.created_at).toLocaleDateString(
                     "ko-KR"
-                  )} ${new Date(project.createdDate).toLocaleTimeString("ko-KR")}`
+                  )} ${new Date(project.created_at).toLocaleTimeString("ko-KR")}`
                 : "날짜 없음"}
             </td>
-            <td>{project.user ?? "사용자 없음"}</td>
+            <td>{project.manager_name ?? "사용자 없음"}</td>
             <td>
               <div className="tb-btn-container">
                 <button className="select" onClick={() => onSelect(project.id)}>
@@ -101,7 +101,7 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
                         </button>
                         <button
                           className="confirm-delete"
-                          onClick={() => handleConfirmDelete(project.id)}
+                          onClick={() => handleConfirmDelete(project._id)}
                         >
                           삭제
                         </button>

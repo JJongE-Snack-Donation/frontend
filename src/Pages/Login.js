@@ -18,12 +18,10 @@ const Login = () => {
             const response = await api.post(
                 `/admin/login`,
                 { username, password }, // JSON 형식으로 전달
-                //{ withCredentials: true } // 쿠키 포함
             );
-            console.log(response);
             // 로그인 성공 처리
             if (response.status === 200) {
-                alert('로그인이 완료되었습니다.');
+                alert('로그인 성공');
                 const data = response.data.data;
                 // 로컬 스토리지에 토큰 저장
                 localStorage.setItem('token', data.access_token);
@@ -33,7 +31,7 @@ const Login = () => {
                 navigate('/project'); // 페이지 이동
             }
         } catch (err) {
-            console.error('로그인 에러:', err);
+            alert('로그인 실패');
             if (err.response && err.response.data && err.response.data.message) {
                 setError(err.response.data.message); // 서버에서 받은 에러 메시지
             } else {
