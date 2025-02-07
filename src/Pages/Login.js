@@ -1,26 +1,73 @@
-// Login.js
-import React from 'react';
-import LoginForm from '../Components/LoginForm';
-import '../Styles/Login.css'
-import {ReactComponent as Logo } from '../Assets/Imgs/etc/logo.svg';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../Api';
+import '../Styles/Login.css';
+import img from '../Assets/Imgs/png/loginImg.png';
 
-const Login = ({ login }) => {
+const Login = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+
+        try {
+            // axios를 사용한 로그인 요청
+            const response = await api.post(
+                `/admin/login`,
+                { username, password }, // JSON 형식으로 전달
+            );
+            // 로그인 성공 처리
+            if (response.status === 200) {
+                alert('로그인 성공');
+                const data = response.data.data;
+                // 로컬 스토리지에 토큰 저장
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('username', data.admin.username);
+                localStorage.setItem('email', data.admin.email);
+                localStorage.setItem('role', data.admin.role);
+                navigate('/project'); // 페이지 이동
+            }
+        } catch (err) {
+            alert('로그인 실패');
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message); // 서버에서 받은 에러 메시지
+            } else {
+                setError('서버와의 통신 중 문제가 발생했습니다.');
+            }
+        }
+    };
+
     return (
-        <div className="Login">
-            <div className="Login-wrapper">
-                <div className="Login-left">
-                    <div className="Login-image-container">
-                    <Logo className='Logo-icon' />
-                        <span className='Logo-text'>쫑태통로</span>
-                    </div>
+        <div className="wrap login-wrap">
+            <h3>동물 보호를 위한 이미지 분석 시스템</h3>
+            <div className="login">
+                <div className="login-img">
+                    <img src={img} alt="login" />
                 </div>
-                <div className="Login-right">
-                    <div className="Login-header">
-                        <span className="login-text">관리자 로그인</span>
-                    </div>
-                    <LoginForm login={login} />
+                <div className="login-box">
+                    <p>관리자 로그인</p>
+                    {error && <p className="error">{error}</p>}
+                    <form onSubmit={handleLogin}>
+                        <input
+                            type="text"
+                            placeholder="아이디"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button type="submit">로그인</button>
+                    </form>
                 </div>
             </div>
+            <h4>Team.쫑이까까후원재단</h4>
         </div>
     );
 };

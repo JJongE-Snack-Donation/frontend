@@ -11,6 +11,10 @@
 }
 
 .sidebar .logo {
+  font-family: 'ClimateCrisisKR-1979';
+  background: linear-gradient(to right, #000000, #747474);
+    -webkit-background-clip: text; /* 텍스트에만 배경 클립 적용 */
+    -webkit-text-fill-color: transparent; /* 텍스트 색상 투명 */
   font-size: 24px;
   font-weight: bold;
   margin: 10px 20px;

@@ -1,0 +1,151 @@
+/* 테이블 전체 스타일 */
+table {
+    width: 96%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+    text-align: center; /* 모든 칸 중앙 정렬 */
+  }
+  
+  /* 각 셀에 얇은 회색 선 추가 */
+  table, th, td {
+    border: 1px solid #f0f0f0; /* 헤더 경계선 */
+  }
+  
+  /* 테이블 헤더 스타일 */
+  thead th {
+    background-color: #FAFAFA; /* 헤더 배경색 */
+    color: #333;
+    padding: 10px 15px;
+    font-weight: bold;
+    text-align: center; /* 헤더도 중앙 정렬 */
+  }
+  
+  /* 테이블 본문 스타일 */
+  tbody tr {
+    background-color: #FFFFFF; /* 본문 배경색 */
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #FFFFFF; /* 본문 배경 통일 */
+  }
+  
+  tbody td {
+    padding: 10px 15px;
+    text-align: center; /* 본문 칸 중앙 정렬 */
+  }
+  
+  /* 상태 컬러 (동적) */
+  .status {
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  
+  .status.completed {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .status.in-progress {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .status.pending {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  /* 버튼 스타일 */
+  .tb-btn-container button {
+    display: flex;
+    background-color: #fff;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 100%;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+  
+  button:hover {
+    opacity: 0.8;
+  }
+  
+  .tb-btn-container button.select {
+    background-color: #006A08;
+  }
+  
+  .tb-btn-container button.edit {
+    border: 1px solid #e9e9e9;
+  }
+
+  .tb-btn-container button.delete {
+    border: 1px solid #FF4E4E;
+  }
+  
+  .tb-btn-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .delete-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .delete-confirm-popup {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: -80px;
+    left: 0;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 0 10px 10px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+  
+  .delete-confirm-popup p {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+  }
+
+  .popup-btn-container button.confirm-delete {
+    background-color: #006A08;
+    color: white;
+  }
+  
+  .cancel-delete:hover {
+    background-color: #e8e8e8;
+  }
+  
+  .popup-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    gap: 7px;
+  }
+
+  .popup-btn-container img {
+    width: 12px;
+    height: 12px;
+  }
+
+  .popup-btn-container button {
+    border-radius: 3px;
+    color: black;
+    padding: 5px 10px;
+    font-size: 12px;
+    width: auto;
+    height: auto;
+  }

@@ -1,6 +1,8 @@
+
 import { useState, useMemo } from 'react';
 //import axios from 'axios';
 import testImages from '../Data/testImages';
+
 
 const useSearch = () => {
     const [projectName, setProjectName] = useState('all');
@@ -9,55 +11,73 @@ const useSearch = () => {
     const [cameraLabel, setCameraLabel] = useState('all');
     const [species, setSpecies] = useState('all');
     const [searchResults, setSearchResults] = useState(testImages);
-
-    // 백엔드 연결 시 수정 
-    // const handleSearch = async () => {
-    //     setIsLoading(true);
-    //     setError(null);
-    //     try {
-    //         const response = await axios.get('YOUR_API_ENDPOINT', {
-    //             params: {
-    //                 projectName,
-    //                 date,
-    //                 cameraSerial,
-    //                 cameraLabel,
-    //                 species
-    //             }
-    //         });
-    //         setSearchResults(response.data);
-    //     } catch (err) {
-    //         setError('검색 중 오류가 발생했습니다.');
-    //         console.error('Search error:', err);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
+    const [testImageData, setTestImageData] = useState(testImages);
+    const [deletedImageIds, setDeletedImageIds] = useState(new Set());
 
 
 
-    const handleSearch = () => {
-        const filteredResults = testImages.filter(image => {
-            const conditions = [];
-            
-            if (projectName !== '' && projectName !== 'all') {
-                conditions.push(image.projectName === projectName);
-            }
-            if (cameraSerial !== 'all') {
-                conditions.push(image.SerialNumber === cameraSerial);
-            }
-            if (cameraLabel !== 'all') {
-                conditions.push(image.UserLabel === cameraLabel);
-            }
-            if (species !== '' && species !== 'all') {
-                conditions.push(image.species === species);
-            }
-            
-            return conditions.length === 0 || conditions.every(condition => condition);
-        });
-        
-        setSearchResults(filteredResults);
-        return filteredResults;
+    // 예외 검수 상태 업데이트 함수
+    const updateExceptionStatus = (checkedIds) => {
+        setTestImageData(prev => 
+            prev.map(img => 
+                checkedIds.includes(img.imageId) 
+                    ? { ...img, isException: true }
+                    : img
+            )
+        );
     };
+
+
+    // useSearch.js
+const handleSearch = () => {
+    console.log("=== Search Start ===");
+    console.log("Current filters:", { projectName, cameraSerial, cameraLabel, species });
+    console.log("Current deletedImageIds:", Array.from(deletedImageIds));
+
+    // 먼저 필터 조건 적용
+    let filteredImages = testImages.filter(image => {
+        const matchesFilters = (
+            (projectName === 'all' || image.projectName === projectName) &&
+            (cameraSerial === 'all' || image.SerialNumber === cameraSerial) &&
+            (cameraLabel === 'all' || image.UserLabel === cameraLabel) &&
+            (species === 'all' || image.species === species)
+        );
+        return matchesFilters && !deletedImageIds.has(image.imageId);
+    });
+
+    console.log("Images after filter conditions:", filteredImages);
+
+    // 프로젝트별로 그룹화
+    const groupedByProject = {};
+    
+    filteredImages.forEach(image => {
+        const projectName = image.projectName;
+        if (!groupedByProject[projectName]) {
+            // 같은 프로젝트의 이미지들 찾기
+            const projectImages = filteredImages.filter(img => 
+                img.projectName === projectName
+            );
+            
+            if (projectImages.length > 0) {
+                const mainImage = { ...projectImages[0] };
+                mainImage.relatedImages = projectImages;
+                groupedByProject[projectName] = mainImage;
+                console.log(`Set main image for ${projectName}:`, mainImage.imageId);
+            }
+        }
+    });
+
+    console.log("Final grouped results:", groupedByProject);
+    
+    const results = Object.values(groupedByProject);
+    setSearchResults(results);
+    return results;
+};
+
+    
+    
+    
+    
 
     const getUniqueOptions = useMemo(() => {
         return {
@@ -78,8 +98,14 @@ const useSearch = () => {
         cameraSerial, setCameraSerial,
         cameraLabel, setCameraLabel,
         species, setSpecies,
-        searchResults, handleSearch,
-        ...getUniqueOptions // 옵션들을 반환값에 포함
+        searchResults, 
+        handleSearch,
+        updateExceptionStatus, 
+        testImageData,         
+        setTestImageData,  
+        deletedImageIds,    
+        setDeletedImageIds,         
+        ...getUniqueOptions
     };
 }; 
 

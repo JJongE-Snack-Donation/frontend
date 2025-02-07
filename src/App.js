@@ -4,12 +4,11 @@ import SidebarLayout from "./Layouts/SidebarLayout";
 import AuthLayout from "./Layouts/AuthLayout";
 import Home from './Pages/Home.js';
 import Project from './Pages/Project.js';
-import Camera from './Pages/camera.js';
+import Camera from './Pages/Cam.js';
 import ImageInquiry from './Pages/ImageInquiry.js';
 import GeneralInspection from './Pages/GInspection.js';
 import ExceptionInspection from './Pages/ExInspection.js';
 import Login from './Pages/Login.js';
-import TestLoginSuccess from './Pages/TestLoginSuccess.js';
 import './Assets/Font/Font.css';
 
 function App() {
@@ -30,7 +29,6 @@ function App() {
             {/* 인증 레이아웃 (사이드바 미포함) */}
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login/>} />
-              <Route path="/testLoginSuccess" element={<TestLoginSuccess />} />
             </Route>
           </Routes>
       </Router>

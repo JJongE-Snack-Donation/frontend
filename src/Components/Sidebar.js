@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../Styles/Sidebar.css";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import api from '../Api';
 import { ReactComponent as Icon1 } from "../Assets/Imgs/btn/project_btn.svg";
 import { ReactComponent as Icon2 } from "../Assets/Imgs/btn/inspection_btn.svg";
 import { ReactComponent as Arrow } from "../Assets/Imgs/btn/arrow_down.svg";
@@ -13,6 +14,7 @@ import { ReactComponent as Icon7 } from "../Assets/Imgs/btn/logout_btn.svg";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
@@ -20,6 +22,30 @@ const Sidebar = () => {
   const toggleSubMenu = () => {
     setIsSubMenuOpen((prev) => !prev);
   };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      console.error('로그아웃 실패: 토큰이 없습니다.');
+      return;
+    }
+  
+    try {
+      await api.post(
+        '/admin/logout',
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      localStorage.clear();
+      navigate('/login');
+    } catch (err) {
+      console.error('로그아웃 에러:', err);
+    }
+  };
+  
 
   return (
     <div className="sidebar">
@@ -65,7 +91,7 @@ const Sidebar = () => {
               카메라 정보
             </Link>
           </li>
-          <li>
+          <li onClick={handleLogout}>
             <Icon7 className="menu-icon" />
             로그아웃
           </li>
