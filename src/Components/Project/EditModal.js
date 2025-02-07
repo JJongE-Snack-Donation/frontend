@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
+import StatusMessage from "./StatusMessage";
+import api from "../../Api";
 import "../../Styles/Modal.css";
 import "../../Styles/DatePicker.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -21,6 +23,7 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
   const [isNameValid, setIsNameValid] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(null);
 
   // 모달 열릴 때 프로젝트 데이터를 상태에 로드
   useEffect(() => {
@@ -38,7 +41,7 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
       });
 
       // project_name을 기준으로 유효성 검사
-      setIsNameValid((projectData.project_name || "").trim().length > 0);
+      setIsNameValid((projectData.project_name || "").trim().length > 0 && projectData.project_name !== project.project_name);
     }
   }, [projectData]);
 
@@ -47,7 +50,7 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
 
     // 이름 유효성 검사
     if (field === "project_name") {
-      setIsNameValid(value.trim().length > 0);
+      setIsNameValid(value.trim().length > 0 && value !== projectData.project_name);
     }
   };
 
@@ -55,6 +58,26 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
     if (isFormValid) {
       onUpdate(project); // 부모 컴포넌트로 수정된 데이터 전달
       onClose(); // 모달 닫기
+    }
+  };
+
+  const handleCheckDuplicate = async () => {
+    if (!isNameValid) return;
+    if (project.project_name === projectData.project_name) return;
+    try {
+      const response = await api.get(`/project/check-name`,
+        { 
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          params: { name: project.project_name } 
+        }
+      );
+      if (response.status === 200) {
+        setIsDuplicate(false);
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error checking duplicate:", err);
     }
   };
 
@@ -88,8 +111,24 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
             type="text"
             placeholder="프로젝트 이름을 입력하세요"
             value={project.project_name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
+            onChange={(e) => handleInputChange("project_name", e.target.value)}
           />
+          <button
+            className={`check-button ${isNameValid ? "active" : ""}`}
+            onClick={handleCheckDuplicate}
+            disabled={!isNameValid}
+          >
+            중복확인
+          </button>
+          <StatusMessage
+          isSuccess={!isDuplicate} // 성공 여부
+          message={
+            isDuplicate
+              ? "중복된 프로젝트 이름입니다."
+              : "사용 가능한 프로젝트 이름입니다."
+          }
+          showMessage={showMessage}
+        />
         </div>
         <div className="row-container">
           <img src={asterisk} alt="asterisk" className="asterisk" />
