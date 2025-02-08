@@ -3,20 +3,20 @@ export const getTableData = (imageData) => {
         파일: [
             { 
                 type: 'double',
-                left: { label: '파일명', value: imageData.FileName || '-' },
-                right: { label: '파일 확장자', value: imageData.FileExtension || '.JPG' }
+                left: { label: '파일명', value: imageData.filename || '-' },
+                right: { label: '파일 확장자', value: imageData.FileExtension || '.jpg' }
             }
         ],
         이벤트: [
             { 
                 type: 'single',
                 label: '프로젝트 이름',
-                value: imageData.projectName || 'No Data'
+                value: imageData.project_name || 'No Data'
             },
             {
                 type: 'double',
-                left: { label: '촬영 날짜', value: imageData.DateTimeOriginal || '-' },
-                right: { label: '등록 날짜', value: imageData.RegisterDate || '-' }
+                left: { label: '촬영 날짜', value: imageData.date || '-' },
+                right: { label: '등록 날짜', value: imageData.date || '-' }
             },
             {
                 type: 'double',
@@ -25,15 +25,15 @@ export const getTableData = (imageData) => {
             },
             {
                 type: 'double',
-                left: { label: '예외 검수 여부', value: imageData.IsDetected ? 'False' : 'True' },
-                right: { label: '카메라 라벨', value: imageData.SerialNumber || 'No Data' }
+                left: { label: '예외 검수 여부', value: imageData.is_classified ? 'False' : 'True' },
+                right: { label: '카메라 라벨', value: imageData.serial_number || 'No Data' }
             }
         ],
         '분석 결과': [
             {
                 type: 'double',
                 left: { label: '종명', value: imageData.species || 'No Data'},
-                right: { label: '개체수', value: imageData.CameraName || 'No Data' }
+                right: { label: '개체수', value: imageData.serial_number || 'No Data' }
             },
             {
                 type: 'single',

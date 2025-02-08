@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../Styles/Home.css';
-import useImagePagination from '../Hooks/useImagePagination';
 import ImageGrid from '../Components/Pagination/ImageGrid';
 import PaginationComponent from '../Components/Pagination/PaginationComponent';
 import ImageModal from '../Components/ImageModal/ImageModal';
@@ -9,125 +8,77 @@ import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
 import useSearch from '../Hooks/useSearch';
 
-
 const GeneralInspection = () => {
-    const { currentPage, itemsPerPage, handlePageChange } = useImagePagination();
-    const [filteredResults, setFilteredResults] = useState([]); // 필터링된 결과 저장
-    const [displayImages, setDisplayImages] = useState([]);
-    const [totalItems, setTotalItems] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    const { 
-        updateExceptionStatus, 
-        testImageData, 
-        setTestImageData, 
+
+    const {
         searchResults,
-        deletedImageIds,
-        setDeletedImageIds
+        totalItems,
+        handleSearch,
+        loading,
+        error
     } = useSearch();
 
-
-
-    const handleImagesUpdate = (updatedImages, checkedIds) => {
-        updateExceptionStatus(checkedIds);  // useSearch의 함수만 사용
-        
-        // 필요한 경우 relatedImages 업데이트
-        setFilteredResults(prev => 
-            prev.map(img => ({
-                ...img,
-                relatedImages: updatedImages
-            }))
-        );
-    };
-    
-    
-    
-
-    const handleClose = () => {
-        setIsModalOpen(false);
-        setSelectedImage(null); // 모달 닫을 때 선택된 이미지도 초기화
+    // 페이지 변경 핸들러
+    const handlePageChange = async (pageNumber) => {
+        setCurrentPage(pageNumber);
+        await handleSearch(pageNumber); // API 호출로 데이터 가져오기
     };
 
-    // 검색 결과 저장
-    const handleSearchClick = (results) => {
-        const updatedResults = results.map(img => {
-            const existingImg = filteredResults.find(f => f.imageId === img.imageId);
-            return {
-                ...img,
-                isException: existingImg?.isException || false,
-                // 여기서 삭제된 관련 이미지만 필터링
-                relatedImages: img.relatedImages?.filter(related => 
-                    !deletedImageIds.has(related.imageId)
-                ).map(related => {
-                    const existingRelated = existingImg?.relatedImages?.find(r => r.imageId === related.imageId);
-                    return {
-                        ...related,
-                        isException: existingRelated?.isException || false
-                    };
-                })
-            };
-        });
-    
-        // 메인 이미지만 삭제 여부 확인
-        const filtered = updatedResults.filter(img => !deletedImageIds.has(img.imageId));
-    
-        setFilteredResults(filtered);
-        setTotalItems(filtered.length);
-        handlePageChange(1);
+    // 검색 핸들러 (항상 첫 번째 페이지부터 시작)
+    const handleSearchSubmit = async () => {
+        setCurrentPage(1);
+        await handleSearch(1);
     };
-    
-    
-    
-    
 
-    // 페이지 변경시 해당 페이지의 이미지만 표시
     useEffect(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        setDisplayImages(filteredResults.slice(startIndex, endIndex));
-    }, [currentPage, filteredResults, itemsPerPage]);
-
-    const handleImageClick = (image) => {
-        setSelectedImage(image);
-        setIsModalOpen(true);
-    };
+        handleSearch(1); // 컴포넌트 마운트 시 첫 번째 페이지 데이터 로드
+    }, []);
 
     return (
         <div className="wrap">
-
-            {/* 상단 헤더 영역 */}
             <NameTag />
-            <Title 
-                title="일반 검수"
-                desc="일반 이벤트 목록"
-            />
+            <Title title="일반 검수" desc="일반 이벤트 목록" />
 
-            {/* 상단 필터 영역 */}
-            <SearchBar onSearch={handleSearchClick} />
+            {/* 검색 바 */}
+            <SearchBar onSearch={handleSearchSubmit} />
 
-            {/* 이미지 그리드 */}
-            <ImageGrid images={displayImages} onImageClick={handleImageClick}/>
-            {isModalOpen && selectedImage && (
-                <ImageModal 
-                image={selectedImage}
-                onClose={handleClose}
-                onImagesUpdate={handleImagesUpdate}
-                deletedImageIds={deletedImageIds}
-                setDeletedImageIds={setDeletedImageIds}
-            />
-            
-            
+            {/* 에러 메시지 */}
+            {error && <div className="error-message">{error}</div>}
+
+            {/* 로딩 상태 */}
+            {loading ? (
+                <div className="loading-indicator">로딩 중...</div>
+            ) : (
+                <>
+                    {/* 이미지 그리드 */}
+                    <ImageGrid 
+                        images={searchResults} 
+                        onImageClick={(image) => {
+                            setSelectedImage(image);
+                            setIsModalOpen(true);
+                        }}
+                    />
+
+                    {/* 페이지네이션 */}
+                    {!isModalOpen && (
+                        <PaginationComponent
+                            currentPage={currentPage}
+                            itemsPerPage={12}
+                            totalItems={totalItems}
+                            onChange={handlePageChange}
+                        />
+                    )}
+                </>
             )}
 
-
-            {/* 페이지네이션 */}
-            {!selectedImage && (
-                <PaginationComponent
-                    currentPage={currentPage}
-                    itemsPerPage={itemsPerPage}
-                    totalItems={totalItems}
-                    onChange={handlePageChange}
+            {/* 이미지 모달 */}
+            {isModalOpen && selectedImage && (
+                <ImageModal
+                    image={selectedImage}
+                    onClose={() => setIsModalOpen(false)}
                 />
             )}
         </div>

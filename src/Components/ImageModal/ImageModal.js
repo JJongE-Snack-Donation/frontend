@@ -12,6 +12,8 @@ import checkIcon from '../../Assets/Imgs/etc/check_message.svg'
 const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
     const [showCompletionMessage, setShowCompletionMessage] = useState(false);
 
+    
+
     const {
         selectedCards,
         checkedBoxes,
@@ -37,30 +39,25 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         handleBulkEdit,          
         handleBulkInfoDownload,  
         handleBulkImageDownload, 
-        handleBulkDelete         
+        handleBulkDelete,
+        handleExceptionInspection         
     } = useImageActions(relatedImages, setRelatedImages, onImagesUpdate, onDelete);
 
-    const handleConfirmInspection = () => {
-        if (onImagesUpdate) {
-            const updatedImages = relatedImages.map(img => ({
-                ...img,
-                isException: checkedBoxes.includes(img.imageId) ? true : img.isException
-            }));
-            onImagesUpdate(updatedImages, checkedBoxes);
-            setRelatedImages(updatedImages); // 추가된 부분
-        }
-        setShowConfirmToast(false);
-        setCheckedBoxes([]);
-        setIsAllSelected(false);
 
-        // 완료 메시지 표시
-        setShowCompletionMessage(true);
-        
-        // 3초 후 메시지 숨기기
-        setTimeout(() => {
-            setShowCompletionMessage(false);
-        }, 3000);
-    };
+    const handleConfirmInspection = () => {
+    handleExceptionInspection(checkedBoxes);
+    setCheckedBoxes([]);
+    setIsAllSelected(false);
+
+    // 완료 메시지 표시
+    setShowCompletionMessage(true);
+    
+    // 3초 후 메시지 숨기기
+    setTimeout(() => {
+        setShowCompletionMessage(false);
+    }, 3000);
+};
+
     
     
 
@@ -120,7 +117,7 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         <div className="modal__all">
                             {relatedImages?.map((image, index) => (
                                 <ImageCard
-                                    key={index}
+                                    key={image.imageId}
                                     image={image}
                                     index={index}
                                     isSelected={selectedCards.includes(image.imageId)}
