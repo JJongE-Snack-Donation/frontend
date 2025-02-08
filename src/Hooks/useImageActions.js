@@ -4,6 +4,50 @@ const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDele
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showConfirmToast, setShowConfirmToast] = useState(false);
 
+
+    // 예외 상태 processed로 처리
+    const handleExceptionInspection = async (checkedIds) => {
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczODk4MzEwOSwianRpIjoiNmEyOWE1NWMtNGNmNC00NTYxLTlkZTItZGEwYWRmYTA2MTM0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM4OTgzMTA5LCJjc3JmIjoiNmUyM2M1NzktN2I1NS00YTU3LTg1MjMtOTZkMmZhMGVkMGRjIiwiZXhwIjoxNzM5MDY5NTA5fQ.1lXYpsy5xo_qm2_1n7-O10XM--4RdH6Y6kIO-hr-OYc';
+
+        for (const imageId of checkedIds) {
+            try {
+                const response = await fetch(`http://localhost:5000/exception/${imageId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        status: "processed",
+                        comment: "Processed via exception inspection"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error("Error updating image status:", error);
+            }
+        }
+
+        const updatedImages = relatedImages.map(img => ({
+            ...img,
+            exception_status: checkedIds.includes(img.imageId) ? "processed" : img.exception_status
+        }));
+
+        setRelatedImages(updatedImages);
+        
+        if (onImagesUpdate) {
+            onImagesUpdate(updatedImages, checkedIds);
+        }
+
+        setShowConfirmToast(false);
+    };
+
     const handleDelete = (imageId, e) => {
         if (e) {
             e.stopPropagation();
@@ -81,7 +125,8 @@ const useImageActions = (relatedImages, setRelatedImages, onImagesUpdate, onDele
         handleBulkEdit,
         handleBulkInfoDownload,
         handleBulkImageDownload,
-        handleBulkDelete
+        handleBulkDelete,
+        handleExceptionInspection
     };
 };
 

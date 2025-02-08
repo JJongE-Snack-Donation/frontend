@@ -23,8 +23,10 @@ const ImageCard = ({
                 type="checkbox" 
                 className="modal__all_image-checkbox"
                 checked={isChecked}
-                onChange={(e) => onCheckboxChange(image.imageId, e)}
-                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                    e.stopPropagation();
+                    onCheckboxChange(image.imageId, e); // image.imageId 전달
+                  }}
             />
             <span className="modal__all_image-number">{index + 1} - {image.species}</span>
             <button 
@@ -41,8 +43,8 @@ const ImageCard = ({
             </button>
         </div>
         <div className="modal__all_image-content">
-            <img src={image.FilePath} alt="" />
-            {image.isException && (
+            <img  src={image.thumbnail} alt="" />
+            {image.exception_status === "processed" && (
                 <div className="exception-overlay">예외</div>
             )}
             <button 

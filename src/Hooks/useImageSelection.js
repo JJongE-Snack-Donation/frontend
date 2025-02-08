@@ -1,3 +1,4 @@
+// useImageSelection.js
 import { useState } from 'react';
 
 export const useImageSelection = (initialImage) => {
@@ -11,7 +12,10 @@ export const useImageSelection = (initialImage) => {
     const handleSelectAll = (e) => {
         const isChecked = e.target.checked;
         setIsAllSelected(isChecked);
-        setCheckedBoxes(isChecked ? initialImage.relatedImages?.map(img => img.imageId) || [] : []);
+        setCheckedBoxes(isChecked 
+            ? relatedImages.map(img => img.imageId) 
+            : []
+        );
     };
 
     const handleCardClick = (clickedImage, e) => {
@@ -23,14 +27,17 @@ export const useImageSelection = (initialImage) => {
 
     const handleCheckboxChange = (imageId, e) => {
         e.stopPropagation();
+        console.log('체크박스 ID:', imageId); // ID 확인용 로그
         setCheckedBoxes(prev => {
-            if (prev.includes(imageId)) {
-                return prev.filter(id => id !== imageId);
-            }
-            return [...prev, imageId];
+          const newChecked = prev.includes(imageId)
+            ? prev.filter(id => id !== imageId)
+            : [...prev, imageId];
+          setIsAllSelected(newChecked.length === relatedImages.length);
+          return newChecked;
         });
-    };
-
+      };
+      
+    
     return {
         selectedCards,
         checkedBoxes,

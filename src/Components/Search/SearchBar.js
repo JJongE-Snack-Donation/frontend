@@ -17,13 +17,12 @@ const SearchBar = ({ onSearch }) =>{
         projectOptions,
         speciesOptions,
         cameraSerialOptions,
-        cameraLabelOptions,
-        deletedImageIds
+        cameraLabelOptions
     } = useSearch();
 
     // 검색 버튼 클릭 함수
     const handleSearchClick = () => {
-        console.log("DeletedImageIds in SearchBar before search:", Array.from(deletedImageIds));
+        
         const results = handleSearch();
         console.log("Search results:", results);
         onSearch(results);
