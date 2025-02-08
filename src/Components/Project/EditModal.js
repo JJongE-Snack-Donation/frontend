@@ -28,23 +28,27 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
   // 모달 열릴 때 프로젝트 데이터를 상태에 로드
   useEffect(() => {
     if (projectData) {
-      // 정확한 프로퍼티 명으로 데이터 설정
       setProject({
+        _id: projectData._id,
+        id: projectData.id,
         project_name: projectData.project_name || "",
         address: projectData.address || "",
-        start_date: projectData.start_date || null,
-        end_date: projectData.end_date || null,
+        start_date: projectData.start_date ? new Date(projectData.start_date) : null,
+        end_date: projectData.end_date ? new Date(projectData.end_date) : null,
         manager_organization: projectData.manager_organization || "",
         user: localStorage.getItem("username"),
         email: localStorage.getItem("email"),
         memo: projectData.memo || "",
       });
-
-      // project_name을 기준으로 유효성 검사
-      setIsNameValid((projectData.project_name || "").trim().length > 0 && projectData.project_name !== project.project_name);
+  
+      // project_name 유효성 검사
+      setIsNameValid(
+        (projectData.project_name || "").trim().length > 0 &&
+        projectData.project_name !== project.project_name
+      );
     }
   }, [projectData]);
-
+  
   const handleInputChange = (field, value) => {
     setProject((prev) => ({ ...prev, [field]: value }));
 
@@ -54,9 +58,19 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
     }
   };
 
+  const formattedProject = {
+    ...project,
+    start_date: project.start_date instanceof Date && !isNaN(project.start_date)
+      ? project.start_date.toISOString().split("T")[0]
+      : null,
+    end_date: project.end_date instanceof Date && !isNaN(project.end_date)
+      ? project.end_date.toISOString().split("T")[0]
+      : null,
+  };  
+
   const handleUpdate = () => {
     if (isFormValid) {
-      onUpdate(project); // 부모 컴포넌트로 수정된 데이터 전달
+      onUpdate(formattedProject); // 부모 컴포넌트로 수정된 데이터 전달
       onClose(); // 모달 닫기
     }
   };
@@ -135,22 +149,21 @@ const EditModal = ({ isOpen, onClose, projectData, onUpdate }) => {
           <p>프로젝트 기간</p>
         </div>
         <div className="row-container input-container">
-          <DatePicker
-            selectsRange
-            startDate={project.start_date}
-            endDate={project.end_date}
-            onChange={(dates) => {
-              const [start, end] = dates;
-              handleInputChange("startDate", start);
-              handleInputChange("endDate", end);
-            }}
-            isClearable={false}
-            dateFormat="yyyy-MM-dd"
-            placeholderText="날짜를 선택하세요"
-            monthsShown={2}
-            shouldCloseOnSelect={false}
-            showPopperArrow={false}
-          />
+           <DatePicker
+              selectsRange
+              startDate={project.start_date}
+              endDate={project.end_date}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setProject({ ...project, start_date: start, end_date: end });
+              }}
+              isClearable={false}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="날짜를 선택하세요"
+              monthsShown={2}
+              shouldCloseOnSelect={false}
+              showPopperArrow={false}
+            />
         </div>
         <div className="row-container">
           <img src={asterisk} alt="asterisk" className="asterisk" />

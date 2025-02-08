@@ -44,7 +44,7 @@ const StepOne = ({ nextStep, setSelectedProjectId }) => {
     };    
     
 
-    const handleDelete = async (_id) => {
+    const handleDelete = async(_id) => {
         try {
             // API 호출 (삭제 요청)
             await api.delete(`/project/${_id}`, {
@@ -79,15 +79,7 @@ const StepOne = ({ nextStep, setSelectedProjectId }) => {
         }
     };    
 
-    const handleAdd = (project) => {
-        /*
-        const maxId = projects.length > 0 ? Math.max(...projects.map((p) => p.id)) : 0;
-        const newProject = {
-            ...project,
-            id: maxId + 1,
-        };
-        setProjects([...projects, newProject]);
-        */
+    const handleAdd = () => {
         fetchProjectInfo();
         // 메시지 설정
         setStatusMessage("프로젝트가 성공적으로 등록되었습니다.");
@@ -105,21 +97,55 @@ const StepOne = ({ nextStep, setSelectedProjectId }) => {
         setIsEditModalOpen(true);
     };
       
-    const handleUpdate = (updatedProject) => {
-        setProjects((prev) =>
-          prev.map((project) =>
-            project.id === updatedProject.id ? updatedProject : project
-          )
-        );
-        fetchProjectInfo();
+    const handleUpdate = async (updatedProject) => {
+        console.log("수정할 프로젝트:", updatedProject);
+        try {
+            // API 호출 (수정 요청)
+            const response = await api.put(`/project/${updatedProject._id}`, updatedProject, {
+                headers: { 
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}` 
+                }
+            });
     
-        setStatusMessage("프로젝트가 성공적으로 수정되었습니다.");
-        setIsSuccess(true);
-        setShowMessage(true);
+            // 서버로부터 수정된 프로젝트 데이터 가져오기
+            const updatedData = response.data.data.project;
     
-        setTimeout(() => setShowMessage(false), 3000); // 3초 후 메시지 숨김
-        setIsEditModalOpen(false); // 수정 모달 닫기
-    };
+            // 상태 업데이트 및 project.id 덮어쓰기
+            setProjects((prevProjects) =>
+                prevProjects.map((project) => {
+                    if (project._id === updatedData._id) {
+                        return { ...updatedData, id: updatedProject.id };  // project.id를 유지
+                    }
+                    return project;
+                })
+            );
+    
+            // 성공 메시지 출력
+            setStatusMessage("프로젝트가 성공적으로 수정되었습니다.");
+            setIsSuccess(true);
+            setShowMessage(true);
+    
+            setTimeout(() => setShowMessage(false), 3000); // 3초 후 메시지 숨김
+            setIsEditModalOpen(false); // 수정 모달 닫기
+        } catch (error) {
+            // 500 에러 처리 및 상태 메시지 설정
+            if (error.response && error.response.status === 500) {
+                setStatusMessage("서버 오류가 발생했습니다. 잠시 후 다시 시도하세요.");
+            } else if (error.response && error.response.status === 400) {
+                setStatusMessage("잘못된 요청입니다. 입력 데이터를 확인하세요.");
+            } else {
+                setStatusMessage("프로젝트 수정 중 오류가 발생했습니다.");
+            }
+    
+            console.error("프로젝트 수정 실패:", error);
+            setIsSuccess(false);
+            setShowMessage(true);
+    
+            setTimeout(() => setShowMessage(false), 3000); // 3초 후 메시지 숨김
+        }
+    };    
+    
 
     const handleSelect = (id) => {
         setSelectedProjectId(id); // 선택된 프로젝트 ID 저장
