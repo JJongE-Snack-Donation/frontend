@@ -122,12 +122,12 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                         key={img.imageId}
                                         image={img}
                                         index={index}
-                                        onCardClick={() => {}}
-                                        isSelected={false}
-                                        isChecked={false}
-                                        onCheckboxChange={() => {}}
-                                        onDownload={() => {}}
-                                        onDelete={() => {}}
+                                        isSelected={selectedCards.includes(img.imageId)}
+                                        isChecked={checkedBoxes.includes(img.imageId)}
+                                        onCardClick={handleCardClick}
+                                        onCheckboxChange={handleCheckboxChange} // 핸들러 전달
+                                        onDownload={handleDownload}
+                                        onDelete={handleDelete}
                                     />
                                 ))
                             ) : (
