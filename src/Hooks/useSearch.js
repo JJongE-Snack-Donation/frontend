@@ -4,6 +4,7 @@ import axios from 'axios';
 
 
 const useSearch = () => {
+    const [relatedImages, setRelatedImages] = useState([]);
     const [projectName, setProjectName] = useState('all');
     const [date, setDate] = useState('all');
     const [cameraSerial, setCameraSerial] = useState('all');
@@ -20,29 +21,37 @@ const useSearch = () => {
         cameraLabelOptions: []
     });
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczODk4MzEwOSwianRpIjoiNmEyOWE1NWMtNGNmNC00NTYxLTlkZTItZGEwYWRmYTA2MTM0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM4OTgzMTA5LCJjc3JmIjoiNmUyM2M1NzktN2I1NS00YTU3LTg1MjMtOTZkMmZhMGVkMGRjIiwiZXhwIjoxNzM5MDY5NTA5fQ.1lXYpsy5xo_qm2_1n7-O10XM--4RdH6Y6kIO-hr-OYc";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTA4MjkzOCwianRpIjoiMzlmZDQ4ZDktMmVjYi00ZmJkLThkOWMtODJlYTdlYzUyMjI4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5MDgyOTM4LCJjc3JmIjoiNzZhMGRmYTEtOGM2Mi00OGM3LThiNWItY2FlMmI5YzFjMzIzIiwiZXhwIjoxNzM5MTY5MzM4fQ.rQWdBTQ7XYZZnc3nn5U-QbtIUkqaRAKNGE_BlaOUhvA";
 
-    // 프로젝트별 그룹화
-    const groupByProject = (images = []) => {
+    // 각 검색 이미지 썸네일 추출
+    const getFirstImagesFromGroups = (groupedImages) => {
+        return groupedImages.map(group => group.relatedImages[0]); // 각 그룹의 첫 번째 이미지 추출
+    };
+
+    // 프로젝트와 종 기준으로 그룹화
+    const groupBySpecies = (images = []) => {
         const groups = {};
         images.forEach(img => {
-            const project = img.project_name;
-            if (!groups[project]) {
-                groups[project] = { 
-                    ...img, 
-                    relatedImages: images.filter(i => i.project_name === project)
+            const key = `${img.project_name}_${img.species}`;
+            if (!groups[key]) {
+                groups[key] = { 
+                    project_name: img.project_name,
+                    species: img.species,
+                    relatedImages: []
                 };
             }
+            groups[key].relatedImages.push(img);
         });
         return Object.values(groups);
     };
+    
 
     const handleSearch = async (page = 1) => {
         setLoading(true);
         try {
             const queryParams = {
                 ...(projectName !== 'all' && { project_name: projectName }),
-                ...(date !== 'all' && { date: new Date(date).toISOString() }), // 날짜를 ISO 형식으로 변환
+                //...(date !== 'all' && { date: new Date(date).toISOString() }), // 날짜를 ISO 형식으로 변환
                 ...(cameraSerial !== 'all' && { serial_number: cameraSerial }),
                 ...(species !== 'all' && { species }),
                 page,
@@ -66,12 +75,14 @@ const useSearch = () => {
                 is_classified: img.is_classified
             })) || [];
 
-            // 프로젝트 그룹화
-            const grouped = groupByProject(mappedImages); 
-            setSearchResults(grouped);
-            setTotalItems(response.data.data.total_count || 0);
+            setRelatedImages(mappedImages);
 
-            return grouped;
+        // 첫 번째 이미지만 저장
+        const grouped = groupBySpecies(mappedImages);
+        const firstImages = grouped.map(group => group.relatedImages[0]);
+        setSearchResults(firstImages);
+
+        setTotalItems(response.data.data.total_count || 0);
 
         } catch (err) {
             console.error('서버 응답:', err.response?.data);
@@ -125,6 +136,7 @@ const useSearch = () => {
         handleSearch,
         loading,
         error,
+        relatedImages,
         ...getUniqueOptions
     };
 };

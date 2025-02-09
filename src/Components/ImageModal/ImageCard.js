@@ -14,6 +14,7 @@ const ImageCard = ({
     onDownload, 
     onDelete 
 }) => (
+    
     <div 
         className={`modal__all_image-item ${isSelected ? 'selected' : ''}`}
         onClick={(e) => onCardClick(image, e)}
@@ -31,7 +32,10 @@ const ImageCard = ({
             <span className="modal__all_image-number">{index + 1} - {image.species}</span>
             <button 
                 className="modal__all_image-download"
-                onClick={(e) => onDownload(image, e)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDownload(image, e)
+                }}
             >
                 <img src={downloadIcon} alt="Download" />
             </button>

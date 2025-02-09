@@ -97,7 +97,7 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                             <div className="modal__bulk-action-dropdown">
                                                 <button >수정</button>
                                                 <button >정보 다운로드</button>
-                                                <button >이미지 다운로드</button>
+                                                <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
                                                 <button 
                                                     style={{ color: '#ff4d4f' }}
                                                     onClick={() => {
@@ -115,19 +115,24 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         </div>
 
                         <div className="modal__all">
-                            {relatedImages?.map((image, index) => (
-                                <ImageCard
-                                    key={image.imageId}
-                                    image={image}
-                                    index={index}
-                                    isSelected={selectedCards.includes(image.imageId)}
-                                    isChecked={checkedBoxes.includes(image.imageId)}
-                                    onCardClick={handleCardClick}
-                                    onCheckboxChange={handleCheckboxChange}
-                                    onDownload={handleDownload}
-                                    onDelete={handleDelete}
-                                />
-                            ))}
+                        {console.log("Rendered Related Images in Modal:", relatedImages)}
+                            {relatedImages?.length > 0 ? (
+                                relatedImages.map((img, index) => (
+                                    <ImageCard
+                                        key={img.imageId}
+                                        image={img}
+                                        index={index}
+                                        onCardClick={() => {}}
+                                        isSelected={false}
+                                        isChecked={false}
+                                        onCheckboxChange={() => {}}
+                                        onDownload={() => {}}
+                                        onDelete={() => {}}
+                                    />
+                                ))
+                            ) : (
+                                <div className="no-images-message">관련된 이미지가 없습니다.</div>
+                            )}
                         </div>
                     </div>
                     <ImageInfo imageData={selectedImageInfo} />

@@ -1,13 +1,12 @@
-// useImageSelection.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useImageSelection = (initialImage) => {
-    const [selectedCards, setSelectedCards] = useState([]);
-    const [checkedBoxes, setCheckedBoxes] = useState([]);
-    const [isAllSelected, setIsAllSelected] = useState(false);
-    const [relatedImages, setRelatedImages] = useState(initialImage.relatedImages || []);
-    const [mainImage, setMainImage] = useState(initialImage);
-    const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage);
+  const [relatedImages, setRelatedImages] = useState(initialImage?.relatedImages || []);
+  const [mainImage, setMainImage] = useState(initialImage || {});
+  const [selectedCards, setSelectedCards] = useState([]);
+  const [checkedBoxes, setCheckedBoxes] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
 
     const handleSelectAll = (e) => {
         const isChecked = e.target.checked;
@@ -17,6 +16,10 @@ export const useImageSelection = (initialImage) => {
             : []
         );
     };
+
+    useEffect(() => {
+      console.log("Initial Related Images in useImageSelection:", relatedImages);
+  }, [initialImage]);
 
     const handleCardClick = (clickedImage, e) => {
         e.stopPropagation();
