@@ -48,10 +48,11 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         handleExceptionInspection(checkedBoxes);
         setCheckedBoxes([]);
         setIsAllSelected(false);
+
         setShowCompletionMessage(true);
         setTimeout(() => {
             setShowCompletionMessage(false);
-        }, 3000);
+        }, 4000);
     };
 
 
@@ -60,10 +61,11 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         try {
             await handleInspectionComplete(image.project_name, image.species);
             setShowInspectionCompleteToast(false);
+
             setShowCompletionMessage(true);
             setTimeout(() => {
                 setShowCompletionMessage(false);
-            }, 3000);
+            }, 4000);
         } catch (error) {
             console.error("검수 확정 중 오류 발생:", error);
             alert("검수 확정 중 오류가 발생했습니다.");
@@ -180,6 +182,19 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         onConfirm={handleConfirmInspectionComplete}
             
                     />
+                )}
+                {showCompletionMessage && (
+                    <div className="modal-completion-message">
+                        <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
+                        예외 검수 설정 완료
+                    </div>
+                )}
+
+                {showCompletionMessage && (
+                    <div className="modal-completion-message">
+                        <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
+                        검수 확정 완료
+                    </div>
                 )}
             </div>
             
