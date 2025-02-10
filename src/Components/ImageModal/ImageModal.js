@@ -13,7 +13,8 @@ import InspectionCompleteToast from './InspectionCompleteToast';
 
 
 const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
-    const [showCompletionMessage, setShowCompletionMessage] = useState(false);
+    const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
+    const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
     const { relatedImages, updateClassification } = useImageStore();
 
@@ -49,9 +50,9 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         setCheckedBoxes([]);
         setIsAllSelected(false);
 
-        setShowCompletionMessage(true);
+        setShowExceptionCompletionMessage(true);
         setTimeout(() => {
-            setShowCompletionMessage(false);
+            setShowExceptionCompletionMessage(false);
         }, 4000);
     };
 
@@ -60,12 +61,13 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
     const handleConfirmInspectionComplete = async () => {
         try {
             await handleInspectionComplete(image.project_name, image.species);
-            setShowInspectionCompleteToast(false);
+            setShowInspectionCompleteToast(false); // 토스트 닫기
 
-            setShowCompletionMessage(true);
-            setTimeout(() => {
-                setShowCompletionMessage(false);
-            }, 4000);
+            // 검수 확정 완료 메시지 표시
+            setShowInspectionCompletionMessage(true);
+                setTimeout(() => {
+                    setShowInspectionCompletionMessage(false);
+                }, 4000);
         } catch (error) {
             console.error("검수 확정 중 오류 발생:", error);
             alert("검수 확정 중 오류가 발생했습니다.");
@@ -119,10 +121,6 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                                 <button onClick={() => handleBulkImageDelete(checkedBoxes)}
                                                     disabled={checkedBoxes.length === 0}
                                                     style={{ color: '#ff4d4f' }}
-                                                    // onClick={() => {
-                                                    //     handleBulkDelete(checkedBoxes);
-                                                    //     setShowConfirmToast(false);  // 토스트 메시지 닫기
-                                                    // }}
                                                 >
                                                     이미지 삭제
                                                 </button>
@@ -183,19 +181,22 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
             
                     />
                 )}
-                {showCompletionMessage && (
+                {/* 예외 검수 설정 완료 메시지 */}
+                {showExceptionCompletionMessage && (
                     <div className="modal-completion-message">
                         <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
                         예외 검수 설정 완료
                     </div>
                 )}
 
-                {showCompletionMessage && (
+                {/* 검수 확정 완료 메시지 */}
+                {showInspectionCompletionMessage && (
                     <div className="modal-completion-message">
                         <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
                         검수 확정 완료
                     </div>
                 )}
+
             </div>
             
         </div>
