@@ -2,9 +2,10 @@ import { useState } from 'react';
 import useImageStore from './useImageStore';
 
 const useImageActions = () => {
-    const { relatedImages, setRelatedImages, deleteImage, updateExceptionStatus } = useImageStore();
+    const { relatedImages, setRelatedImages, deleteImage, updateExceptionStatus} = useImageStore();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showConfirmToast, setShowConfirmToast] = useState(false);
+    const [checkedImages, setCheckedImages] = useState([]);
 
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTE2OTUxNiwianRpIjoiMTc2YThkMzUtMGQ1My00MTdkLThlM2ItYjlkMDFkOGZhYTZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5MTY5NTE2LCJjc3JmIjoiOWNkYTY1MzYtYjBjZC00MjhiLWExZTEtNzVhNGE4MzA0NmU4IiwiZXhwIjoxNzM5MjU1OTE2fQ.rWkkf8myjmzmZ6rY2MPLwBqBNGJKdZjUQh-uTRz3fJo";
 
@@ -208,17 +209,39 @@ const useImageActions = () => {
         }
     };
 
-    // const handleBulkDelete = (checkedIds) => {
-    //     setDeletedImageIds(prev => new Set([...prev, ...checkedIds]));
-        
-    //     const updatedImages = relatedImages.filter(img => !checkedIds.includes(img.imageId));
-    //     setRelatedImages(updatedImages);
-        
-    //     if (onImagesUpdate) {
-    //         onImagesUpdate(updatedImages, checkedIds);
-    //     }
-    //     setIsDropdownOpen(false);
-    // };
+    // 다중 이미지 삭제 
+    const handleBulkImageDelete = async (checkedIds) => {
+    
+        try {
+            // DELETE 요청 보내기
+            const response = await fetch(`http://localhost:5000/images/bulk-delete`, {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ image_ids: checkedIds })
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                alert(`이미지 삭제 실패: ${errorData.message}`);
+                return;
+            }
+    
+            const result = await response.json();
+            const updatedImages = relatedImages.filter(img => !checkedIds.includes(img.imageId));
+            setRelatedImages(updatedImages);
+            setCheckedImages([]);  // 이제 이 함수가 정의되어 있어야 합니다.
+            alert(result.message || '선택한 이미지들이 성공적으로 삭제되었습니다.');
+
+    
+        } catch (error) {
+            console.error('Bulk delete failed:', error);
+            alert('이미지 삭제 중 오류가 발생했습니다.');
+        }
+    };
     
 
     return {
@@ -231,7 +254,10 @@ const useImageActions = () => {
         handleDownload,
         handleBulkImageDownload,
         handleExceptionInspection,
-        handleInspectionComplete
+        handleInspectionComplete,
+        handleBulkImageDelete,
+        checkedImages,
+        setCheckedImages
     };
 };
 

@@ -39,7 +39,8 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         handleDownload,
         handleBulkImageDownload,
         handleExceptionInspection,
-        handleInspectionComplete 
+        handleInspectionComplete,
+        handleBulkImageDelete
     } = useImageActions();
 
     // 예외 검수 설정 핸들러
@@ -113,7 +114,8 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                                 <button >수정</button>
                                                 <button >정보 다운로드</button>
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
-                                                <button 
+                                                <button onClick={() => handleBulkImageDelete(checkedBoxes)}
+                                                    disabled={checkedBoxes.length === 0}
                                                     style={{ color: '#ff4d4f' }}
                                                     // onClick={() => {
                                                     //     handleBulkDelete(checkedBoxes);
