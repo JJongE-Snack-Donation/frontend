@@ -14,6 +14,7 @@ import StepFour from "../Components/Project/StepFour";
 const Project = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectProjectName, setSelectProjectName] = useState(null);
 
   const renderContent = () => {
     switch (currentStep) {
@@ -22,6 +23,7 @@ const Project = () => {
           <StepOne
             nextStep={() => setCurrentStep(2)}
             setSelectedProjectId={setSelectedProjectId}
+            setSelectProjectName={setSelectProjectName}
           />
         );
       case 2:
@@ -29,6 +31,7 @@ const Project = () => {
           <StepTwo
             nextStep={() => setCurrentStep(3)}
             projectId={selectedProjectId}
+            projectName={selectProjectName}
           />
         );
       case 3:
@@ -36,6 +39,7 @@ const Project = () => {
           <StepThree
             nextStep={() => setCurrentStep(4)}
             projectId={selectedProjectId}
+            projectName={selectProjectName}
           />
         );
       case 4:

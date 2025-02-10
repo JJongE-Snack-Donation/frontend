@@ -24,6 +24,7 @@ function App() {
               </ProtectedRoute>
             }
           >
+            <Route path="/" element={<Project />} />
             <Route path="/project" element={<Project />} />
             <Route path="/camera" element={<Camera />} />
             <Route path="/image-inquiry" element={<ImageInquiry />} />
