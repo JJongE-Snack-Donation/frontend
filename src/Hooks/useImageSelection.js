@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 export const useImageSelection = (initialImage) => {
@@ -18,7 +19,6 @@ export const useImageSelection = (initialImage) => {
     };
 
     useEffect(() => {
-      console.log("Initial Related Images in useImageSelection:", relatedImages);
   }, [initialImage]);
 
     const handleCardClick = (clickedImage, e) => {
@@ -30,7 +30,6 @@ export const useImageSelection = (initialImage) => {
 
     const handleCheckboxChange = (imageId, e) => {
         e.stopPropagation();
-        console.log('체크박스 ID:', imageId); // ID 확인용 로그
         setCheckedBoxes(prev => {
           const newChecked = prev.includes(imageId)
             ? prev.filter(id => id !== imageId)

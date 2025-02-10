@@ -7,19 +7,23 @@ import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
 import useSearch from '../Hooks/useSearch';
+import useImageStore from '../Hooks/useImageStore';
+import useImageActions from '../Hooks/useImageActions';
 
 const GeneralInspection = () => {
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
     const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { relatedImages } = useImageStore();
+    const imageActions = useImageActions();
+    
 
     const {
         searchResults,
         totalItems,
         handleSearch,
         loading,
-        error,
-        relatedImages
+        error
     } = useSearch();
 
     // 페이지 변경 핸들러
@@ -58,10 +62,18 @@ const GeneralInspection = () => {
                     <ImageGrid 
                         images={searchResults} 
                         onImageClick={(image) => {
-                            const relatedImagesForSelected = relatedImages.filter(
-                                (img) => img.project_name === image.project_name && img.species === image.species
-                            ); // 선택된 이미지와 동일한 프로젝트와 종의 이미지를 필터링
-                    
+
+                            console.log("Selected Image:", image); // 선택된 이미지 로그
+                            console.log("Current Related Images:", relatedImages); 
+                            
+                            const relatedImagesForSelected = Array.isArray(relatedImages)
+                                ? relatedImages.filter(
+                                    (img) => img.project_name === image.project_name && img.species === image.species
+                                )
+                                : [];
+
+                            console.log("Filtered Related Images for Selected Image:", relatedImagesForSelected);
+
                             setSelectedImage({ ...image, relatedImages: relatedImagesForSelected });
                             setIsModalOpen(true);
                         }}
@@ -81,14 +93,13 @@ const GeneralInspection = () => {
 
             {/* 이미지 모달 */}
             {isModalOpen && selectedImage && (
-                <>
-                {console.log("Related Images passed to Modal:", relatedImages)}
-                <ImageModal
-                    image={selectedImage}
-                    relatedImages={relatedImages} // 관련 이미지 전달
-                    onClose={() => setIsModalOpen(false)}
-                />
-            </>
+                <ImageModal 
+                image={selectedImage} 
+                onClose={() => {
+                    setSelectedImage(null); 
+                    setIsModalOpen(false); 
+                }} 
+            />
             )}
         </div>
     );

@@ -1,0 +1,66 @@
+.inspection-complete-toast {
+    position: fixed;
+    bottom: 90px;
+    right: 250px;
+    width: 300px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0f1;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    z-index: 1000;
+}
+
+.inspection-complete-toast__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.inspection-complete-toast__header {
+    display: flex;
+    align-items: center;
+}
+
+.inspection-complete-toast__description {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666666;
+    text-align: center;
+}
+
+.inspection-complete-toast__btn-group {
+    display: flex;
+    justify-content: flex-end; /* 버튼들을 오른쪽으로 정렬 */
+    gap: 10px; /* 버튼 사이의 간격 */
+    margin-top: 16px;
+    width: 50%;
+}
+
+.inspection-complete-toast__cancel-btn,
+.inspection-complete-toast__confirm-btn {
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    /* flex-grow 속성 제거 */
+}
+
+.inspection-complete-toast__cancel-btn {
+    background-color: #f5f5f5; /* 회색 버튼 */
+    color: #333333; /* 텍스트 색상 */
+    border: none;
+}
+
+.inspection-complete-toast__confirm-btn {
+    background-color: #117a12; /* 초록색 버튼 */
+    color: white; /* 텍스트 색상 */
+    border: none;
+}
+
+.inspection-complete-toast__cancel-btn:hover {
+    background-color: #e0e0e0; /* hover 효과 */
+}
+
+.inspection-complete-toast__confirm-btn:hover {
+    background-color: #45a049; /* hover 효과 */
+}

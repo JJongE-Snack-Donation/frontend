@@ -1,27 +1,28 @@
 import React from 'react';
 import '../../Styles/ImageModal.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useImageSelection } from '../../Hooks/useImageSelection';
 import useImageActions from '../../Hooks/useImageActions';
 import ImageViewer from './ImageViewer';
 import ImageCard from './ImageCard';
 import ImageInfo from './ImageInfo';
-import ConfirmToast from './ConfirmToast';
+import ConfirmToast from './ExceptionConfirmToast';
 import checkIcon from '../../Assets/Imgs/etc/check_message.svg'
+import useImageStore from '../../Hooks/useImageStore';
+import InspectionCompleteToast from './InspectionCompleteToast';
+
 
 const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
     const [showCompletionMessage, setShowCompletionMessage] = useState(false);
-
-    
+    const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
+    const { relatedImages, updateClassification } = useImageStore();
 
     const {
         selectedCards,
         checkedBoxes,
         isAllSelected,
-        relatedImages,
         mainImage,
         selectedImageInfo,
-        setRelatedImages,
         setCheckedBoxes, 
         setIsAllSelected,
         handleSelectAll,
@@ -36,27 +37,41 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         setShowConfirmToast,
         handleDelete,
         handleDownload,
-        handleBulkEdit,          
-        handleBulkInfoDownload,  
-        handleBulkImageDownload, 
-        handleBulkDelete,
-        handleExceptionInspection         
-    } = useImageActions(relatedImages, setRelatedImages, onImagesUpdate, onDelete);
+        handleBulkImageDownload,
+        handleExceptionInspection,
+        handleInspectionComplete 
+    } = useImageActions();
 
-
+    // 예외 검수 설정 핸들러
     const handleConfirmInspection = () => {
-    handleExceptionInspection(checkedBoxes);
-    setCheckedBoxes([]);
-    setIsAllSelected(false);
+        handleExceptionInspection(checkedBoxes);
+        setCheckedBoxes([]);
+        setIsAllSelected(false);
+        setShowCompletionMessage(true);
+        setTimeout(() => {
+            setShowCompletionMessage(false);
+        }, 3000);
+    };
 
-    // 완료 메시지 표시
-    setShowCompletionMessage(true);
-    
-    // 3초 후 메시지 숨기기
-    setTimeout(() => {
-        setShowCompletionMessage(false);
-    }, 3000);
-};
+
+    // 검수 확정 핸들러
+    const handleConfirmInspectionComplete = async () => {
+        try {
+            await handleInspectionComplete(image.project_name, image.species);
+            setShowInspectionCompleteToast(false);
+            setShowCompletionMessage(true);
+            setTimeout(() => {
+                setShowCompletionMessage(false);
+            }, 3000);
+        } catch (error) {
+            console.error("검수 확정 중 오류 발생:", error);
+            alert("검수 확정 중 오류가 발생했습니다.");
+        }
+    };
+
+
+    useEffect(() => {
+    }, [relatedImages]);
 
     
     
@@ -100,10 +115,10 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
                                                 <button 
                                                     style={{ color: '#ff4d4f' }}
-                                                    onClick={() => {
-                                                        handleBulkDelete(checkedBoxes);
-                                                        setShowConfirmToast(false);  // 토스트 메시지 닫기
-                                                    }}
+                                                    // onClick={() => {
+                                                    //     handleBulkDelete(checkedBoxes);
+                                                    //     setShowConfirmToast(false);  // 토스트 메시지 닫기
+                                                    // }}
                                                 >
                                                     이미지 삭제
                                                 </button>
@@ -115,7 +130,6 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         </div>
 
                         <div className="modal__all">
-                        {console.log("Rendered Related Images in Modal:", relatedImages)}
                             {relatedImages?.length > 0 ? (
                                 relatedImages.map((img, index) => (
                                     <ImageCard
@@ -137,19 +151,36 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                     </div>
                     <ImageInfo imageData={selectedImageInfo} />
                 </div>
-            </div>
-            {showConfirmToast && (
-                <ConfirmToast
-                    onConfirm={handleConfirmInspection}
-                    onCancel={() => setShowConfirmToast(false)}
-                />
-            )}
-            {showCompletionMessage && (
-                <div className="modal-completion-message">
-                    <img src={checkIcon} alt="CheckMassage" />
-                    예외 검수 설정 완료
+
+                <div className="modal__footer">
+                    <button
+                        className="modal__confirm-btn"
+                        onClick={() => setShowInspectionCompleteToast(true)}
+                    >
+                        검수 확정
+                    </button>
+                    <button
+                        className="modal__close-btn"
+                        onClick={onClose}
+                    >
+                        닫기
+                    </button>
                 </div>
-            )}
+                {showConfirmToast && (
+                    <ConfirmToast
+                        onConfirm={handleConfirmInspection}
+                        onCancel={() => setShowConfirmToast(false)}
+                    />
+                )}
+                {showInspectionCompleteToast && (
+                    <InspectionCompleteToast
+                        onClose={() => setShowInspectionCompleteToast(false)}
+                        onConfirm={handleConfirmInspectionComplete}
+            
+                    />
+                )}
+            </div>
+            
         </div>
     );
 };
