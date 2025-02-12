@@ -94,7 +94,7 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
       // 성공 시 서버 응답 데이터 반영
       const uploadedData = response.data.data.uploaded_files || [];
       console.log("업로드 성공:", uploadedData);
-      setUploadedFiles(uploadedData.map((file) => file.filename));
+      setUploadedFiles(uploadedData.map((file) => ({ filename: file.filename, image_id: file.image_id })));
       setCurrentPart("review");
 
     } catch (error) {
@@ -112,56 +112,54 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-  const handleCheckboxChange = (fileName) => {
+  const handleCheckboxChange = (fileId) => {
     setSelectedFiles((prevSelected) =>
-      prevSelected.includes(fileName)
-        ? prevSelected.filter((file) => file !== fileName)
-        : [...prevSelected, fileName]
+      prevSelected.includes(fileId)
+        ? prevSelected.filter((id) => id !== fileId)
+        : [...prevSelected, fileId]
     );
   };
 
   const handleDeleteSelectedFiles = async () => {
     if (selectedFiles.length === 0) return;
-  
+
     try {
-      // API 요청을 위한 payload 생성
-      const response = await api.delete("/files/bulk-delete", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        data: {
-          image_ids: selectedFiles,  // 삭제할 이미지 ID 리스트
-        },
-      });
-  
-      // 상태 코드로 성공 판별
-      if (response.status === 200) {
-        console.log("파일 삭제 결과:", response.data);
-        const failedIds = response.data.data.failed_ids || [];
-        const successfulDeletes = selectedFiles.filter((id) => !failedIds.includes(id));
-  
-        // 성공적으로 삭제된 파일들을 UI에서 제거
-        setUploadedFiles((prevFiles) => prevFiles.filter((file) => !successfulDeletes.includes(file)));
-        setSelectedFiles([]); // 선택 상태 초기화
-  
-        // 결과 피드백
-        if (failedIds.length > 0) {
-          alert(`${failedIds.length}개의 파일 삭제에 실패했습니다.`);
+        // API 요청을 위한 payload 생성
+        const response = await api.delete("/files/bulk-delete", {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            data: {
+                image_ids: selectedFiles,  // 삭제할 image_id 리스트
+            },
+        });
+
+        // 상태 코드로 성공 판별
+        if (response.status === 200) {
+            console.log("파일 삭제 결과:", response.data);
+            const failedIds = response.data.data.failed_ids || [];
+            const successfulDeletes = selectedFiles.filter((id) => !failedIds.includes(id));
+
+            // 성공적으로 삭제된 파일들을 UI에서 제거
+            setUploadedFiles((prevFiles) => prevFiles.filter((file) => !successfulDeletes.includes(file.image_id)));
+            setSelectedFiles([]); // 선택 상태 초기화
+
+            // 결과 피드백
+            if (failedIds.length > 0) {
+                alert(`${failedIds.length}개의 파일 삭제에 실패했습니다.`);
+            } else {
+                alert("모든 선택된 파일이 성공적으로 삭제되었습니다.");
+            }
         } else {
-          alert("모든 선택된 파일이 성공적으로 삭제되었습니다.");
+            // 상태 코드가 200이 아니면 실패로 간주
+            alert("파일 삭제 중 문제가 발생했습니다. 다시 시도하세요.");
         }
-      } else {
-        // 상태 코드가 200이 아니면 실패로 간주
-        alert("파일 삭제 중 문제가 발생했습니다. 다시 시도하세요.");
-      }
-  
     } catch (error) {
-      console.error("파일 삭제 실패:", error);
-      alert("서버에 연결할 수 없습니다. 다시 시도하세요.");
+        console.error("파일 삭제 실패:", error);
+        alert("서버에 연결할 수 없습니다. 다시 시도하세요.");
     }
-  };
-  
+};
 
    // 페이지 변경 핸들러
   const handlePageChange = (pageNumber) => {
@@ -170,11 +168,11 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedFiles(currentFiles);
+      setSelectedFiles(currentFiles.map((file) => file.image_id)); // image_id만 저장
     } else {
       setSelectedFiles([]);
     }
-  };
+  };  
 
   const handleStartAnalysis = () => {
     nextStep();
@@ -312,10 +310,10 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
                 <td>
                   <input
                     type="checkbox"
-                    checked={selectedFiles.includes(file)}
-                    onChange={() => handleCheckboxChange(file)}
+                    checked={selectedFiles.includes(file.image_id)}
+                    onChange={() => handleCheckboxChange(file.image_id)}
                   />
-                  {file}
+                  {file.filename}
                 </td>
               </tr>
             ))}
