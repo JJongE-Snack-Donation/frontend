@@ -61,42 +61,49 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
 
   const processFiles = async (files) => {
     if (!files || files.length === 0) return;
-
+  
     setUploadedFiles(files.map((file) => file.name));
     setProgress(0);
     setCurrentPart("uploading");
     setIsUploading(true);
-
+  
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
+  
     const projectInfo = JSON.stringify({
-      project_id: projectId,  // 프로젝트 ID
-      project_name: projectName  // 프로젝트 이름
+      project_id: projectId,  
+      project_name: projectName  
     });
-    
+  
     formData.append("project_info", projectInfo);
     console.log("프로젝트 정보:", formData.get("project_info"));
-
+  
     try {
+      // **1. 파일 업로드 요청 (0% → 50%)**
       const response = await api.post("/files/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         onUploadProgress: (event) => {
-          const percentCompleted = Math.round((event.loaded * 100) / event.total);
+          const percentCompleted = Math.round((event.loaded * 50) / event.total);
           setProgress(percentCompleted);
         },
       });
-
-      // 성공 시 서버 응답 데이터 반영
-      const uploadedData = response.data.data.uploaded_files || [];
-      console.log("업로드 성공:", uploadedData);
-      setUploadedFiles(uploadedData.map((file) => ({ filename: file.filename, image_id: file.image_id })));
-      setCurrentPart("review");
-
+  
+      if (response.status === 200) {
+        console.log("업로드 성공:", response.data);
+        const uploadedData = response.data.data.uploaded_files || [];
+  
+        setUploadedFiles(uploadedData.map((file) => ({ filename: file.filename, image_id: file.image_id })));
+        setProgress(50); // **업로드 완료 시 50% 고정**
+        
+        // **2. 파싱 시작**
+        await startParsing(uploadedData.map((file) => file.image_id));
+      }
+  
     } catch (error) {
       console.error("파일 업로드 실패:", error);
       setFailedUploads((prev) => prev + 1);
@@ -105,6 +112,45 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
       setIsUploading(false);
     }
   };
+  
+  const startParsing = async (imageIds) => {
+    if (!imageIds || imageIds.length === 0) return;
+  
+    try {
+      console.log("파싱 시작:", imageIds);
+  
+      const response = await api.post("/files/parse-exif", 
+        JSON.stringify({ image_ids: imageIds, timeout: 30 }), 
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          }
+        });
+        
+      console.log("파싱 요청 결과:", response.data);
+      
+      if (response.status === 200) {
+        console.log("파싱 요청 성공, 진행률 증가 시작...");
+        
+        // **3. 진행률 50% → 100%까지 점진적 증가**
+        let progressInterval = setInterval(() => {
+          setProgress((prevProgress) => {
+            if (prevProgress >= 100) {
+              clearInterval(progressInterval);
+              setCurrentPart("review");  // **파싱 완료 후 review로 이동**
+              return 100;
+            }
+            return prevProgress + 5;  // 5%씩 증가
+          });
+        }, 500); // 0.5초마다 진행률 증가
+      }
+  
+    } catch (error) {
+      console.error("파싱 요청 실패:", error);
+      alert("파싱 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+  };  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
