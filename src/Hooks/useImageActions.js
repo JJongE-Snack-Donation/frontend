@@ -6,6 +6,8 @@ const useImageActions = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [showConfirmToast, setShowConfirmToast] = useState(false);
     const [checkedImages, setCheckedImages] = useState([]);
+    const { deleteMultipleImages } = useImageStore();
+    const [checkedBoxes, setCheckedBoxes] = useState([]);
 
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTc2MTA1MCwianRpIjoiMWZiNTg2MzktZjcyMi00Y2I3LWI3MzAtZGQ0OTRkOTE2M2NmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5NzYxMDUwLCJjc3JmIjoiZTNkNGU1MjYtOWIyOS00ZWQ0LWFkMmQtMGM0ZWRmNzczYTliIiwiZXhwIjoxNzM5ODQ3NDUwfQ.upcExpHp2m_XzX4cbQqn82h1Yjh2aVfGeOL2sRBm9N4";
 
@@ -101,69 +103,60 @@ const useImageActions = () => {
 
 
     // 단일 이미지 삭제
-    const handleDelete = async (imageId, e) => {
-        if (e) {
-            e.stopPropagation();
-        }
-    
+    const handleDelete = async (imageId) => {
         try {
-            // DELETE 요청 보내기
-            const response = await fetch(`http://localhost:5000/unclassified-images/${imageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                
-            
-                alert(`이미지 삭제 실패: ${errorData.message}`);
-                return;
+          const response = await fetch(`http://localhost:5000/classified-images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${token}`
             }
-    
-            // 성공적으로 삭제된 경우 Zustand 스토어 업데이트
-            deleteImage(imageId);
-            alert('이미지가 성공적으로 삭제되었습니다.');
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '이미지 삭제 실패');
+          }
+      
+          // 서버 응답이 성공적이면 로컬 상태 업데이트
+          deleteImage(imageId);
+          alert('이미지가 성공적으로 삭제되었습니다.');
         } catch (error) {
-            alert('이미지 삭제 중 오류가 발생했습니다.');
+          console.error('삭제 중 오류:', error);
+          alert(`이미지 삭제 중 오류가 발생했습니다: ${error.message}`);
         }
-    };
+      };
+      
+      
 
 
 
 
     // 단일 다운로드
-    const handleDownload = async (image, e) => {
-        e.stopPropagation();
+    const handleDownload = async (imageId) => {
         try {
-            const response = await fetch(`http://localhost:5000/download/image/${image.imageId}`, {
-                method: 'GET',
-                headers: {
-                    'accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+          const response = await fetch(`http://localhost:5000/download/image/${imageId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
             }
-    
+          });
+          if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = image.filename || `image_${image.imageId}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'image.jpg';
+            document.body.appendChild(a);
+            a.click();
             window.URL.revokeObjectURL(url);
+          } else {
+            console.error('Download failed');
+          }
         } catch (error) {
-            alert(`다운로드 실패: ${error.message}`);
+          console.error('Error downloading image:', error);
         }
-    };
+      };
+      
     
 
     // // 드롭다운 액션 함수
@@ -172,10 +165,7 @@ const useImageActions = () => {
     //     setIsDropdownOpen(false);
     // };
 
-    // const handleBulkInfoDownload = (checkedIds) => {
-    //     // 정보 다운로드 로직
-    //     setIsDropdownOpen(false);
-    // };
+
 
     // 다중 이미지 다운로드
     const handleBulkImageDownload = async (checkedIds) => { 
@@ -211,37 +201,35 @@ const useImageActions = () => {
 
     // 다중 이미지 삭제 
     const handleBulkImageDelete = async (checkedIds) => {
-    
         try {
-            // DELETE 요청 보내기
-            const response = await fetch(`http://localhost:5000/images/bulk-delete`, {
-                method: 'POST',
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ image_ids: checkedIds })
-            });
-    
-            if (!response.ok) {
-                const errorData = await response.json();
-                alert(`이미지 삭제 실패: ${errorData.message}`);
-                return;
-            }
-    
-            const result = await response.json();
-            const updatedImages = relatedImages.filter(img => !checkedIds.includes(img.imageId));
-            setRelatedImages(updatedImages);
-            setCheckedImages([]);  // 이제 이 함수가 정의되어 있어야 합니다.
-            alert(result.message || '선택한 이미지들이 성공적으로 삭제되었습니다.');
-
-    
+          const response = await fetch(`http://localhost:5000/images/bulk-delete`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ image_ids: checkedIds })
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '이미지 삭제 실패');
+          }
+      
+          const result = await response.json();
+          
+          // 상태 업데이트
+          deleteMultipleImages(checkedIds);
+          setCheckedBoxes([]);
+          
+          alert(result.message || '선택한 이미지들이 성공적으로 삭제되었습니다.');
         } catch (error) {
-            console.error('Bulk delete failed:', error);
-            alert('이미지 삭제 중 오류가 발생했습니다.');
+          console.error('Bulk delete failed:', error);
+          alert(`이미지 삭제 중 오류가 발생했습니다: ${error.message}`);
         }
-    };
+      };
+      
     
 
     return {
@@ -257,7 +245,9 @@ const useImageActions = () => {
         handleInspectionComplete,
         handleBulkImageDelete,
         checkedImages,
-        setCheckedImages
+        setCheckedImages,
+        checkedBoxes,
+        setCheckedBoxes
     };
 };
 

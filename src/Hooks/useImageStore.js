@@ -6,6 +6,38 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6
 const useImageStore = create((set, get) => ({
     groupedImages: [],
     setGroupedImages: (groups) => set({ groupedImages: Array.isArray(groups) ? groups : [] }),
+    deleteImage: (imageId) => set((state) => ({
+        groupImages: Object.fromEntries(
+          Object.entries(state.groupImages).map(([evtnum, images]) => [
+            evtnum,
+            images.filter(img => img.imageId !== imageId)
+          ])
+        ),
+        groupedImages: state.groupedImages.map(group => ({
+          ...group,
+          imageCount: group.imageCount - 1
+        })).filter(group => group.imageCount > 0)
+      })),
+    
+      deleteMultipleImages: (imageIds) => set((state) => {
+        const newGroupImages = Object.fromEntries(
+          Object.entries(state.groupImages).map(([evtnum, images]) => [
+            evtnum,
+            images.filter(img => !imageIds.includes(img.imageId))
+          ])
+        );
+        
+        const newGroupedImages = state.groupedImages.map(group => ({
+          ...group,
+          imageCount: (newGroupImages[group.evtnum] || []).length
+        })).filter(group => group.imageCount > 0);
+    
+        return {
+          groupImages: newGroupImages,
+          groupedImages: newGroupedImages
+        };
+      }),
+
     deleteGroup: (evtnum) =>
         set((state) => ({
             groupedImages: state.groupedImages.filter((group) => group.evtnum !== evtnum),

@@ -19,6 +19,7 @@ const ImageModal = ({ groupData, onClose }) => {
     const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
 
+
     const {
         selectedCards,
         checkedBoxes,
@@ -120,7 +121,6 @@ const ImageModal = ({ groupData, onClose }) => {
                                         {isDropdownOpen && (
                                             <div className="modal__bulk-action-dropdown">
                                                 <button >수정</button>
-                                                <button >정보 다운로드</button>
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
                                                 <button onClick={() => handleBulkImageDelete(checkedBoxes)}
                                                     disabled={checkedBoxes.length === 0}
@@ -146,8 +146,8 @@ const ImageModal = ({ groupData, onClose }) => {
                                         isChecked={checkedBoxes.includes(img.imageId)}
                                         onCardClick={(e) => handleCardClick(img, e)}
                                         onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
-                                        onDownload={handleDownload}
-                                        onDelete={handleDelete}
+                                        onDownload={() => handleDownload(img.imageId)}
+                                        onDelete={(e) => handleDelete(img.imageId, e)}
                                     />
                                 ))
                             ) : (
