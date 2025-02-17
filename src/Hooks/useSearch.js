@@ -1,18 +1,19 @@
-
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import useImageStore from './useImageStore'; 
+import useImageStore from './useImageStore';
 
 const useSearch = () => {
-    const { relatedImages, setRelatedImages } = useImageStore();
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [projectName, setProjectName] = useState('all');
-    const [date, setDate] = useState('all');
-    const [cameraSerial, setCameraSerial] = useState('all');
-    const [cameraLabel, setCameraLabel] = useState('all');
-    const [species, setSpecies] = useState('all');
-    const [searchResults, setSearchResults] = useState([]);
+    const { groupedImages, setGroupedImages } = useImageStore();
+    const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [searchParams, setSearchParams] = useState({
+        projectName: '',
+        date: '',
+        serialNumber: '',
+        species: ''
+    });
     const [totalItems, setTotalItems] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [options, setOptions] = useState({
@@ -22,144 +23,114 @@ const useSearch = () => {
         cameraLabelOptions: [],
     });
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTE2OTUxNiwianRpIjoiMTc2YThkMzUtMGQ1My00MTdkLThlM2ItYjlkMDFkOGZhYTZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5MTY5NTE2LCJjc3JmIjoiOWNkYTY1MzYtYjBjZC00MjhiLWExZTEtNzVhNGE4MzA0NmU4IiwiZXhwIjoxNzM5MjU1OTE2fQ.rWkkf8myjmzmZ6rY2MPLwBqBNGJKdZjUQh-uTRz3fJo";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTc2MTA1MCwianRpIjoiMWZiNTg2MzktZjcyMi00Y2I3LWI3MzAtZGQ0OTRkOTE2M2NmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5NzYxMDUwLCJjc3JmIjoiZTNkNGU1MjYtOWIyOS00ZWQ0LWFkMmQtMGM0ZWRmNzczYTliIiwiZXhwIjoxNzM5ODQ3NDUwfQ.upcExpHp2m_XzX4cbQqn82h1Yjh2aVfGeOL2sRBm9N4";
 
-    // 프로젝트와 종 기준으로 그룹화
-    const groupBySpecies = (images = []) => {
-        const groups = {};
-        images.forEach(img => {
-            const key = `${img.project_name}_${img.species}`;
-            if (!groups[key]) {
-                groups[key] = { 
-                    project_name: img.project_name,
-                    species: img.species,
-                    relatedImages: []
-                };
-            }
-            groups[key].relatedImages.push(img);
-        });
-        return Object.values(groups);
-    };
-    
-
-    const handleSearch = async (page = 1) => {
+    const handleSearch = useCallback(async (page = 1) => {
         setLoading(true);
         try {
             const queryParams = {
-                ...(projectName !== 'all' && { project_name: projectName }),
-                //...(date !== 'all' && { date: new Date(date).toISOString() }), // 날짜를 ISO 형식으로 변환
-                ...(cameraSerial !== 'all' && { serial_number: cameraSerial }),
-                ...(cameraLabel !== 'all' && { camera_label: cameraLabel }),
-                ...(species !== 'all' && { species }),
+                project_name: searchParams.projectName || undefined,
+                date: searchParams.date || undefined,
+                serial_number: searchParams.serialNumber || undefined,
+                species: searchParams.species || undefined,
                 page,
-                per_page: 100
+                per_page: 100,
+                group_by: 'evtnum'
             };
-
-            console.log("Search Query Params:", queryParams);
 
             const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
                 params: queryParams,
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            console.log("API Response:", response.data);
-
-            const newImages = response.data?.data?.images.map((img) => ({
-                imageId: img.id,
-                filename: img.filename,
-                thumbnail: img.thumbnail,
-                species: img.species,
-                count: img.count || 0,
-                serial_number: img.serial_number,
-                date: img.date,
-                project_name: img.project_name,
-                is_classified: img.is_classified,
-                exception_status: img.exception_status
-            }));
-
-            console.log("Mapped Images:", newImages);
-
-            // 기존 데이터와 병합
-            setRelatedImages(newImages);
-            
-
-        // 그룹화된 데이터 생성
-        const groupedImages = groupBySpecies(newImages);
-
-        console.log("Grouped Images:", groupedImages);
-
-        setSearchResults(groupedImages.map((group) => group.relatedImages[0]));
-        setTotalItems(response.data.data.total_count || 0);
-
+            if (response.data.status === 200) {
+                if (response.data.groups) {
+                    setGroupedImages(response.data.groups);
+                    setTotalItems(response.data.total);
+                    setCurrentPage(page);
+                } else if (response.data.images) {
+                    const grouped = response.data.images.map(img => ({
+                        evtnum: img.event_number,
+                        serialNumber: img.serial_number,
+                        imageCount: 1,
+                        ThumnailPath: img.thumbnail,
+                        projectName: img.project_name,
+                        DateTimeOriginal: img.date
+                    }));
+                    setGroupedImages(grouped);
+                    setTotalItems(response.data.total);
+                    setCurrentPage(page);
+                } else {
+                    setError('서버 응답 형식이 예상과 다릅니다.');
+                }
+            } else {
+                setError(`API 요청 실패: ${response.data.message}`);
+            }
         } catch (err) {
-        
             setError(err.response?.data?.message || '데이터를 가져오는 중 오류가 발생했습니다.');
-            return [];
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchParams, setGroupedImages]);
 
-
-    // 현재 선택된 이미지와 동일한 그룹의 이미지만 필터링
-    const filteredImages = useMemo(() => {
-        if (!selectedImage || !relatedImages.length) return [];
-        const filtered = relatedImages.filter(
-            (img) =>
-                img.project_name === selectedImage.project_name &&
-                img.species === selectedImage.species
+    const filteredGroups = useMemo(() => {
+        if (!selectedGroup || !groupedImages.length) return groupedImages;
+        return groupedImages.filter(
+            (group) =>
+                group.projectName === selectedGroup.projectName &&
+                group.serialNumber === selectedGroup.serialNumber
         );
-        console.log("Filtered Images:", filtered);
-        return filtered;
+    }, [selectedGroup, groupedImages]);
 
-    }, [selectedImage, relatedImages]);
+    const fetchOptions = useCallback(async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
+                params: { is_classified: true },
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
 
-
-    // 옵션 로드
-    useEffect(() => {
-        const fetchOptions = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
-                    params: { is_classified: false },
-                    headers: { 'Authorization': `Bearer ${token}` }
+            if (response.data.data?.images) {
+                const images = response.data.data.images;
+                setOptions({
+                    projectOptions: [...new Set(images.map(item => item.project_name))]
+                        .map(value => ({ value, label: value })),
+                    speciesOptions: [...new Set(images.map(item => item.species))]
+                        .map(value => ({ value, label: value })),
+                    cameraSerialOptions: [...new Set(images.map(item => item.serial_number))]
+                        .map(value => ({ value, label: value })),
+                    cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
+                        .map(value => ({ value, label: value }))
                 });
-
-                if (response.data.data?.images) {
-                    const images = response.data.data.images;
-                    setOptions({
-                        projectOptions: [...new Set(images.map(item => item.project_name))]
-                            .map(value => ({ value, label: value })),
-                        speciesOptions: [...new Set(images.map(item => item.species))]
-                            .map(value => ({ value, label: value })),
-                        cameraSerialOptions: [...new Set(images.map(item => item.serial_number))]
-                            .map(value => ({ value, label: value })),
-                        cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
-                            .map(value => ({ value, label: value }))
-                    });
-                }
-            } catch (error) {
-
-                console.error('옵션 로드 실패:', error);
             }
-        };
-        fetchOptions();
+        } catch (error) {
+            console.error('옵션 로드 실패:', error);
+            setError('옵션을 불러오는 중 오류가 발생했습니다.');
+        }
     }, []);
 
-    const getUniqueOptions = useMemo(() => options, [options]);
+    useEffect(() => {
+        fetchOptions();
+        handleSearch(1);
+    }, [fetchOptions, handleSearch]);
+
+    const updateSearchParam = useCallback((key, value) => {
+        setSearchParams(prev => ({ ...prev, [key]: value }));
+    }, []);
 
     return {
-        projectName, setProjectName,
-        date, setDate,
-        cameraSerial, setCameraSerial,
-        cameraSerial, setCameraSerial,
-        species, setSpecies,
-        searchResults,
+        searchParams,
+        updateSearchParam,
+        groupedImages,
+        filteredGroups,
         totalItems,
+        currentPage,
         handleSearch,
         loading,
         error,
-        filteredImages,
-        ...getUniqueOptions
+        setSelectedGroup,
+        options,
+        fetchOptions,
+        fetchGroupImages
     };
 };
 

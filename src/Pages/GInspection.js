@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../Styles/Home.css';
 import ImageGrid from '../Components/Pagination/ImageGrid';
 import PaginationComponent from '../Components/Pagination/PaginationComponent';
@@ -8,82 +8,66 @@ import Title from '../Components/Title';
 import SearchBar from '../Components/Search/SearchBar';
 import useSearch from '../Hooks/useSearch';
 import useImageStore from '../Hooks/useImageStore';
-import useImageActions from '../Hooks/useImageActions';
 
 const GeneralInspection = () => {
-    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
-    const [selectedImage, setSelectedImage] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { relatedImages } = useImageStore();
-    const imageActions = useImageActions();
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
     
-
     const {
-        searchResults,
+        groupedImages,
         totalItems,
+        currentPage,
         handleSearch,
         loading,
-        error
+        error,
+        options,
+        searchParams,
+        updateSearchParam
     } = useSearch();
 
-    // 페이지 변경 핸들러
     const handlePageChange = async (pageNumber) => {
-        setCurrentPage(pageNumber);
-        await handleSearch(pageNumber); // API 호출로 데이터 가져오기
+        await handleSearch(pageNumber);
     };
 
-    // 검색 핸들러 (항상 첫 번째 페이지부터 시작)
     const handleSearchSubmit = async () => {
-        setCurrentPage(1);
         await handleSearch(1);
     };
 
-    useEffect(() => {
-        handleSearch(1); // 컴포넌트 마운트 시 첫 번째 페이지 데이터 로드
-    }, []);
+    const handleGroupClick = async (group) => {
+        setSelectedGroup(group);
+        await fetchGroupImages(group.evtnum);
+        setIsModalOpen(true);
+    };
 
     return (
         <div className="wrap">
             <NameTag />
             <Title title="일반 검수" desc="일반 이벤트 목록" />
 
-            {/* 검색 바 */}
-            <SearchBar onSearch={handleSearchSubmit} />
+            <SearchBar 
+                onSearch={handleSearchSubmit}
+                options={options}
+                searchParams={searchParams}
+                updateSearchParam={updateSearchParam}
+                handleSearch={handleSearch}
+            />
 
-            {/* 에러 메시지 */}
             {error && <div className="error-message">{error}</div>}
 
-            {/* 로딩 상태 */}
             {loading ? (
                 <div className="loading-indicator">로딩 중...</div>
             ) : (
                 <>
-                    {/* 이미지 그리드 */}
                     <ImageGrid 
-                        images={searchResults} 
-                        onImageClick={(image) => {
-
-                            console.log("Selected Image:", image); // 선택된 이미지 로그
-                            console.log("Current Related Images:", relatedImages); 
-                            
-                            const relatedImagesForSelected = Array.isArray(relatedImages)
-                                ? relatedImages.filter(
-                                    (img) => img.project_name === image.project_name && img.species === image.species
-                                )
-                                : [];
-
-                            console.log("Filtered Related Images for Selected Image:", relatedImagesForSelected);
-
-                            setSelectedImage({ ...image, relatedImages: relatedImagesForSelected });
-                            setIsModalOpen(true);
-                        }}
+                        groups={groupedImages} 
+                        onGroupClick={handleGroupClick}
                     />
 
-                    {/* 페이지네이션 */}
                     {!isModalOpen && (
                         <PaginationComponent
                             currentPage={currentPage}
-                            itemsPerPage={12}
+                            itemsPerPage={100}
                             totalItems={totalItems}
                             onChange={handlePageChange}
                         />
@@ -91,15 +75,11 @@ const GeneralInspection = () => {
                 </>
             )}
 
-            {/* 이미지 모달 */}
-            {isModalOpen && selectedImage && (
+            {isModalOpen && selectedGroup && (
                 <ImageModal 
-                image={selectedImage} 
-                onClose={() => {
-                    setSelectedImage(null); 
-                    setIsModalOpen(false); 
-                }} 
-            />
+                    onClose={() => setIsModalOpen(false)} 
+                    groupData={selectedGroup}
+                />
             )}
         </div>
     );

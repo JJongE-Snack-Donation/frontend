@@ -3,30 +3,33 @@ import '../../Styles/SearchBar.css'
 import Bookmark from '../Bookmark';
 import Legend from './Legend';
 import FilterItem from './FilterItem';
-import useSearch from '../../Hooks/useSearch';
 
-const SearchBar = ({ onSearch }) =>{
-    // 상태 관리
+const SearchBar = ({ 
+    onSearch, 
+    projectName, setProjectName,
+    date, setDate,
+    serialNumber, setSerialNumber,
+    species, setSpecies,
+    options = {},
+    handleSearch
+}) => {
     const {
-        projectName, setProjectName,
-        date, setDate,
-        cameraSerial, setCameraSerial,
-        cameraLabel, setCameraLabel,
-        species, setSpecies,
-        handleSearch,
-        projectOptions,
-        speciesOptions,
-        cameraSerialOptions,
-        cameraLabelOptions
-    } = useSearch();
+        projectOptions = [],
+        speciesOptions = [],
+        cameraSerialOptions = [],
+        cameraLabelOptions = []
+    } = options;
 
     // 검색 버튼 클릭 함수
     const handleSearchClick = () => {
-        
-        const results = handleSearch();
-        console.log("Search results:", results);
-        onSearch(results);
+        if (typeof handleSearch === 'function') {
+            handleSearch();
+        }
+        if (typeof onSearch === 'function') {
+            onSearch();
+        }
     };
+    
 
     return (
         <div className="search-filter">
@@ -47,16 +50,9 @@ const SearchBar = ({ onSearch }) =>{
 
                 <FilterItem
                     label="카메라 시리얼"
-                    value={cameraSerial}
-                    onChange={(e) => setCameraSerial(e.target.value)}
+                    value={serialNumber}
+                    onChange={(e) => setSerialNumber(e.target.value)}
                     options={[{ value: "all", label: "ALL" }, ...cameraSerialOptions]}
-                />
-
-                <FilterItem
-                    label="카메라 라벨"
-                    value={cameraLabel}
-                    onChange={(e) => setCameraLabel(e.target.value)}
-                    options={[{ value: "all", label: "ALL" }, ...cameraLabelOptions]}
                 />
 
                 <FilterItem
@@ -67,10 +63,10 @@ const SearchBar = ({ onSearch }) =>{
                 />
 
                 <div className='filter-item'>
-                        <div className='filter-label'>즐겨찾기</div>
-                        <Bookmark />
+                    <div className='filter-label'>즐겨찾기</div>
+                    <Bookmark />
                 </div>
-                    <button className="search-button" onClick={handleSearchClick}>검색</button>
+                <button className="search-button" onClick={handleSearchClick}>검색</button>
                 <div>
                     <Legend />
                 </div>

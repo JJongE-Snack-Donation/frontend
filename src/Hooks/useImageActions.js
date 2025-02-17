@@ -7,7 +7,7 @@ const useImageActions = () => {
     const [showConfirmToast, setShowConfirmToast] = useState(false);
     const [checkedImages, setCheckedImages] = useState([]);
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTE2OTUxNiwianRpIjoiMTc2YThkMzUtMGQ1My00MTdkLThlM2ItYjlkMDFkOGZhYTZmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5MTY5NTE2LCJjc3JmIjoiOWNkYTY1MzYtYjBjZC00MjhiLWExZTEtNzVhNGE4MzA0NmU4IiwiZXhwIjoxNzM5MjU1OTE2fQ.rWkkf8myjmzmZ6rY2MPLwBqBNGJKdZjUQh-uTRz3fJo";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTc2MTA1MCwianRpIjoiMWZiNTg2MzktZjcyMi00Y2I3LWI3MzAtZGQ0OTRkOTE2M2NmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5NzYxMDUwLCJjc3JmIjoiZTNkNGU1MjYtOWIyOS00ZWQ0LWFkMmQtMGM0ZWRmNzczYTliIiwiZXhwIjoxNzM5ODQ3NDUwfQ.upcExpHp2m_XzX4cbQqn82h1Yjh2aVfGeOL2sRBm9N4";
 
     // 예외 상태 processed로 처리
     const handleExceptionInspection = async (checkedIds) => {
@@ -21,7 +21,7 @@ const useImageActions = () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        status: "processed",
+                        exception_status: "processed",
                         comment: "Processed via exception inspection"
                     })
                 });

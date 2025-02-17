@@ -1,22 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../Styles/ImageModal.css';
-import { useState, useEffect } from 'react';
 import { useImageSelection } from '../../Hooks/useImageSelection';
+import useSearch from '../../Hooks/useSearch';
 import useImageActions from '../../Hooks/useImageActions';
+import useImageStore from '../../Hooks/useImageStore';
 import ImageViewer from './ImageViewer';
 import ImageCard from './ImageCard';
 import ImageInfo from './ImageInfo';
 import ConfirmToast from './ExceptionConfirmToast';
-import checkIcon from '../../Assets/Imgs/etc/check_message.svg'
-import useImageStore from '../../Hooks/useImageStore';
 import InspectionCompleteToast from './InspectionCompleteToast';
+import checkIcon from '../../Assets/Imgs/etc/check_message.svg';
 
-
-const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
+const ImageModal = ({ groupData, onClose }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
+    const { fetchGroupImages } = useSearch();
     const { relatedImages, updateClassification } = useImageStore();
+    const [groupImages, setGroupImages] = useState([]);
 
     const {
         selectedCards,
@@ -28,8 +29,9 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         setIsAllSelected,
         handleSelectAll,
         handleCardClick,
-        handleCheckboxChange
-    } = useImageSelection(image);
+        handleCheckboxChange,
+        setRelatedImages
+    } = useImageSelection({ relatedImages: groupImages });
 
     const {
         isDropdownOpen,
@@ -44,40 +46,42 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         handleBulkImageDelete
     } = useImageActions();
 
-    // 예외 검수 설정 핸들러
     const handleConfirmInspection = () => {
         handleExceptionInspection(checkedBoxes);
         setCheckedBoxes([]);
         setIsAllSelected(false);
-
         setShowExceptionCompletionMessage(true);
-        setTimeout(() => {
-            setShowExceptionCompletionMessage(false);
-        }, 4000);
+        setTimeout(() => setShowExceptionCompletionMessage(false), 4000);
     };
 
-
-    // 검수 확정 핸들러
     const handleConfirmInspectionComplete = async () => {
         try {
-            await handleInspectionComplete(image.project_name, image.species);
-            setShowInspectionCompleteToast(false); // 토스트 닫기
-
-            // 검수 확정 완료 메시지 표시
+            await handleInspectionComplete(groupData.projectName, groupData.species);
+            setShowInspectionCompleteToast(false);
             setShowInspectionCompletionMessage(true);
-                setTimeout(() => {
-                    setShowInspectionCompletionMessage(false);
-                }, 4000);
+            setTimeout(() => setShowInspectionCompletionMessage(false), 4000);
         } catch (error) {
             console.error("검수 확정 중 오류 발생:", error);
             alert("검수 확정 중 오류가 발생했습니다.");
         }
     };
 
-
     useEffect(() => {
-    }, [relatedImages]);
-
+        const loadGroupImages = async () => {
+          if (groupData && groupData.evtnum) {
+            const images = await fetchGroupImages(groupData.evtnum);
+    
+            setGroupImages(images);
+    
+            if (images.length > 0) {
+              setRelatedImages(images);
+              handleCardClick(images[0]); // 첫 번째 이미지를 기본 선택
+            }
+          }
+        };    
+    
+        loadGroupImages();
+      }, [groupData, fetchGroupImages]);
     
     
 
@@ -132,16 +136,16 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         </div>
 
                         <div className="modal__all">
-                            {relatedImages?.length > 0 ? (
-                                relatedImages.map((img, index) => (
+                        {groupImages.length > 0 ? (
+                            groupImages.map((img, index) => (
                                     <ImageCard
                                         key={img.imageId}
                                         image={img}
                                         index={index}
                                         isSelected={selectedCards.includes(img.imageId)}
                                         isChecked={checkedBoxes.includes(img.imageId)}
-                                        onCardClick={handleCardClick}
-                                        onCheckboxChange={handleCheckboxChange} // 핸들러 전달
+                                        onCardClick={(e) => handleCardClick(img, e)}
+                                        onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
                                         onDownload={handleDownload}
                                         onDelete={handleDelete}
                                     />

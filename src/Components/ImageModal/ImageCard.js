@@ -29,7 +29,7 @@ const ImageCard = ({
                     onCheckboxChange(image.imageId, e); // image.imageId 전달
                   }}
             />
-            <span className="modal__all_image-number">{index + 1} - {image.species}</span>
+            <span className="modal__all_image-number">{index + 1} - {image.fileName}</span>
             <button 
                 className="modal__all_image-download"
                 onClick={(e) => {
@@ -47,7 +47,7 @@ const ImageCard = ({
             </button>
         </div>
         <div className="modal__all_image-content">
-            <img  src={image.thumbnail} alt="" />
+            <img  src={image.imageUrl} alt="" />
             {image.exception_status === "processed" && (
                 <div className="exception-overlay">예외</div>
             )}
