@@ -16,7 +16,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
       return '/fallback-image.jpg';
     }
     const url = `http://localhost:5000/images/${path.replace(/^\.?\/?(mnt\/)?/, '')}`;
-    console.log(`Generated image URL: ${url}`);
     return url;
   };
   
