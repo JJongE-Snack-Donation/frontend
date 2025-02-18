@@ -15,6 +15,7 @@ const Project = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [selectProjectName, setSelectProjectName] = useState(null);
+  const [selectProjectFile, setSelectProjectFile] = useState(null);
 
   const renderContent = () => {
     switch (currentStep) {
@@ -32,6 +33,7 @@ const Project = () => {
             nextStep={() => setCurrentStep(3)}
             projectId={selectedProjectId}
             projectName={selectProjectName}
+            setSelectProjectFile={setSelectProjectFile}
           />
         );
       case 3:
@@ -40,6 +42,7 @@ const Project = () => {
             nextStep={() => setCurrentStep(4)}
             projectId={selectedProjectId}
             projectName={selectProjectName}
+            projectFile={selectProjectFile}
           />
         );
       case 4:

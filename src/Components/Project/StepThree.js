@@ -1,23 +1,67 @@
 import React, { useState, useEffect } from "react";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
+import api from "../../Api";
 
-const StepThree = ({ nextStep }) => {
+const StepThree = ({ nextStep, projectId, projectName, projectFile }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          nextStep(); // 100%가 되면 다음 단계로 이동
-          return 100;
-        }
-        return prev + 10; // 10%씩 증가 (속도는 필요에 따라 변경)
-      });
-    }, 500); // 500ms마다 진행도 증가
+    // 분석 시작 API 호출
+    const startDetection = async () => {
+      try {
+        console.log("선택된 파일들:", projectFile.map((file) => file.image_id));
+        
+        const response = await api.post(
+          "/detect",
+          JSON.stringify({ image_ids: projectFile.map((file) => file.image_id) }),
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 클리어
-  }, [nextStep]);
+        if (response.status === 202) {
+          console.log("분석 요청 결과:", response.data);
+          checkProgress(); // 진행률 조회 시작
+        } else {
+          alert("분석 요청 중 문제가 발생했습니다. 다시 시도하세요.");
+        }
+      } catch (error) {
+        console.error("분석 요청 실패:", error);
+        alert("서버 오류로 인해 분석을 시작할 수 없습니다.");
+      }
+    };
+
+    const checkProgress = () => {
+      const interval = setInterval(async () => {
+        try {
+          const progressResponse = await api.get("/status/ai-progress", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+
+          if (progressResponse.status === 200 && progressResponse.data.progress !== undefined) {
+            const newProgress = progressResponse.data.progress;
+            setProgress(newProgress);
+
+            if (newProgress >= 100) {
+              clearInterval(interval);
+              nextStep(); // 100%가 되면 다음 단계로 이동
+            }
+          }
+        } catch (error) {
+          console.error("진행률 조회 실패:", error);
+        }
+      }, 1000); // 1초마다 진행 상태 확인
+
+      return () => clearInterval(interval); // 컴포넌트 언마운트 시 클리어
+    };
+
+    startDetection(); // 컴포넌트가 마운트되면 AI 분석 시작
+  }, [nextStep, projectFile]);
 
   return (
     <div className="step-two-container step-three-container">
@@ -30,15 +74,11 @@ const StepThree = ({ nextStep }) => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>image1.jpg</td>
-          </tr>
-          <tr>
-            <td>image2.jpg</td>
-          </tr>
-          <tr>
-            <td>image3.jpg</td>
-          </tr>
+          {projectFile.map((file, index) => (
+            <tr key={index}>
+              <td>{file.filename}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

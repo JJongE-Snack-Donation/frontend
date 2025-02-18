@@ -4,7 +4,7 @@ import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import trash from "../../Assets/Imgs/btn/project/trash.svg";
 
-const StepTwo = ({nextStep,projectId,projectName}) => {
+const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   const [currentPart, setCurrentPart] = useState("upload");
   const [progress, setProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -220,8 +220,9 @@ const StepTwo = ({nextStep,projectId,projectName}) => {
     }
   };  
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     nextStep();
+    setSelectProjectFile(uploadedFiles);
   };
 
   const UploadProcess = () => {
