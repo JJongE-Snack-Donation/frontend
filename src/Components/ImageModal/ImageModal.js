@@ -10,6 +10,8 @@ import ImageInfo from './ImageInfo';
 import ConfirmToast from './ExceptionConfirmToast';
 import InspectionCompleteToast from './InspectionCompleteToast';
 import checkIcon from '../../Assets/Imgs/etc/check_message.svg';
+import useCountUpdate from '../../Hooks/useCountUpdate';
+import CountUpdatePopup from './CountUpdatePopup';
 
 const ImageModal = ({ groupData, onClose }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
@@ -18,6 +20,8 @@ const ImageModal = ({ groupData, onClose }) => {
     const { fetchGroupImages } = useSearch();
     const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const { updateNormalInspectionBulk } = useCountUpdate();
 
 
     const {
@@ -66,6 +70,30 @@ const ImageModal = ({ groupData, onClose }) => {
             alert("검수 확정 중 오류가 발생했습니다.");
         }
     };
+
+    const handleOpenPopup = () => {
+        if (checkedBoxes.length === 0) {
+            alert('수정할 이미지를 선택해주세요.');
+            return;
+        }
+        setIsPopupOpen(true);
+    };
+
+    const handleClosePopup = () => {
+        setIsPopupOpen(false);
+    };
+
+    const handleSubmitPopup = async (updates) => {
+        try {
+            const result = await updateNormalInspectionBulk(checkedBoxes, updates);
+            alert(`${result.modified_count}개의 이미지가 수정되었습니다.`);
+        } catch (error) {
+            alert('이미지 수정 중 오류가 발생했습니다.');
+        } finally {
+            handleClosePopup();
+        }
+    };
+
 
     useEffect(() => {
         const loadGroupImages = async () => {
@@ -120,7 +148,12 @@ const ImageModal = ({ groupData, onClose }) => {
                                         </button>
                                         {isDropdownOpen && (
                                             <div className="modal__bulk-action-dropdown">
-                                                <button >수정</button>
+                                                <button onClick={handleOpenPopup} className="modal__edit-button">수정</button>
+                                                <CountUpdatePopup
+                                                    isOpen={isPopupOpen}
+                                                    onClose={handleClosePopup}
+                                                    onSubmit={handleSubmitPopup}
+                                                />
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
                                                 <button onClick={() => handleBulkImageDelete(checkedBoxes)}
                                                     disabled={checkedBoxes.length === 0}

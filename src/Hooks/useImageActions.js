@@ -9,7 +9,7 @@ const useImageActions = () => {
     const { deleteMultipleImages } = useImageStore();
     const [checkedBoxes, setCheckedBoxes] = useState([]);
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczOTc2MTA1MCwianRpIjoiMWZiNTg2MzktZjcyMi00Y2I3LWI3MzAtZGQ0OTRkOTE2M2NmIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzM5NzYxMDUwLCJjc3JmIjoiZTNkNGU1MjYtOWIyOS00ZWQ0LWFkMmQtMGM0ZWRmNzczYTliIiwiZXhwIjoxNzM5ODQ3NDUwfQ.upcExpHp2m_XzX4cbQqn82h1Yjh2aVfGeOL2sRBm9N4";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
 
     // 예외 상태 processed로 처리
     const handleExceptionInspection = async (checkedIds) => {
@@ -18,41 +18,31 @@ const useImageActions = () => {
                 const response = await fetch(`http://localhost:5000/exception/${imageId}/status`, {
                     method: 'PUT',
                     headers: {
-                        'accept': 'application/json',
+                        'Accept': 'application/json',
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        exception_status: "processed",
+                        status: "processed",  // 'exception_status'에서 'status'로 변경
                         comment: "Processed via exception inspection"
                     })
                 });
-
+    
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 const result = await response.json();
+                console.log("Update successful:", result);
             } catch (error) {
                 console.error("Error updating image status:", error);
             }
         }
-
+    
         updateExceptionStatus(checkedIds, "processed");
         setShowConfirmToast(false);
-
-        //const updatedImages = relatedImages.map(img => ({
-        //    ...img,
-        //    exception_status: checkedIds.includes(img.imageId) ? "processed" : img.exception_status
-        //}));
-//
-        //setRelatedImages(updatedImages);
-        //
-        //if (onImagesUpdate) {
-        //    onImagesUpdate(updatedImages, checkedIds);
-        //}
-//
-        //setShowConfirmToast(false);
     };
+    
 
 
     // 검수 확정 핸들러 
