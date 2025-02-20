@@ -24,7 +24,7 @@ const GeneralInspection = () => {
         options,
         searchParams,
         updateSearchParam
-    } = useSearch();
+    } = useSearch('normal');
 
     const handlePageChange = async (pageNumber) => {
         await handleSearch(pageNumber);
