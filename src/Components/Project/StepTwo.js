@@ -125,33 +125,68 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
     try {
       console.log("파싱 시작:", imageIds);
   
-      const response = await api.post("/files/parse-exif", 
-        JSON.stringify({ image_ids: imageIds, timeout: 30 }), 
+      const response = await api.post(
+        "/files/parse-exif",
+        JSON.stringify({ image_ids: imageIds, timeout: 30 }),
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
-          }
-        });
-        
+          },
+        }
+      );
+  
       console.log("파싱 요청 결과:", response.data);
-      
+  
       if (response.status === 200) {
         console.log("파싱 요청 성공, 진행률 증가 시작...");
-        
-        // **3. 진행률 50% → 100%까지 점진적 증가**
+  
         let progressInterval = setInterval(() => {
           setProgress((prevProgress) => {
             if (prevProgress >= 100) {
               clearInterval(progressInterval);
-              setCurrentPart("review");  // **파싱 완료 후 review로 이동**
+              setCurrentPart("review"); // 파싱 완료 후 review로 이동
               return 100;
             }
-            return prevProgress + 5;  // 5%씩 증가
+            return prevProgress + 5; // 5%씩 증가
           });
-        }, 500); // 0.5초마다 진행률 증가
-      }
+        }, 500);
+      } else if (response.status === 206) {
+        console.warn("일부 이미지만 파싱 성공:", response.data);
   
+        const { parsed_count, failed_images } = response.data.data || {};
+        const failedCount = failed_images ? failed_images.length : 0;
+  
+        // 상태 메시지 업데이트
+        setStatusMessage(
+          `일부 이미지(${parsed_count}개)의 EXIF 파싱이 완료되었으나, ${failedCount}개 실패`
+        );
+        setIsSuccess(true);
+        setShowMessage(true);
+  
+        // 기존 실패한 업로드 개수에 파싱 실패한 개수 추가
+        setFailedUploads((prev) => prev + failedCount);
+  
+        // 실패한 이미지들을 업로드된 목록에서 제거 (파싱 실패 처리)
+        setUploadedFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            failed_images.includes(file.filename) ? { ...file, failed: true } : file
+          )
+        );
+  
+        let progressInterval = setInterval(() => {
+          setProgress((prevProgress) => {
+            if (prevProgress >= 90) { // 90%까지만 증가 (완전하지 않음)
+              clearInterval(progressInterval);
+              setCurrentPart("review"); // 그래도 review로 이동
+              return 90;
+            }
+            return prevProgress + 5;
+          });
+        }, 500);
+  
+        setTimeout(() => setShowMessage(false), 5000);
+      }
     } catch (error) {
       console.error("파싱 요청 실패:", error);
       setStatusMessage("파싱 중 오류가 발생했습니다. 다시 시도해주세요.");
