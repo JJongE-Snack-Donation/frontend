@@ -51,12 +51,6 @@ const ImageCard = ({
             {image.exception_status === "processed" && (
                 <div className="exception-overlay">예외</div>
             )}
-            <button 
-                className="modal__favorite-btn"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <img src={starIcon} alt="Favorite" />
-            </button>
         </div>
 
     </div>
