@@ -62,10 +62,6 @@ const SearchBar = ({
                     options={[{ value: "all", label: "ALL" }, ...speciesOptions]}
                 />
 
-                <div className='filter-item'>
-                    <div className='filter-label'>즐겨찾기</div>
-                    <Bookmark />
-                </div>
                 <button className="search-button" onClick={handleSearchClick}>검색</button>
                 <div>
                     <Legend />
