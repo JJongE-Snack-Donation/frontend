@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import api from "../../Api";
+import StatusMessage from "./StatusMessage";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import trash from "../../Assets/Imgs/btn/project/trash.svg";
+import Pagination from "../Pagination/FilePagenation";
 
 const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   const [currentPart, setCurrentPart] = useState("upload");
@@ -17,6 +19,10 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   const [isUploading, setIsUploading] = useState(false);
   const [filesPerPage] = useState(8); // 한 페이지당 보여줄 파일 수
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [statusMessage, setStatusMessage] = useState(""); // 상태 메시지
+  const [isSuccess, setIsSuccess] = useState(false); // 성공 여부
+  const [showMessage, setShowMessage] = useState(false); // 메시지 표시 여부
+  
 
   const indexOfLastFile = currentPage * filesPerPage;
   const indexOfFirstFile = indexOfLastFile - filesPerPage;
@@ -148,7 +154,10 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   
     } catch (error) {
       console.error("파싱 요청 실패:", error);
-      alert("파싱 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setStatusMessage("파싱 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setIsSuccess(false);
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
     }
   };  
 
@@ -193,17 +202,28 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
 
             // 결과 피드백
             if (failedIds.length > 0) {
-                alert(`${failedIds.length}개의 파일 삭제에 실패했습니다.`);
+                setStatusMessage(`${failedIds.length}개의 파일 삭제에 실패했습니다.`);
+                setIsSuccess(false);
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 3000);
             } else {
-                alert("모든 선택된 파일이 성공적으로 삭제되었습니다.");
+                setStatusMessage("모든 선택된 파일이 성공적으로 삭제되었습니다.");
+                setIsSuccess(true);
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 3000);
             }
         } else {
             // 상태 코드가 200이 아니면 실패로 간주
-            alert("파일 삭제 중 문제가 발생했습니다. 다시 시도하세요.");
+            setStatusMessage("파일 삭제 중 문제가 발생했습니다. 다시 시도하세요.");
+            setIsSuccess(false);
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
         }
     } catch (error) {
         console.error("파일 삭제 실패:", error);
-        alert("서버에 연결할 수 없습니다. 다시 시도하세요.");
+        setStatusMessage("서버에 연결할 수 없습니다. 다시 시도하세요.");
+        setIsSuccess(false);
+        setShowMessage(true);
     }
 };
 
@@ -228,6 +248,11 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   const UploadProcess = () => {
     return (
       <>
+        <StatusMessage
+            isSuccess={isSuccess}
+            message={statusMessage}
+            showMessage={showMessage}
+        />
         <div className={`step-two-container ${currentPart === "review" ? "review-container" : ""}`}>
           <CircularProgress value={progress} isCompleted={currentPart === "review"} />
           <h2>
@@ -294,7 +319,7 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
             </label>
           </div>
 
-          <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
+          <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. jpg, 혹은 jpeg 형식의 파일만 업로드 가능하며 최대 파일 크기는 10MB입니다.</h5>
         </div>
 
         {currentPart === "review" && (
@@ -368,7 +393,7 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
               </table>
             </div>
              {/* 페이지네이션 */}
-            <div className="pagination">
+            {/*<div className="pagination">
             {Array.from({ length: Math.ceil(uploadedFiles.length / filesPerPage) }, (_, i) => (
               <button
                 key={i}
@@ -378,7 +403,13 @@ const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
                 {i + 1}
               </button>
             ))}
-            </div>
+            </div>*/}
+            <Pagination 
+              totalItems={uploadedFiles.length} 
+              itemsPerPage={filesPerPage} 
+              currentPage={currentPage} 
+              onPageChange={handlePageChange} 
+            />
             <div className="start-btn-container">
               <button 
               className="start-btn"

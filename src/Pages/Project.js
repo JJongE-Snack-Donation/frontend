@@ -16,6 +16,7 @@ const Project = () => {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [selectProjectName, setSelectProjectName] = useState(null);
   const [selectProjectFile, setSelectProjectFile] = useState(null);
+  const [analysisEndTime, setAnalysisEndTime] = useState(null);
 
   const renderContent = () => {
     switch (currentStep) {
@@ -43,12 +44,14 @@ const Project = () => {
             projectId={selectedProjectId}
             projectName={selectProjectName}
             projectFile={selectProjectFile}
+            setAnalysisEndTime={setAnalysisEndTime}
           />
         );
       case 4:
         return <StepFour 
                 nextStep={() => setCurrentStep(1)}
                 upload={() => setCurrentStep(2)}
+                analysisEndTime={analysisEndTime}
                 />;
       default:
         return null;

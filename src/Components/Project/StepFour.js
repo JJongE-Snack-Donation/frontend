@@ -1,7 +1,7 @@
 import React from "react";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 
-const StepFour = ({nextStep, upload}) => {
+const StepFour = ({nextStep, upload, analysisEndTime}) => {
 
     const handleNextStep = () => {
         nextStep();
@@ -11,11 +11,15 @@ const StepFour = ({nextStep, upload}) => {
         upload();
     }
 
+    const formattedTime = analysisEndTime
+    ? new Date(analysisEndTime).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })
+    : "시간 정보 없음";
+
     return (
         <div className="step-two-container step-four-container">
             <CircularProgress value={100} isCompleted={true} />
             <h2>분석이 완료되었습니다.</h2>
-            <span>2025-01-31 00:00:00</span>
+            <span>{formattedTime}</span>
             <div className="row-btn">
                 <button 
                 className="move-btn"

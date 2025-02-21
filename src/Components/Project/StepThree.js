@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import api from "../../Api";
+import Pagination from "../Pagination/FilePagenation"; // 페이지네이션 컴포넌트 가져오기
 
-const StepThree = ({ nextStep, projectId, projectName, projectFile }) => {
+const StepThree = ({ nextStep, projectId, projectName, projectFile, setAnalysisEndTime }) => {
   const [progress, setProgress] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const filesPerPage = 5; // 한 페이지당 보여줄 파일 수
 
   useEffect(() => {
     // 분석 시작 API 호출
     const startDetection = async () => {
       try {
         console.log("선택된 파일들:", projectFile.map((file) => file.image_id));
-        
+
         const response = await api.post(
           "/detect",
           JSON.stringify({ image_ids: projectFile.map((file) => file.image_id) }),
@@ -49,6 +52,8 @@ const StepThree = ({ nextStep, projectId, projectName, projectFile }) => {
 
             if (newProgress >= 100) {
               clearInterval(interval);
+              const endTime = new Date().toISOString(); // 완료된 시간 기록
+              setAnalysisEndTime(endTime); // StepFour로 전달할 상태 업데이트
               nextStep(); // 100%가 되면 다음 단계로 이동
             }
           }
@@ -63,10 +68,16 @@ const StepThree = ({ nextStep, projectId, projectName, projectFile }) => {
     startDetection(); // 컴포넌트가 마운트되면 AI 분석 시작
   }, [nextStep, projectFile]);
 
+  // 페이지네이션 관련 로직
+  const indexOfLastFile = currentPage * filesPerPage;
+  const indexOfFirstFile = indexOfLastFile - filesPerPage;
+  const currentFiles = projectFile.slice(indexOfFirstFile, indexOfLastFile);
+
   return (
     <div className="step-two-container step-three-container">
       <CircularProgress value={progress} isCompleted={progress >= 100} />
       <h2>분석이 진행 중입니다...</h2>
+      
       <table className="file-list">
         <thead>
           <tr>
@@ -74,13 +85,21 @@ const StepThree = ({ nextStep, projectId, projectName, projectFile }) => {
           </tr>
         </thead>
         <tbody>
-          {projectFile.map((file, index) => (
+          {currentFiles.map((file, index) => (
             <tr key={index}>
               <td>{file.filename}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* 페이지네이션 적용 */}
+      <Pagination
+        totalItems={projectFile.length}
+        itemsPerPage={filesPerPage}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
