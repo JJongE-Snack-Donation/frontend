@@ -4,7 +4,7 @@ const useCountUpdate = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDEyNzI0NCwianRpIjoiOGQ4YmNhY2YtZWI0My00ZjFhLTkxNDEtNjNiOTNjOWRiMTdhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMTI3MjQ0LCJjc3JmIjoiNjA3OGRmNzktZWU2Ny00ZmMwLWJjMWMtOWQzOGFlOWJkYTdlIiwiZXhwIjoxNzQwMjEzNjQ0fQ.E5cmh2Y9El_MATXmNDsnH9wlhYbTlgJ7wD44Pyf30PQ";
 
     const updateNormalInspectionBulk = async (imageIds, updates) => {
         setLoading(true);

@@ -5,6 +5,7 @@ import useImageStore from './useImageStore';
 const useSearch = (selectedPage) => {
     const { groupedImages, setGroupedImages } = useImageStore();
     const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
+    const fetchExceptionGroupImages = useImageStore(state => state.fetchExceptionGroupImages);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [searchParams, setSearchParams] = useState({
         projectName: '',
@@ -23,7 +24,7 @@ const useSearch = (selectedPage) => {
         cameraLabelOptions: [],
     });
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDEyNzI0NCwianRpIjoiOGQ4YmNhY2YtZWI0My00ZjFhLTkxNDEtNjNiOTNjOWRiMTdhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMTI3MjQ0LCJjc3JmIjoiNjA3OGRmNzktZWU2Ny00ZmMwLWJjMWMtOWQzOGFlOWJkYTdlIiwiZXhwIjoxNzQwMjEzNjQ0fQ.E5cmh2Y9El_MATXmNDsnH9wlhYbTlgJ7wD44Pyf30PQ";
 
     // 일반 검수 리스트 조회
     const handleSearch = useCallback(async (page = 1) => {
@@ -122,7 +123,7 @@ const useSearch = (selectedPage) => {
     }, [searchParams, setGroupedImages]);
 
 
-
+    
     const filteredGroups = useMemo(() => {
         if (!selectedGroup || !groupedImages.length) return groupedImages;
         return groupedImages.filter(
@@ -132,13 +133,19 @@ const useSearch = (selectedPage) => {
         );
     }, [selectedGroup, groupedImages]);
 
+    
+    //검색 옵션 로드
     const fetchOptions = useCallback(async () => {
         try {
-            const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
-                params: { is_classified: true },
+            const endpoint = selectedPage === 'normal' 
+                ? 'http://localhost:5000/search/inspection/normal/search'
+                : 'http://localhost:5000/search/inspection/exception/search';
+    
+            const response = await axios.get(endpoint, {
+                params: { is_classified: selectedPage === 'normal' ? true : false },
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-
+    
             if (response.data.data?.images) {
                 const images = response.data.data.images;
                 setOptions({
@@ -156,7 +163,8 @@ const useSearch = (selectedPage) => {
             console.error('옵션 로드 실패:', error);
             setError('옵션을 불러오는 중 오류가 발생했습니다.');
         }
-    }, []);
+    }, [selectedPage, token]);
+    
 
     // 페이지 선택에 따라 검수 조회 목록 다르게 설정
     useEffect(() => {
@@ -187,6 +195,7 @@ const useSearch = (selectedPage) => {
         options,
         fetchOptions,
         fetchGroupImages,
+        fetchExceptionGroupImages,
         handleExceptionSearch,
     };
 };

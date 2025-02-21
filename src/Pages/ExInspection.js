@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../Styles/Home.css';
+import ImageModal from '../Components/ImageModal/ImageModal';
 import ImageGrid from '../Components/Pagination/ImageGrid';
 import NameTag from '../Components/NameTag';
 import Title from '../Components/Title';
@@ -11,7 +12,9 @@ import PaginationComponent from '../Components/Pagination/PaginationComponent';
 const ExceptionInspection = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState(null);
-    const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
+    const fetchExceptionGroupImages = useImageStore(state => state.fetchExceptionGroupImages);
+    
+    const selectedPage = 'exception'; 
 
     const {
         groupedImages,
@@ -23,7 +26,7 @@ const ExceptionInspection = () => {
         searchParams,
         updateSearchParam,
         handleExceptionSearch
-    } = useSearch('exception');
+    } = useSearch(selectedPage);
 
     const handlePageChange = async (pageNumber) => {
         await handleExceptionSearch(pageNumber);
@@ -36,7 +39,7 @@ const ExceptionInspection = () => {
 
     const handleGroupClick = async (group) => {
         setSelectedGroup(group);
-        await fetchGroupImages(group.evtnum);
+        await fetchExceptionGroupImages(group.evtnum);
         setIsModalOpen(true);
     };
 
@@ -78,10 +81,24 @@ const ExceptionInspection = () => {
                             onChange={handlePageChange}
                         />
                     )}
+                                {isModalOpen && selectedGroup && (
+                <ImageModal
+                    onClose={() => setIsModalOpen(false)}
+                    groupData={selectedGroup}
+                    selectedPage={selectedPage} 
+                />
+            
+            )}
                 </>
             )}
 
-
+            {isModalOpen && selectedGroup && (
+            <ImageModal
+                onClose={() => setIsModalOpen(false)}
+                groupData={selectedGroup}
+                selectedPage={selectedPage} 
+            />
+            )}
 
 
         </div>

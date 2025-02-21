@@ -13,16 +13,18 @@ import checkIcon from '../../Assets/Imgs/etc/check_message.svg';
 import useCountUpdate from '../../Hooks/useCountUpdate';
 import CountUpdatePopup from './CountUpdatePopup';
 
-const ImageModal = ({ groupData, onClose }) => {
+const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
-    const { fetchGroupImages } = useSearch();
+    const { fetchGroupImages, fetchExceptionGroupImages } = useSearch();
     const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
+    const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
 
+    const imagesToUse = selectedPage === 'normal' ? groupImages : exceptionGroupImages;
 
     const {
         selectedCards,
@@ -36,7 +38,7 @@ const ImageModal = ({ groupData, onClose }) => {
         handleCardClick,
         handleCheckboxChange,
         setRelatedImages
-    } = useImageSelection({ relatedImages: groupImages });
+    }  = useImageSelection({ relatedImages: imagesToUse, selectedPage });
 
     const {
         isDropdownOpen,
@@ -97,20 +99,27 @@ const ImageModal = ({ groupData, onClose }) => {
 
     useEffect(() => {
         const loadGroupImages = async () => {
-          if (groupData && groupData.evtnum) {
-            const images = await fetchGroupImages(groupData.evtnum);
+            if (groupData && groupData.evtnum) {
+                let images;
+                if (selectedPage === 'normal') {
+                    images = await fetchGroupImages(groupData.evtnum);
+                    setGroupImages(images);
+                } else if (selectedPage === 'exception') {
+                    images = await fetchExceptionGroupImages(groupData.evtnum);
+                    setExceptionGroupImages(images);
+                }
     
-            setGroupImages(images);
-    
-            if (images.length > 0) {
-              setRelatedImages(images);
-              handleCardClick(images[0]); // 첫 번째 이미지를 기본 선택
+                if (images && images.length > 0) {
+                    setRelatedImages(images);
+                    handleCardClick(images[0]);
+                }
             }
-          }
         };    
     
         loadGroupImages();
-      }, [groupData, fetchGroupImages]);
+    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+    
+      
     
     
 
@@ -169,8 +178,8 @@ const ImageModal = ({ groupData, onClose }) => {
                         </div>
 
                         <div className="modal__all">
-                        {groupImages.length > 0 ? (
-                            groupImages.map((img, index) => (
+                        {imagesToUse.length > 0 ? (
+                            imagesToUse.map((img, index) => (
                                     <ImageCard
                                         key={img.imageId}
                                         image={img}
