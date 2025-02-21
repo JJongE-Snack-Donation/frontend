@@ -139,13 +139,15 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                             />
                             <label>전체 선택</label>
                             <div className="modal__option-bar-right">
+                            {selectedPage === 'normal' && (
                                 <button 
                                     className="modal__inspection-btn"
                                     disabled={checkedBoxes.length === 0}
                                     onClick={() => setShowConfirmToast(true)}
                                 >
-                                    예외 검수
+                                예외 검수
                                 </button>
+                            )}
 
                                 {checkedBoxes.length > 1 && (
                                     <div className="modal__bulk-action">
@@ -201,12 +203,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                 </div>
 
                 <div className="modal__footer">
-                    <button
-                        className="modal__confirm-btn"
-                        onClick={() => setShowInspectionCompleteToast(true)}
-                    >
-                        검수 확정
-                    </button>
+                    {selectedPage === 'normal' && (
+                        <button
+                            className="modal__confirm-btn"
+                            onClick={() => setShowInspectionCompleteToast(true)}
+                        >
+                            검수 확정
+                        </button>
+                    )}
                     <button
                         className="modal__close-btn"
                         onClick={onClose}
