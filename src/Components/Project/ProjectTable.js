@@ -71,10 +71,10 @@ const ProjectTable = ({ projects, onDelete, onEdit, onSelect }) => {
             <td>{project.manager_name ?? "사용자 없음"}</td>
             <td>
               <div className="tb-btn-container">
-                <button className="select" onClick={() => onSelect(project.id)}>
+                <button className="select" onClick={() => onSelect(project._id)}>
                   <img src={arrow} alt="arrow" />
                 </button>
-                <button className="edit" onClick={() => onEdit(project.id)}>
+                <button className="edit" onClick={() => onEdit(project._id)}>
                   <img src={write} alt="write" />
                 </button>
 

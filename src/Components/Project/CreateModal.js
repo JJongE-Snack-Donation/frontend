@@ -66,6 +66,9 @@ const Modal = ({ isOpen, onClose, onAdd }) => {
       }
     } catch (err) {
       console.error("Error checking duplicate:", err);
+      setIsDuplicate(true);
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 2000);
     }
   };
 
@@ -78,8 +81,6 @@ const Modal = ({ isOpen, onClose, onAdd }) => {
   const handleAdd = async () => {
     if (isDuplicate === false) {
       try {
-        // 프로젝트 추가 요청
-        console.log(formattedProject);
         const response = await api.post(
           "/project",
           JSON.stringify({

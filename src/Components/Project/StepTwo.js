@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import api from "../../Api";
+import StatusMessage from "./StatusMessage";
 import { ReactComponent as Upload } from "../../Assets/Imgs/etc/upload.svg";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 import trash from "../../Assets/Imgs/btn/project/trash.svg";
+import Pagination from "../Pagination/FilePagenation";
 
-const StepTwo = ({nextStep}) => {
+const StepTwo = ({nextStep,projectId,projectName,setSelectProjectFile}) => {
   const [currentPart, setCurrentPart] = useState("upload");
   const [progress, setProgress] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -13,6 +16,17 @@ const StepTwo = ({nextStep}) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [remainingTime, setRemainingTime] = useState(null);
   const [failedUploads, setFailedUploads] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [filesPerPage] = useState(8); // 한 페이지당 보여줄 파일 수
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [statusMessage, setStatusMessage] = useState(""); // 상태 메시지
+  const [isSuccess, setIsSuccess] = useState(false); // 성공 여부
+  const [showMessage, setShowMessage] = useState(false); // 메시지 표시 여부
+  
+
+  const indexOfLastFile = currentPage * filesPerPage;
+  const indexOfFirstFile = indexOfLastFile - filesPerPage;
+  const currentFiles = uploadedFiles.slice(indexOfFirstFile, indexOfLastFile);
 
   useEffect(() => {
     let interval;
@@ -51,27 +65,136 @@ const StepTwo = ({nextStep}) => {
     setFailedUploads(0);
   };
 
-  const processFiles = (files) => {
+  const processFiles = async (files) => {
     if (!files || files.length === 0) return;
-
+  
     setUploadedFiles(files.map((file) => file.name));
     setProgress(0);
     setCurrentPart("uploading");
-
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setCurrentPart("review"), 500);
-          return 100;
-        }
-        const newProgress = prev + 10;
-        const remaining = ((100 - newProgress) / 10) * 3;
-        setRemainingTime(remaining);
-        return newProgress;
+    setIsUploading(true);
+  
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+  
+    const projectInfo = JSON.stringify({
+      project_id: projectId,  
+      project_name: projectName  
+    });
+  
+    formData.append("project_info", projectInfo);
+    console.log("프로젝트 정보:", formData.get("project_info"));
+  
+    try {
+      // **1. 파일 업로드 요청 (0% → 50%)**
+      const response = await api.post("/files/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        onUploadProgress: (event) => {
+          const percentCompleted = Math.round((event.loaded * 50) / event.total);
+          setProgress(percentCompleted);
+        },
       });
-    }, 3000);
+  
+      if (response.status === 200) {
+        console.log("업로드 성공:", response.data);
+        const uploadedData = response.data.data.uploaded_files || [];
+  
+        setUploadedFiles(uploadedData.map((file) => ({ filename: file.filename, image_id: file.image_id })));
+        setProgress(50); // **업로드 완료 시 50% 고정**
+        
+        // **2. 파싱 시작**
+        await startParsing(uploadedData.map((file) => file.image_id));
+      }
+  
+    } catch (error) {
+      console.error("파일 업로드 실패:", error);
+      setFailedUploads((prev) => prev + 1);
+      setCurrentPart("upload");
+    } finally {
+      setIsUploading(false);
+    }
   };
+  
+  const startParsing = async (imageIds) => {
+    if (!imageIds || imageIds.length === 0) return;
+  
+    try {
+      console.log("파싱 시작:", imageIds);
+  
+      const response = await api.post(
+        "/files/parse-exif",
+        JSON.stringify({ image_ids: imageIds, timeout: 30 }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+  
+      console.log("파싱 요청 결과:", response.data);
+  
+      if (response.status === 200) {
+        console.log("파싱 요청 성공, 진행률 증가 시작...");
+  
+        let progressInterval = setInterval(() => {
+          setProgress((prevProgress) => {
+            if (prevProgress >= 100) {
+              clearInterval(progressInterval);
+              setCurrentPart("review"); // 파싱 완료 후 review로 이동
+              return 100;
+            }
+            return prevProgress + 5; // 5%씩 증가
+          });
+        }, 500);
+      } else if (response.status === 206) {
+        console.warn("일부 이미지만 파싱 성공:", response.data);
+  
+        const { parsed_count, failed_images } = response.data.data || {};
+        const failedCount = failed_images ? failed_images.length : 0;
+  
+        // 상태 메시지 업데이트
+        setStatusMessage(
+          `일부 이미지(${parsed_count}개)의 EXIF 파싱이 완료되었으나, ${failedCount}개 실패`
+        );
+        setIsSuccess(true);
+        setShowMessage(true);
+  
+        // 기존 실패한 업로드 개수에 파싱 실패한 개수 추가
+        setFailedUploads((prev) => prev + failedCount);
+  
+        // 실패한 이미지들을 업로드된 목록에서 제거 (파싱 실패 처리)
+        setUploadedFiles((prevFiles) =>
+          prevFiles.map((file) =>
+            failed_images.includes(file.filename) ? { ...file, failed: true } : file
+          )
+        );
+  
+        let progressInterval = setInterval(() => {
+          setProgress((prevProgress) => {
+            if (prevProgress >= 90) { // 90%까지만 증가 (완전하지 않음)
+              clearInterval(progressInterval);
+              setCurrentPart("review"); // 그래도 review로 이동
+              return 90;
+            }
+            return prevProgress + 5;
+          });
+        }, 500);
+  
+        setTimeout(() => setShowMessage(false), 5000);
+      }
+    } catch (error) {
+      console.error("파싱 요청 실패:", error);
+      setStatusMessage("파싱 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setIsSuccess(false);
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 3000);
+    }
+  };  
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -79,35 +202,92 @@ const StepTwo = ({nextStep}) => {
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-  const handleCheckboxChange = (fileName) => {
+  const handleCheckboxChange = (fileId) => {
     setSelectedFiles((prevSelected) =>
-      prevSelected.includes(fileName)
-        ? prevSelected.filter((file) => file !== fileName)
-        : [...prevSelected, fileName]
+      prevSelected.includes(fileId)
+        ? prevSelected.filter((id) => id !== fileId)
+        : [...prevSelected, fileId]
     );
   };
 
-  const handleDeleteSelectedFiles = () => {
-    setUploadedFiles((prevFiles) => prevFiles.filter((file) => !selectedFiles.includes(file)));
-    setSelectedFiles([]);
+  const handleDeleteSelectedFiles = async () => {
+    if (selectedFiles.length === 0) return;
+
+    try {
+        // API 요청을 위한 payload 생성
+        const response = await api.delete("/files/bulk-delete", {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            data: {
+                image_ids: selectedFiles,  // 삭제할 image_id 리스트
+            },
+        });
+
+        // 상태 코드로 성공 판별
+        if (response.status === 200) {
+            console.log("파일 삭제 결과:", response.data);
+            const failedIds = response.data.data.failed_ids || [];
+            const successfulDeletes = selectedFiles.filter((id) => !failedIds.includes(id));
+
+            // 성공적으로 삭제된 파일들을 UI에서 제거
+            setUploadedFiles((prevFiles) => prevFiles.filter((file) => !successfulDeletes.includes(file.image_id)));
+            setSelectedFiles([]); // 선택 상태 초기화
+
+            // 결과 피드백
+            if (failedIds.length > 0) {
+                setStatusMessage(`${failedIds.length}개의 파일 삭제에 실패했습니다.`);
+                setIsSuccess(false);
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 3000);
+            } else {
+                setStatusMessage("모든 선택된 파일이 성공적으로 삭제되었습니다.");
+                setIsSuccess(true);
+                setShowMessage(true);
+                setTimeout(() => setShowMessage(false), 3000);
+            }
+        } else {
+            // 상태 코드가 200이 아니면 실패로 간주
+            setStatusMessage("파일 삭제 중 문제가 발생했습니다. 다시 시도하세요.");
+            setIsSuccess(false);
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 3000);
+        }
+    } catch (error) {
+        console.error("파일 삭제 실패:", error);
+        setStatusMessage("서버에 연결할 수 없습니다. 다시 시도하세요.");
+        setIsSuccess(false);
+        setShowMessage(true);
+    }
+};
+
+   // 페이지 변경 핸들러
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
-  // ✅ 전체 선택 체크박스의 상태 관리
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      setSelectedFiles(uploadedFiles);
+      setSelectedFiles(currentFiles.map((file) => file.image_id)); // image_id만 저장
     } else {
       setSelectedFiles([]);
     }
-  };
+  };  
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     nextStep();
+    setSelectProjectFile(uploadedFiles);
   };
 
   const UploadProcess = () => {
     return (
       <>
+        <StatusMessage
+            isSuccess={isSuccess}
+            message={statusMessage}
+            showMessage={showMessage}
+        />
         <div className={`step-two-container ${currentPart === "review" ? "review-container" : ""}`}>
           <CircularProgress value={progress} isCompleted={currentPart === "review"} />
           <h2>
@@ -174,7 +354,7 @@ const StepTwo = ({nextStep}) => {
             </label>
           </div>
 
-          <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. 업로드 중에는 페이지 이동이 가능하지만, 새로 고침은 피해주세요</h5>
+          <h5>한 번에 최대 10,000장 이하로 업로드할 것을 권장합니다. jpg, 혹은 jpeg 형식의 파일만 업로드 가능하며 최대 파일 크기는 10MB입니다.</h5>
         </div>
 
         {currentPart === "review" && (
@@ -217,35 +397,54 @@ const StepTwo = ({nextStep}) => {
                 <img src={trash} alt="trash" />
               </button>
             </div>
-            <table className="file-list">
-              <thead>
-                <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAll}
-                      checked={uploadedFiles.length > 0 && selectedFiles.length === uploadedFiles.length}
-                    />
-                    파일 이름
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {uploadedFiles.map((file, index) => (
-                  <tr key={index} className={selectedFiles.includes(file) ? "selected" : ""}>
-                    <td>
+            <div className="file-list-container">
+              <table className="file-list">
+                <thead>
+                  <tr>
+                    <th>
                       <input
                         type="checkbox"
-                        checked={selectedFiles.includes(file)}
-                        onChange={() => handleCheckboxChange(file)}
+                        onChange={handleSelectAll}
+                        checked={uploadedFiles.length > 0 && selectedFiles.length === uploadedFiles.length}
                       />
-                      <span className="custom-checkbox"></span>
-                      {file}
-                    </td>
+                      파일 이름
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                {currentFiles.map((file, index) => (
+              <tr key={index}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedFiles.includes(file.image_id)}
+                    onChange={() => handleCheckboxChange(file.image_id)}
+                  />
+                  {file.filename}
+                </td>
+              </tr>
+            ))}
+                </tbody>
+              </table>
+            </div>
+             {/* 페이지네이션 */}
+            {/*<div className="pagination">
+            {Array.from({ length: Math.ceil(uploadedFiles.length / filesPerPage) }, (_, i) => (
+              <button
+                key={i}
+                className={i + 1 === currentPage ? "active" : ""}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            </div>*/}
+            <Pagination 
+              totalItems={uploadedFiles.length} 
+              itemsPerPage={filesPerPage} 
+              currentPage={currentPage} 
+              onPageChange={handlePageChange} 
+            />
             <div className="start-btn-container">
               <button 
               className="start-btn"

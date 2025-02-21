@@ -128,7 +128,7 @@ color: rgb(204, 204, 204);
   flex-wrap: wrap;
   gap: 4px;
   padding: 4px;
-  background-color: #f8f8f8;
+  background-color: #fcfcfc;
   height: 50%;
   overflow-y: auto;
 }
@@ -335,6 +335,42 @@ input[type="checkbox"] {
   animation: fadeInOut 5s ease-in-out;
 }
 
-.modal__image_edit-btn{
+.modal__footer {
+  position: absolute; /* 모달 내부에 고정 */
+  bottom: 20px; /* 모달 하단에서 20px 간격 */
+  right: 20px; /* 모달 오른쪽에서 20px 간격 */
+  display: flex; /* 버튼을 가로로 정렬 */
+  gap: 10px; /* 버튼 간 간격 */
+}
 
+.modal__confirm-btn,
+.modal__close-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.modal__confirm-btn {
+  background-color: #117a12; /* 초록색 */
+  color: white;
+}
+
+.modal__close-btn {
+  background-color: #f1f1f1; /* 빨간색 */
+  
+  color: rgb(24, 24, 24);
+}
+
+.modal__confirm-btn:hover {
+  background-color: #0f5210;
+}
+
+.modal__close-btn:hover {
+  background-color: #acacac;
+}
+
+.modal__container {
+  position: relative; /* 자식 요소의 absolute 위치 기준 */
 }

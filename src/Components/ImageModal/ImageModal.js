@@ -1,31 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../Styles/ImageModal.css';
-import { useState } from 'react';
 import { useImageSelection } from '../../Hooks/useImageSelection';
+import useSearch from '../../Hooks/useSearch';
 import useImageActions from '../../Hooks/useImageActions';
+import useImageStore from '../../Hooks/useImageStore';
 import ImageViewer from './ImageViewer';
 import ImageCard from './ImageCard';
 import ImageInfo from './ImageInfo';
-import ConfirmToast from './ConfirmToast';
-import checkIcon from '../../Assets/Imgs/etc/check_message.svg'
+import ConfirmToast from './ExceptionConfirmToast';
+import InspectionCompleteToast from './InspectionCompleteToast';
+import checkIcon from '../../Assets/Imgs/etc/check_message.svg';
+import useCountUpdate from '../../Hooks/useCountUpdate';
+import CountUpdatePopup from './CountUpdatePopup';
 
-const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
-    const [showCompletionMessage, setShowCompletionMessage] = useState(false);
+const ImageModal = ({ groupData, onClose }) => {
+    const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
+    const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
+    const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
+    const { fetchGroupImages } = useSearch();
+    const { relatedImages, updateClassification } = useImageStore();
+    const [groupImages, setGroupImages] = useState([]);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const { updateNormalInspectionBulk } = useCountUpdate();
+
 
     const {
         selectedCards,
         checkedBoxes,
         isAllSelected,
-        relatedImages,
         mainImage,
         selectedImageInfo,
-        setRelatedImages,
         setCheckedBoxes, 
         setIsAllSelected,
         handleSelectAll,
         handleCardClick,
-        handleCheckboxChange
-    } = useImageSelection(image);
+        handleCheckboxChange,
+        setRelatedImages
+    } = useImageSelection({ relatedImages: groupImages });
 
     const {
         isDropdownOpen,
@@ -34,33 +45,72 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
         setShowConfirmToast,
         handleDelete,
         handleDownload,
-        handleBulkEdit,          
-        handleBulkInfoDownload,  
-        handleBulkImageDownload, 
-        handleBulkDelete         
-    } = useImageActions(relatedImages, setRelatedImages, onImagesUpdate, onDelete);
+        handleBulkImageDownload,
+        handleExceptionInspection,
+        handleInspectionComplete,
+        handleBulkImageDelete
+    } = useImageActions();
 
     const handleConfirmInspection = () => {
-        if (onImagesUpdate) {
-            const updatedImages = relatedImages.map(img => ({
-                ...img,
-                isException: checkedBoxes.includes(img.imageId) ? true : img.isException
-            }));
-            onImagesUpdate(updatedImages, checkedBoxes);
-            setRelatedImages(updatedImages); // 추가된 부분
-        }
-        setShowConfirmToast(false);
+        handleExceptionInspection(checkedBoxes);
         setCheckedBoxes([]);
         setIsAllSelected(false);
-
-        // 완료 메시지 표시
-        setShowCompletionMessage(true);
-        
-        // 3초 후 메시지 숨기기
-        setTimeout(() => {
-            setShowCompletionMessage(false);
-        }, 3000);
+        setShowExceptionCompletionMessage(true);
+        setTimeout(() => setShowExceptionCompletionMessage(false), 4000);
     };
+
+    const handleConfirmInspectionComplete = async () => {
+        try {
+            await handleInspectionComplete(groupData.projectName, groupData.species);
+            setShowInspectionCompleteToast(false);
+            setShowInspectionCompletionMessage(true);
+            setTimeout(() => setShowInspectionCompletionMessage(false), 4000);
+        } catch (error) {
+            console.error("검수 확정 중 오류 발생:", error);
+            alert("검수 확정 중 오류가 발생했습니다.");
+        }
+    };
+
+    const handleOpenPopup = () => {
+        if (checkedBoxes.length === 0) {
+            alert('수정할 이미지를 선택해주세요.');
+            return;
+        }
+        setIsPopupOpen(true);
+    };
+
+    const handleClosePopup = () => {
+        setIsPopupOpen(false);
+    };
+
+    const handleSubmitPopup = async (updates) => {
+        try {
+            const result = await updateNormalInspectionBulk(checkedBoxes, updates);
+            alert(`${result.modified_count}개의 이미지가 수정되었습니다.`);
+        } catch (error) {
+            alert('이미지 수정 중 오류가 발생했습니다.');
+        } finally {
+            handleClosePopup();
+        }
+    };
+
+
+    useEffect(() => {
+        const loadGroupImages = async () => {
+          if (groupData && groupData.evtnum) {
+            const images = await fetchGroupImages(groupData.evtnum);
+    
+            setGroupImages(images);
+    
+            if (images.length > 0) {
+              setRelatedImages(images);
+              handleCardClick(images[0]); // 첫 번째 이미지를 기본 선택
+            }
+          }
+        };    
+    
+        loadGroupImages();
+      }, [groupData, fetchGroupImages]);
     
     
 
@@ -98,15 +148,16 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                                         </button>
                                         {isDropdownOpen && (
                                             <div className="modal__bulk-action-dropdown">
-                                                <button >수정</button>
-                                                <button >정보 다운로드</button>
-                                                <button >이미지 다운로드</button>
-                                                <button 
+                                                <button onClick={handleOpenPopup} className="modal__edit-button">수정</button>
+                                                <CountUpdatePopup
+                                                    isOpen={isPopupOpen}
+                                                    onClose={handleClosePopup}
+                                                    onSubmit={handleSubmitPopup}
+                                                />
+                                                <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
+                                                <button onClick={() => handleBulkImageDelete(checkedBoxes)}
+                                                    disabled={checkedBoxes.length === 0}
                                                     style={{ color: '#ff4d4f' }}
-                                                    onClick={() => {
-                                                        handleBulkDelete(checkedBoxes);
-                                                        setShowConfirmToast(false);  // 토스트 메시지 닫기
-                                                    }}
                                                 >
                                                     이미지 삭제
                                                 </button>
@@ -118,36 +169,73 @@ const ImageModal = ({ image, onClose, onImagesUpdate, onDelete }) => {
                         </div>
 
                         <div className="modal__all">
-                            {relatedImages?.map((image, index) => (
-                                <ImageCard
-                                    key={index}
-                                    image={image}
-                                    index={index}
-                                    isSelected={selectedCards.includes(image.imageId)}
-                                    isChecked={checkedBoxes.includes(image.imageId)}
-                                    onCardClick={handleCardClick}
-                                    onCheckboxChange={handleCheckboxChange}
-                                    onDownload={handleDownload}
-                                    onDelete={handleDelete}
-                                />
-                            ))}
+                        {groupImages.length > 0 ? (
+                            groupImages.map((img, index) => (
+                                    <ImageCard
+                                        key={img.imageId}
+                                        image={img}
+                                        index={index}
+                                        isSelected={selectedCards.includes(img.imageId)}
+                                        isChecked={checkedBoxes.includes(img.imageId)}
+                                        onCardClick={(e) => handleCardClick(img, e)}
+                                        onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
+                                        onDownload={() => handleDownload(img.imageId)}
+                                        onDelete={(e) => handleDelete(img.imageId, e)}
+                                    />
+                                ))
+                            ) : (
+                                <div className="no-images-message">관련된 이미지가 없습니다.</div>
+                            )}
                         </div>
                     </div>
                     <ImageInfo imageData={selectedImageInfo} />
                 </div>
-            </div>
-            {showConfirmToast && (
-                <ConfirmToast
-                    onConfirm={handleConfirmInspection}
-                    onCancel={() => setShowConfirmToast(false)}
-                />
-            )}
-            {showCompletionMessage && (
-                <div className="modal-completion-message">
-                    <img src={checkIcon} alt="CheckMassage" />
-                    예외 검수 설정 완료
+
+                <div className="modal__footer">
+                    <button
+                        className="modal__confirm-btn"
+                        onClick={() => setShowInspectionCompleteToast(true)}
+                    >
+                        검수 확정
+                    </button>
+                    <button
+                        className="modal__close-btn"
+                        onClick={onClose}
+                    >
+                        닫기
+                    </button>
                 </div>
-            )}
+                {showConfirmToast && (
+                    <ConfirmToast
+                        onConfirm={handleConfirmInspection}
+                        onCancel={() => setShowConfirmToast(false)}
+                    />
+                )}
+                {showInspectionCompleteToast && (
+                    <InspectionCompleteToast
+                        onClose={() => setShowInspectionCompleteToast(false)}
+                        onConfirm={handleConfirmInspectionComplete}
+            
+                    />
+                )}
+                {/* 예외 검수 설정 완료 메시지 */}
+                {showExceptionCompletionMessage && (
+                    <div className="modal-completion-message">
+                        <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
+                        예외 검수 설정 완료
+                    </div>
+                )}
+
+                {/* 검수 확정 완료 메시지 */}
+                {showInspectionCompletionMessage && (
+                    <div className="modal-completion-message">
+                        <img src={checkIcon} alt="확인 아이콘" className="completion-message__icon" />
+                        검수 확정 완료
+                    </div>
+                )}
+
+            </div>
+            
         </div>
     );
 };
