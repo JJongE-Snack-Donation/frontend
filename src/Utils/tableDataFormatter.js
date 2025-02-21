@@ -25,7 +25,7 @@ export const getTableData = (imageData) => {
         },
         {
           type: 'double',
-          left: { label: 'AI 검수 여부', value: imageData.exception_status === "pending" ? "True" : "False" },
+          left: { label: 'AI 검수 여부', value: imageData.is_classified === true ? "True" : "False" },
           right: { label: '카메라 라벨', value: imageData.SerialNumber || 'No Data' }
         }
       ],
