@@ -91,24 +91,18 @@ const useImageStore = create((set, get) => ({
     exceptionGroupImages: {},
     // 검색창에서 선택한 이미지 그룹의 전체 이미지 조회 (예외 검수)
     fetchExceptionGroupImages: async (evtnum) => {
-        console.log('Fetching exception group images for evtnum:', evtnum); // 요청 시작 로그
         try {
             const response = await axios.get('http://localhost:5000/inspection/exception', {
                 params: { evtnum },
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            console.log('API Response:', response); // 전체 응답 로그
-            console.log('Fetched Exception Group Images:', response.data); // 응답 데이터 로그
-            const images = response.data.images;
-            console.log('Extracted images:', images); // 추출된 이미지 배열 로그
+            const images = response.data.images;            
             set((state) => ({
                 exceptionGroupImages: { ...state.exceptionGroupImages, [evtnum]: images }
             }));
-            console.log('Updated state:', get().exceptionGroupImages); // 업데이트된 상태 로그
             return images;
         } catch (error) {
             console.error("Exception Group images fetch error:", error);
-            console.error("Error details:", error.response ? error.response.data : 'No response data');
             return [];
         }
     }
