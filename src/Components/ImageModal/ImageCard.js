@@ -14,6 +14,7 @@ const ImageCard = ({
     onDownload, 
     onDelete 
 }) => (
+    
     <div 
         className={`modal__all_image-item ${isSelected ? 'selected' : ''}`}
         onClick={(e) => onCardClick(image, e)}
@@ -23,13 +24,18 @@ const ImageCard = ({
                 type="checkbox" 
                 className="modal__all_image-checkbox"
                 checked={isChecked}
-                onChange={(e) => onCheckboxChange(image.imageId, e)}
-                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                    e.stopPropagation();
+                    onCheckboxChange(image.imageId, e); // image.imageId 전달
+                  }}
             />
-            <span className="modal__all_image-number">{index + 1} - {image.species}</span>
+            <span className="modal__all_image-number">{index + 1} - {image.fileName}</span>
             <button 
                 className="modal__all_image-download"
-                onClick={(e) => onDownload(image, e)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDownload(image, e)
+                }}
             >
                 <img src={downloadIcon} alt="Download" />
             </button>
@@ -41,8 +47,8 @@ const ImageCard = ({
             </button>
         </div>
         <div className="modal__all_image-content">
-            <img src={image.FilePath} alt="" />
-            {image.isException && (
+            <img  src={image.imageUrl} alt="" />
+            {image.exception_status === "processed" && (
                 <div className="exception-overlay">예외</div>
             )}
             <button 
