@@ -46,6 +46,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         setIsDropdownOpen,
         setShowConfirmToast,
         handleDelete,
+        handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
         handleExceptionInspection,
@@ -191,7 +192,9 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                         onCardClick={(e) => handleCardClick(img, e)}
                                         onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
                                         onDownload={() => handleDownload(img.imageId)}
-                                        onDelete={(e) => handleDelete(img.imageId, e)}
+                                        onDelete={(e) => selectedPage === 'normal' 
+                                            ? handleDelete(img.imageId, e) 
+                                            : handleExceptionDelete(img.imageId, e)}
                                     />
                                 ))
                             ) : (

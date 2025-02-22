@@ -9,7 +9,7 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
 
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDEyNzI0NCwianRpIjoiOGQ4YmNhY2YtZWI0My00ZjFhLTkxNDEtNjNiOTNjOWRiMTdhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMTI3MjQ0LCJjc3JmIjoiNjA3OGRmNzktZWU2Ny00ZmMwLWJjMWMtOWQzOGFlOWJkYTdlIiwiZXhwIjoxNzQwMjEzNjQ0fQ.E5cmh2Y9El_MATXmNDsnH9wlhYbTlgJ7wD44Pyf30PQ";
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
 
   const handleSelectAll = (e) => {
     const isChecked = e.target.checked;
@@ -20,17 +20,19 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   // 카드 클릭 시 선택된 카드의 아이디와 정보 재설정, 메인 이미지로 설정
   const handleCardClick = useCallback((clickedImage, e = null) => {
     if (e && e.stopPropagation) {
-      e.stopPropagation();
+        e.stopPropagation();
     }
     setSelectedCards([clickedImage.imageId]);
-    setSelectedImageInfo(clickedImage);
     setMainImage(clickedImage);
 
     // 이미 상세 정보가 있다면 API 호출을 하지 않음
     if (!clickedImage.detailFetched) {
-      fetchImageDetail(clickedImage.imageId, selectedPage);
+        fetchImageDetail(clickedImage.imageId, selectedPage);
+    } else {
+        setSelectedImageInfo(clickedImage);
     }
-  }, [selectedPage]);
+}, [selectedPage]);
+
 
   // 체크 박스 선택 시
   const handleCheckboxChange = (imageId, e) => {
@@ -53,14 +55,15 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
       const endpoint = selectedPage === 'normal'
         ? `http://localhost:5000/classified-images/${imageId}`
         : `http://localhost:5000/unclassified-images/${imageId}`;
-
+  
       const response = await axios.get(endpoint, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+  
       console.log('Fetched Image Detail:', response.data);
       setSelectedImageInfo(response.data);
     } catch (error) {
-      console.error('Error fetching image detail:', error);
+      console.error('Error fetching image detail:', error.response || error);
     }
   };
 

@@ -1,4 +1,10 @@
 export const getTableData = (imageData) => {
+  const speciesMapping = {
+    'pig': '멧돼지',
+    'raccoon': '너구리',
+    'deer': '고라니'
+  };
+
     return {
       '파일': [
         { 
@@ -32,7 +38,7 @@ export const getTableData = (imageData) => {
       '분석 결과': [
         {
           type: 'double',
-          left: { label: '종명', value: imageData.BestClass || 'No Data'},
+          left: { label: '종명', value: speciesMapping[imageData.BestClass] || imageData.BestClass || 'No Data'},
           right: { label: '개체수', value: imageData.Count || 'No Data' }
         },
         {
