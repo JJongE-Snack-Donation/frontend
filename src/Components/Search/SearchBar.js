@@ -33,7 +33,6 @@ const SearchBar = ({
 
     return (
         <div className="search-filter">
-            <div className="filter-container">
                 <FilterItem
                     label="프로젝트 이름"
                     value={projectName}
@@ -62,15 +61,12 @@ const SearchBar = ({
                     options={[{ value: "all", label: "ALL" }, ...speciesOptions]}
                 />
 
-                <div className='filter-item'>
-                    <div className='filter-label'>즐겨찾기</div>
+                <div className='filter-item bookmark'>
+                    즐겨찾기
                     <Bookmark />
                 </div>
                 <button className="search-button" onClick={handleSearchClick}>검색</button>
-                <div>
-                    <Legend />
-                </div>
-            </div>
+                <Legend />
         </div>
     );
 };

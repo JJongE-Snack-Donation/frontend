@@ -1,25 +1,23 @@
 .search-filter {
+    display: flex;
+    position: relative;
     padding: 16px 20px;
     background: #fbfbfb;
-    border-bottom: 1px solid #e5e5e5;
-    width: 1615px;
+    width: 94%;
     height: 80px;
-}
-
-.filter-container {
-    display: flex;
-    align-items: center;
     gap: 20px;
+    font-size: 12px;
 }
 
 .filter-item {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 15%;
 }
 
-.filter-label {
-    font-size: 13px;
+.bookmark {
+    min-width: 50px;
 }
 
 .filter-select {
@@ -27,8 +25,8 @@
     border: 1px solid #e5e5e5;
     border-radius: 4px;
     background: #fff;
-    font-size: 14px;
-    min-width: 239px;
+    font-size: 12px;
+    font-family:'Pretendard';
 }
 
 .search-button {
@@ -37,8 +35,8 @@
     color: white;
     border: none;
     border-radius: 4px;
-    width: 270px;
     height: 60px;
+    width: 100%;
     cursor: pointer;
     margin-left: auto;
 }
