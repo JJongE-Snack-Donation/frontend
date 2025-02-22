@@ -92,7 +92,7 @@ const useImageActions = () => {
 
 
 
-    // 단일 이미지 삭제
+    // 단일 이미지 삭제(일반 검수)
     const handleDelete = async (imageId) => {
         try {
           const response = await fetch(`http://localhost:5000/classified-images/${imageId}`, {
@@ -117,7 +117,30 @@ const useImageActions = () => {
         }
       };
       
+    // 단일 이미지 삭제(예외 검수)
+      const handleExceptionDelete = async (imageId) => {
+        try {
+          const response = await fetch(`http://localhost:5000/unclassified-images/${imageId}`, {
+            method: 'DELETE',
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
       
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '이미지 삭제 실패');
+          }
+      
+          // 서버 응답이 성공적이면 로컬 상태 업데이트
+          deleteImage(imageId);
+          alert('이미지가 성공적으로 삭제되었습니다.');
+        } catch (error) {
+          console.error('삭제 중 오류:', error);
+          alert(`이미지 삭제 중 오류가 발생했습니다: ${error.message}`);
+        }
+      };
 
 
 
@@ -229,6 +252,7 @@ const useImageActions = () => {
         setIsDropdownOpen,
         setShowConfirmToast,
         handleDelete,
+        handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
         handleExceptionInspection,
