@@ -60,11 +60,6 @@ const SearchBar = ({
                     onChange={(e) => setSpecies(e.target.value)}
                     options={[{ value: "all", label: "ALL" }, ...speciesOptions]}
                 />
-
-                <div className='filter-item bookmark'>
-                    즐겨찾기
-                    <Bookmark />
-                </div>
                 <button className="search-button" onClick={handleSearchClick}>검색</button>
                 <Legend />
         </div>

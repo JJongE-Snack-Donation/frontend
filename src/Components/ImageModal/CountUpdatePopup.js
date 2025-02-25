@@ -28,10 +28,10 @@ const CountUpdatePopup = ({ isOpen, onClose, onSubmit }) => {
                             onChange={(e) => setBestClass(e.target.value)}
                             className="count-update-popup__select"
                         >
+                            <option value="고라니">고라니</option>
+                            <option value="멧돼지">멧돼지</option>
+                            <option value="너구리">너구리</option>
                             <option value="사람">사람</option>
-                            <option value="동물">너구리</option>
-                            <option value="동물">고라니</option>
-                            <option value="동물">동물</option>
                         </select>
                     </div>
 

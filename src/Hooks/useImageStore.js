@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
 
 const useImageStore = create((set, get) => ({
     groupedImages: [],
@@ -67,6 +67,7 @@ const useImageStore = create((set, get) => ({
             ),
         })),
     groupImages: {},
+    // 검색창에서 선택한 이미지 그룹의 전체 이미지 조회 (일반 검수)
     fetchGroupImages: async (evtnum) => {
         if (get().groupImages[evtnum]) {
             return get().groupImages[evtnum];
@@ -86,6 +87,27 @@ const useImageStore = create((set, get) => ({
             return [];
         }
     },
+
+    exceptionGroupImages: {},
+    // 검색창에서 선택한 이미지 그룹의 전체 이미지 조회 (예외 검수)
+    fetchExceptionGroupImages: async (evtnum) => {
+        try {
+            const response = await axios.get('http://localhost:5000/inspection/exception', {
+                params: { evtnum },
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const images = response.data.images;            
+            set((state) => ({
+                exceptionGroupImages: { ...state.exceptionGroupImages, [evtnum]: images }
+            }));
+            return images;
+        } catch (error) {
+            console.error("Exception Group images fetch error:", error);
+            return [];
+        }
+    }
+    
+    
 }));
 
 export default useImageStore;

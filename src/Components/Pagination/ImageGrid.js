@@ -27,7 +27,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
           <div className="image-card__header">
             <input type='checkbox' className="image-card__checkbox"/>
             <p className="image-card__title">Event: {group.evtnum}</p>
-            <button className='image-card__delete-btn'><img src={trashBinIcon} alt="Delete"/></button>
           </div>
           <div className="image-card__content">
             <img
@@ -35,9 +34,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
               onError={handleImageError}
               alt="" 
               className='image-card__img'/>
-            <button className='image-card__favorite-btn'>
-              <img src={starIcon} alt="Favorite"/>
-            </button>
           </div>
           <div className="image-card__info">
             <p className="image-card__info-item">이미지 수: {group.imageCount}</p>

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import downloadIcon from '../../Assets/Imgs/btn/download.svg';
 import trashbinIcon from '../../Assets/Imgs/btn/trash_bin.svg';
-import starIcon from '../../Assets/Imgs/etc/star.svg';
 import '../../Styles/ImageModal.css'
 
 const ImageCard = ({ 
@@ -13,8 +12,22 @@ const ImageCard = ({
     onCheckboxChange, 
     onDownload, 
     onDelete 
-}) => (
+}) => {
     
+
+    useEffect(() => {
+        console.log(`Image ${index + 1} - ${image.FileName}:`, {
+            imageId: image._id,
+            exception_status: image.exception_status,
+            is_classified: image.is_classified,
+            BestClass: image.BestClass,
+            evtnum: image.evtnum,
+            exception_comment: image.exception_comment,
+            exception_updated_at: image.exception_updated_at
+        });
+    }, [image, index]);
+
+return (
     <div 
         className={`modal__all_image-item ${isSelected ? 'selected' : ''}`}
         onClick={(e) => onCardClick(image, e)}
@@ -46,21 +59,16 @@ const ImageCard = ({
                 <img src={trashbinIcon} alt="Delete" />
             </button>
         </div>
-        <div className="modal__all_image-content">
+        <div className="modal__all_image-content" style={{ position: 'relative' }}>
             <img  src={image.imageUrl} alt="" />
             {image.exception_status === "processed" && (
-                <div className="exception-overlay">예외</div>
+            <div className="exception-overlay">예외</div>
             )}
-            <button 
-                className="modal__favorite-btn"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <img src={starIcon} alt="Favorite" />
-            </button>
+
         </div>
 
     </div>
 );
-
+};
 
 export default ImageCard;
