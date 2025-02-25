@@ -1,22 +1,21 @@
 import { useState } from 'react';
+import api from '../Api';
 
 const useCountUpdate = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
 
     const updateNormalInspectionBulk = async (imageIds, updates) => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch('/inspection/normal/bulk-update', {
+            const response = await api.post('/inspection/normal/bulk-update', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({
                     image_ids: imageIds,

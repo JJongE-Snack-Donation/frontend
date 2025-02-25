@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '../Api';
 
 export const useImageSelection = ({ initialImage, selectedPage }) => {
   const [relatedImages, setRelatedImages] = useState(initialImage?.relatedImages || []);
@@ -8,8 +8,6 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const [checkedBoxes, setCheckedBoxes] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
-
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
 
   const handleSelectAll = (e) => {
     const isChecked = e.target.checked;
@@ -53,11 +51,13 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const fetchImageDetail = async (imageId, selectedPage) => {
     try {
       const endpoint = selectedPage === 'normal'
-        ? `http://localhost:5000/classified-images/${imageId}`
-        : `http://localhost:5000/unclassified-images/${imageId}`;
+        ? `/classified-images/${imageId}`
+        : `/unclassified-images/${imageId}`;
   
-      const response = await axios.get(endpoint, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const response = await api.get(endpoint, {
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
       });
   
       console.log('Fetched Image Detail:', response.data);

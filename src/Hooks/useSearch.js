@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import axios from 'axios';
 import useImageStore from './useImageStore';
+import api from '../Api';
 
 const useSearch = (selectedPage) => {
     const { groupedImages, setGroupedImages } = useImageStore();
@@ -24,8 +24,6 @@ const useSearch = (selectedPage) => {
         cameraLabelOptions: [],
     });
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
-
     // 일반 검수 리스트 조회
     const handleSearch = useCallback(async (page = 1) => {
         setLoading(true);
@@ -40,9 +38,11 @@ const useSearch = (selectedPage) => {
                 group_by: 'evtnum'
             };
 
-            const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
+            const response = await api.get('/search/inspection/normal/search', {
                 params: queryParams,
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                 }
             });
 
             if (response.data.status === 200) {
@@ -90,9 +90,11 @@ const useSearch = (selectedPage) => {
                 group_by: 'evtnum'
             };
 
-            const response = await axios.get('http://localhost:5000/search/inspection/exception/search', {
+            const response = await api.get('/search/inspection/exception/search', {
                 params: queryParams,
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                 }
             });
 
             if (response.data.status === 200) {
@@ -138,12 +140,12 @@ const useSearch = (selectedPage) => {
     const fetchOptions = useCallback(async () => {
         try {
             const endpoint = selectedPage === 'normal' 
-                ? 'http://localhost:5000/search/inspection/normal/search'
-                : 'http://localhost:5000/search/inspection/exception/search';
+                ? '/search/inspection/normal/search'
+                : '/search/inspection/exception/search';
     
-            const response = await axios.get(endpoint, {
+            const response = await api.get(endpoint, {
                 params: { is_classified: selectedPage === 'normal' ? true : false },
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
             });
     
             if (response.data.data?.images) {
@@ -163,7 +165,7 @@ const useSearch = (selectedPage) => {
             console.error('옵션 로드 실패:', error);
             setError('옵션을 불러오는 중 오류가 발생했습니다.');
         }
-    }, [selectedPage, token]);
+    }, [selectedPage]);
     
 
     // 페이지 선택에 따라 검수 조회 목록 다르게 설정

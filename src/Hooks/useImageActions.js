@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import useImageStore from './useImageStore';
+import api from '../Api';
 
 const useImageActions = () => {
     const { relatedImages, setRelatedImages, deleteImage, updateExceptionStatus} = useImageStore();
@@ -9,18 +10,15 @@ const useImageActions = () => {
     const { deleteMultipleImages } = useImageStore();
     const [checkedBoxes, setCheckedBoxes] = useState([]);
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
-
     // 예외 상태 processed로 처리
     const handleExceptionInspection = async (checkedIds) => {
         for (const imageId of checkedIds) {
             try {
-                const response = await fetch(`http://localhost:5000/exception/${imageId}/status`, {
-                    method: 'PUT',
+                const response = await api.put(`/exception/${imageId}/status`, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     },
                     body: JSON.stringify({
                         status: "processed",  // 'exception_status'에서 'status'로 변경
@@ -52,12 +50,11 @@ const useImageActions = () => {
                 .filter(img => img.project_name === projectName && img.species === species)
                 .map(img => img.imageId);
     
-            const response = await fetch('http://localhost:5000/classification/batch', {
-                method: 'POST',
+            const response = await api.post('/classification/batch', {
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({
                     image_ids: imageIds,
@@ -95,11 +92,10 @@ const useImageActions = () => {
     // 단일 이미지 삭제(일반 검수)
     const handleDelete = async (imageId) => {
         try {
-          const response = await fetch(`http://localhost:5000/classified-images/${imageId}`, {
-            method: 'DELETE',
+          const response = await api.delete(`/classified-images/${imageId}`, {
             headers: {
               'Accept': 'application/json',
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${localStorage.getItem("token")}`
             }
           });
       
@@ -120,11 +116,10 @@ const useImageActions = () => {
     // 단일 이미지 삭제(예외 검수)
       const handleExceptionDelete = async (imageId) => {
         try {
-          const response = await fetch(`http://localhost:5000/unclassified-images/${imageId}`, {
-            method: 'DELETE',
+          const response = await api.delete(`/unclassified-images/${imageId}`, {
             headers: {
               'Accept': 'application/json',
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${localStorage.getItem("token")}`
             }
           });
       
@@ -148,9 +143,9 @@ const useImageActions = () => {
     // 단일 다운로드
     const handleDownload = async (imageId) => {
         try {
-          const response = await fetch(`http://localhost:5000/download/image/${imageId}`, {
+          const response = await api.get(`/download/image/${imageId}`, {
             headers: {
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${localStorage.getItem("token")}`
             }
           });
           if (response.ok) {
@@ -183,12 +178,11 @@ const useImageActions = () => {
     // 다중 이미지 다운로드
     const handleBulkImageDownload = async (checkedIds) => { 
         try {
-            const response = await fetch(`http://localhost:5000/download/images`, {
-                method: 'POST',
+            const response = await api.post(`/download/images`, {
                 headers: {
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
                 body: JSON.stringify({ image_ids: checkedIds })
             });
@@ -215,12 +209,11 @@ const useImageActions = () => {
     // 다중 이미지 삭제 
     const handleBulkImageDelete = async (checkedIds) => {
         try {
-          const response = await fetch(`http://localhost:5000/images/bulk-delete`, {
-            method: 'POST',
+          const response = await api.post(`/images/bulk-delete`, {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({ image_ids: checkedIds })
           });

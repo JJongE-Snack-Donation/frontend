@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
-
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDIwNDk2MywianRpIjoiMTMxZTc4ZDUtOTlhZi00NDM2LWExMDItZTQ0ZGQ3NWYzM2YxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMjA0OTYzLCJjc3JmIjoiNzZjZWMyZDYtMDJlMC00MGY5LWE2YjktOTgxYzVhOTY0MzUwIiwiZXhwIjoxNzQwMjkxMzYzfQ.7RCYY69qvos2E5I7o3nhwtEl9GpuXA6ekZEqCS07tog";
+import api from '../Api';
 
 const useImageStore = create((set, get) => ({
     groupedImages: [],
@@ -73,9 +71,11 @@ const useImageStore = create((set, get) => ({
             return get().groupImages[evtnum];
         }
         try {
-            const response = await axios.get('http://localhost:5000/inspection/normal', {
+            const response = await api.get('/inspection/normal', {
                 params: { evtnum },
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                 }
             });
             const images = response.data.images;
             set((state) => ({
@@ -92,9 +92,11 @@ const useImageStore = create((set, get) => ({
     // 검색창에서 선택한 이미지 그룹의 전체 이미지 조회 (예외 검수)
     fetchExceptionGroupImages: async (evtnum) => {
         try {
-            const response = await axios.get('http://localhost:5000/inspection/exception', {
+            const response = await api.get('/inspection/exception', {
                 params: { evtnum },
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                 }
             });
             const images = response.data.images;            
             set((state) => ({
