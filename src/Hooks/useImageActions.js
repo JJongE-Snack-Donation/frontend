@@ -167,12 +167,35 @@ const useImageActions = () => {
       
     
 
-    // // 드롭다운 액션 함수
-    // const handleBulkEdit = (checkedIds) => {
-    //     // 수정 로직
-    //     setIsDropdownOpen(false);
-    // };
+    // 일반 검수 다중 이미지 정보 수정 
+    const handleBulkEdit = async (checkedIds, updates) => {
+      try {
+          const response = await api.post('/inspection/normal/bulk-update', {
+            image_ids: checkedIds,
+            updates: updates
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
 
+          if (response.status === 200) {
+              // UI 업데이트 로직
+              const updatedImages = relatedImages.map(img => 
+                  checkedIds.includes(img._id) ? { ...img, ...updates } : img
+              );
+              setRelatedImages(updatedImages);
+
+              // 성공 메시지 표시
+              setShowConfirmToast(true);
+              setTimeout(() => setShowConfirmToast(false), 3000);
+          }
+      } catch (error) {
+          console.error('Bulk update failed:', error);
+          // 에러 처리 로직
+      }
+      setIsDropdownOpen(false);
+  };
 
 
     // 다중 이미지 다운로드
@@ -254,7 +277,8 @@ const useImageActions = () => {
         checkedImages,
         setCheckedImages,
         checkedBoxes,
-        setCheckedBoxes
+        setCheckedBoxes,
+        handleBulkEdit
     };
 };
 

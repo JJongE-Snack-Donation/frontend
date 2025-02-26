@@ -86,16 +86,22 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         setIsPopupOpen(false);
     };
 
-    const handleSubmitPopup = async (updates) => {
+    const handleSubmitPopup = async (checkedIds, updates) => {
         try {
-            const result = await updateNormalInspectionBulk(checkedBoxes, updates);
-            alert(`${result.modified_count}개의 이미지가 수정되었습니다.`);
+            const result = await updateNormalInspectionBulk(checkedIds, updates);
+            if (result && result.data && typeof result.data.modified_count === 'number') {
+                alert(`${result.data.modified_count}개의 이미지가 수정되었습니다.`);
+            } else {
+                alert('이미지가 성공적으로 수정되었습니다.');
+            }
         } catch (error) {
+            console.error('이미지 수정 중 오류 발생:', error);
             alert('이미지 수정 중 오류가 발생했습니다.');
         } finally {
             handleClosePopup();
         }
     };
+    
 
 
     useEffect(() => {
@@ -164,6 +170,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                                 <CountUpdatePopup
                                                     isOpen={isPopupOpen}
                                                     onClose={handleClosePopup}
+                                                    checkedIds={checkedBoxes}
                                                     onSubmit={handleSubmitPopup}
                                                 />
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
