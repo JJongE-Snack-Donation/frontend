@@ -47,6 +47,7 @@ const useSearch = (selectedPage) => {
 
             if (response.data.status === 200) {
                 if (response.data.groups) {
+                    console.log(response);
                     setGroupedImages(response.data.groups);
                     setTotalItems(response.data.total);
                     setCurrentPage(page);
@@ -135,7 +136,6 @@ const useSearch = (selectedPage) => {
         );
     }, [selectedGroup, groupedImages]);
 
-    
     //검색 옵션 로드
     const fetchOptions = useCallback(async () => {
         try {
@@ -175,6 +175,8 @@ const useSearch = (selectedPage) => {
             handleSearch(1);
         } else if (selectedPage === 'exception') {
             handleExceptionSearch(1);
+        } else {
+            setError('선택된 페이지가 없습니다.');
         }
     }, [fetchOptions, handleSearch, handleExceptionSearch, selectedPage]);
     

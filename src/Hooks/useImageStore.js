@@ -75,7 +75,7 @@ const useImageStore = create((set, get) => ({
                 params: { evtnum },
                 headers: { 
                     Authorization: `Bearer ${localStorage.getItem("token")}`
-                 }
+                }
             });
             const images = response.data.images;
             set((state) => ({
