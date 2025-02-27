@@ -18,7 +18,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
     const { fetchGroupImages, fetchExceptionGroupImages } = useSearch();
-    const { relatedImages, updateClassification } = useImageStore();
+    //const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
     const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
