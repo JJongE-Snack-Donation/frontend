@@ -64,10 +64,15 @@ const useImageStore = create((set, get) => ({
                     : group
             ),
         })),
+    
+    relatedImages: [],
+    setRelatedImages: (images) => set({ relatedImages: Array.isArray(images) ? images : [] }),
     groupImages: {},
+    
     // 검색창에서 선택한 이미지 그룹의 전체 이미지 조회 (일반 검수)
     fetchGroupImages: async (evtnum) => {
         if (get().groupImages[evtnum]) {
+            set({ relatedImages: get().groupImages[evtnum] });
             return get().groupImages[evtnum];
         }
         try {
@@ -79,7 +84,8 @@ const useImageStore = create((set, get) => ({
             });
             const images = response.data.images;
             set((state) => ({
-                groupImages: { ...state.groupImages, [evtnum]: images }
+                groupImages: { ...state.groupImages, [evtnum]: images },
+                relatedImages: images
             }));
             return images;
         } catch (error) {
@@ -100,7 +106,8 @@ const useImageStore = create((set, get) => ({
             });
             const images = response.data.images;            
             set((state) => ({
-                exceptionGroupImages: { ...state.exceptionGroupImages, [evtnum]: images }
+                exceptionGroupImages: { ...state.exceptionGroupImages, [evtnum]: images },
+                relatedImages: images
             }));
             return images;
         } catch (error) {

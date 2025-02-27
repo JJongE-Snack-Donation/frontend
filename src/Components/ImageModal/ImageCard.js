@@ -42,7 +42,7 @@ return (
                     onCheckboxChange(image.imageId, e); // image.imageId 전달
                   }}
             />
-            <span className="modal__all_image-number">{index + 1} - {image.fileName}</span>
+            <span className="modal__all_image-number">{index + 1}</span>
             <button 
                 className="modal__all_image-download"
                 onClick={(e) => {

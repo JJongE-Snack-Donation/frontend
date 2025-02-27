@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import api from '../Api';
+import useImageStore from './useImageStore';
 
 export const useImageSelection = ({ initialImage, selectedPage }) => {
-  const [relatedImages, setRelatedImages] = useState(initialImage?.relatedImages || []);
+  const { relatedImages, setRelatedImages: setStoreRelatedImages } = useImageStore();
   const [mainImage, setMainImage] = useState(initialImage || {});
   const [selectedCards, setSelectedCards] = useState([]);
   const [checkedBoxes, setCheckedBoxes] = useState([]);
@@ -14,6 +15,10 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
     setIsAllSelected(isChecked);
     setCheckedBoxes(isChecked ? relatedImages.map(img => img.imageId) : []);
   };
+
+  const setRelatedImages = useCallback((images) => {
+    setStoreRelatedImages(images);
+  }, [setStoreRelatedImages]);
 
   // 카드 클릭 시 선택된 카드의 아이디와 정보 재설정, 메인 이미지로 설정
   const handleCardClick = useCallback((clickedImage, e = null) => {
@@ -61,11 +66,14 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
       });
   
       console.log('Fetched Image Detail:', response.data);
-      setSelectedImageInfo(response.data);
+      // 예외 검수의 경우 data 키 안의 내용을 추출
+      const imageData = selectedPage === 'normal' ? response.data : response.data.data;
+      setSelectedImageInfo(imageData);
     } catch (error) {
       console.error('Error fetching image detail:', error.response || error);
     }
   };
+  
 
   return {
     selectedCards,
@@ -74,8 +82,8 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
     relatedImages,
     mainImage,
     selectedImageInfo,
-    setRelatedImages,
     setCheckedBoxes,
+    setRelatedImages,
     setIsAllSelected,
     handleSelectAll,
     handleCardClick,

@@ -153,12 +153,38 @@ color: rgb(204, 204, 204);
 }
 
 .modal__all_image-checkbox {
-  margin-right: 8px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 1.2em;  /* 폰트 크기의 1.2배 */
+  height: 1.2em; /* 폰트 크기의 1.2배 */
+  border: 0.15em solid #129900;
+  border-radius: 0.2em;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+  font-size: 1em; /* 기본 폰트 크기 설정 */
 }
 
-input[type="checkbox"] {
-  accent-color: #129900;
+.modal__all_image-checkbox:checked {
+  background-color: #129900;
 }
+
+.modal__all_image-checkbox:checked::after {
+  content: '\2714';
+  font-size: 0.8em;
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal__all_image-checkbox:focus {
+  box-shadow: 0 0 0 0.15em rgba(18, 153, 0, 0.2);
+}
+
 
 .modal__all_image-number {
   flex: 1;

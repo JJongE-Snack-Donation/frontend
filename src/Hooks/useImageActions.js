@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useImageStore from './useImageStore';
 import api from '../Api';
 
@@ -9,8 +9,9 @@ const useImageActions = () => {
     const [checkedImages, setCheckedImages] = useState([]);
     const { deleteMultipleImages } = useImageStore();
     const [checkedBoxes, setCheckedBoxes] = useState([]);
+    
 
-    // 예외 상태 processed로 처리
+    // 예외 상태 processed로 처리 
     const handleExceptionInspection = async (checkedIds) => {
       for (const imageId of checkedIds) {
           try {
@@ -39,49 +40,93 @@ const useImageActions = () => {
   };
   
     
-
+  useEffect(() => {
+    const unsubscribe = useImageStore.subscribe(
+      state => state.relatedImages,
+      (relatedImages) => {
+        console.log('relatedImages updated:', relatedImages);
+      }
+    );
+    return unsubscribe;
+  }, []);
+  
 
     // 검수 확정 핸들러 
     const handleInspectionComplete = async (projectName, species) => {
-        try {
-            const imageIds = relatedImages
-                .filter(img => img.project_name === projectName && img.species === species)
-                .map(img => img.imageId);
+      console.log('handleInspectionComplete called with:', { projectName, species });
+      console.log('Current state:', useImageStore.getState());
+      console.log('relatedImages:', relatedImages);
     
-            const response = await api.post('/classification/batch', {
-                headers: {
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                },
-                body: JSON.stringify({
-                    image_ids: imageIds,
-                    classification: {
-                        category: species,
-                        confidence: 1.0 // 검수 확정이므로 최대 신뢰도로 설정
-                    }
-                })
-            });
+      if (!Array.isArray(relatedImages) || relatedImages.length === 0) {
+        console.error('관련 이미지가 없거나 유효하지 않습니다.');
+        alert('처리할 이미지가 없습니다.');
+        return;
+      }
     
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const result = await response.json();
-    
-            setRelatedImages((prevImages) =>
-                prevImages.map((img) =>
-                    imageIds.includes(img.imageId)
-                        ? { ...img, is_classified: true }
-                        : img
-                )
-            );
-    
-            alert(`${result.data.modified_count}개의 이미지가 검수 확정되었습니다.`);
-        } catch (error) {
-            console.error("Error during inspection completion:", error);
-            alert("검수 확정 중 오류가 발생했습니다.");
+      try {
+        const imageIds = relatedImages
+          ?.map(img => img?.imageId)
+          ?.filter(Boolean) || [];
+
+        console.log('Image IDs:', imageIds);
+
+        if (imageIds.length === 0) {
+          console.error('선택된 이미지가 없습니다.');
+          alert('선택된 이미지가 없습니다.');
+          return;
         }
+    
+        const makeRequest = async () => {
+          return api.post('/classification/batch', 
+            {
+              image_ids: imageIds,
+              classification: {
+                BestClass: species,
+                Accuracy: 1.0
+              }
+            },
+            {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+        };
+    
+        let response;
+        try {
+          response = await makeRequest();
+        } catch (error) {
+          if (error.response && error.response.status === 401) {
+            // 토큰 갱신 로직
+            await refreshToken();
+            response = await makeRequest();
+          } else {
+            throw error;
+          }
+        }
+    
+        setRelatedImages((prevImages) =>
+          prevImages.map((img) =>
+            imageIds.includes(img.imageId)
+              ? { ...img, is_classified: true, inspection_complete: true }
+              : img
+          )
+        );
+    
+        alert(`${response.data.data.modified_count}개의 이미지가 검수 확정되었습니다.`);
+      } catch (error) {
+        console.error("검수 확정 중 오류 발생:", error);
+        if (error.response) {
+          alert(`검수 확정 실패: ${error.response.data.message || '서버 오류가 발생했습니다.'}`);
+        } else if (error.request) {
+          alert('서버에서 응답이 없습니다. 네트워크 연결을 확인해주세요.');
+        } else {
+          alert(`요청 중 오류가 발생했습니다: ${error.message}`);
+        }
+      }
     };
     
 
