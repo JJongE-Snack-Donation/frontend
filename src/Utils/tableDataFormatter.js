@@ -1,3 +1,17 @@
+const formatDate = (dateObject) => {
+  if (!dateObject || !dateObject.$date) return '-';
+  const date = new Date(dateObject.$date);
+  return date.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+};
+
 export const getTableData = (imageData) => {
   const speciesMapping = {
     'pig': '멧돼지',
@@ -21,8 +35,8 @@ export const getTableData = (imageData) => {
         },
         {
           type: 'double',
-          left: { label: '촬영 날짜', value: imageData.DateTimeOriginal || '-' },
-          right: { label: '등록 날짜', value: imageData.DateTimeOriginal || '-' }
+          left: { label: '촬영 날짜', value: formatDate(imageData.DateTimeOriginal) },
+          right: { label: '등록 날짜', value: formatDate(imageData.DateTimeOriginal) }
         },
         {
           type: 'double',
