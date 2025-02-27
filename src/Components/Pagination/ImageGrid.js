@@ -1,7 +1,5 @@
 import React from 'react';
 import '../../Styles/Pagination/ImageGrid.css';
-import trashBinIcon from '../../Assets/Imgs/btn/trash_bin.svg'
-import starIcon from '../../Assets/Imgs/etc/star.svg'
 
 const ImageGrid = ({ groups, onGroupClick }) => {
   const handleImageError = (e) => {

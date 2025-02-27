@@ -144,7 +144,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                 checked={isAllSelected}
                                 onChange={handleSelectAll}
                             />
-                            <label>전체 선택</label>
+                            전체 선택
                             <div className="modal__option-bar-right">
                             {selectedPage === 'normal' && (
                                 <button 
