@@ -12,34 +12,32 @@ const useImageActions = () => {
 
     // 예외 상태 processed로 처리
     const handleExceptionInspection = async (checkedIds) => {
-        for (const imageId of checkedIds) {
-            try {
-                const response = await api.put(`/exception/${imageId}/status`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    },
-                    body: JSON.stringify({
-                        status: "processed",  // 'exception_status'에서 'status'로 변경
-                        comment: "Processed via exception inspection"
-                    })
-                });
-    
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
-                const result = await response.json();
-                console.log("Update successful:", result);
-            } catch (error) {
-                console.error("Error updating image status:", error);
-            }
-        }
-    
-        updateExceptionStatus(checkedIds, "processed");
-        setShowConfirmToast(false);
-    };
+      for (const imageId of checkedIds) {
+          try {
+              const response = await api.put(`/exception/${imageId}/status`, 
+                  {
+                      status: "processed",
+                      comment: "Processed via exception inspection"
+                  },
+                  {
+                      headers: {
+                          'Accept': 'application/json',
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${localStorage.getItem("token")}`
+                      }
+                  }
+              );
+  
+              console.log("Update successful:", response.data);
+          } catch (error) {
+              console.error("Error updating image status:", error);
+          }
+      }
+  
+      updateExceptionStatus(checkedIds, "processed");
+      setShowConfirmToast(false);
+  };
+  
     
 
 
