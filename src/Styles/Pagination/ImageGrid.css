@@ -6,9 +6,8 @@
   padding: 20px;
   margin: 0 auto;
   overflow-y: scroll;
-  margin-top: 5px;
   margin-bottom: 50px;
-  width: 98%;
+  width: 96%;
 }
 
 ::-webkit-scrollbar {
@@ -22,6 +21,7 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
 }
 
 .image-card:hover {
@@ -42,7 +42,7 @@
 
 .image-card__title {
   margin: 10px;
-  font-size: 14px;
+  font-size: 12px;
   flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
