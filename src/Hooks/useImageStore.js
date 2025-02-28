@@ -118,30 +118,48 @@ const useImageStore = create((set, get) => ({
 
     completedGroupImages: {},
 
-    // 🔹 검수 완료된 이미지 조회 추가
-    fetchCompletedGroupImages: async (evtnum) => {
-        if (get().completedGroupImages[evtnum]) {
-            set({ relatedImages: get().completedGroupImages[evtnum] });
-            return get().completedGroupImages[evtnum];
-        }
-        try {
-            const response = await api.get('/images', {
-                params: { evtnum },
-                headers: { 
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            const images = response.data.images;
-            set((state) => ({
-                completedGroupImages: { ...state.completedGroupImages, [evtnum]: images },
-                relatedImages: images
-            }));
-            return images;
-        } catch (error) {
-            console.error("Completed Group images fetch error:", error);
-            return [];
-        }
+// 🔹 검수 완료된 이미지 조회 추가
+fetchCompletedGroupImages: async (evtnum) => {
+    if (get().completedGroupImages[evtnum]) {
+        set({ relatedImages: get().completedGroupImages[evtnum] });
+        return get().completedGroupImages[evtnum];
     }
+    try {
+        const response = await api.get('/images', {
+            params: { evtnum },
+            headers: { 
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+        
+        console.log('완료된 이미지 응답:', response.data);
+        
+        // 백엔드 응답 구조에 맞게 수정
+        const images = response.data.data?.images || [];
+        
+        // 이미지 데이터 구조 변환 (필요한 필드 추가)
+        const processedImages = images.map(img => ({
+            ...img,
+            imageId: img._id, // imageId 필드 추가
+            imageUrl: img.ThumnailPath, // 이미지 URL 필드 추가
+            thumbnail: img.ThumnailPath, // 썸네일 필드 추가
+            FileName: img.FileName || '' // FileName 필드 확인
+        }));
+        
+        console.log('처리된 이미지 데이터:', processedImages);
+        
+        set((state) => ({
+            completedGroupImages: { ...state.completedGroupImages, [evtnum]: processedImages },
+            relatedImages: processedImages
+        }));
+        return processedImages;
+    } catch (error) {
+        console.error("Completed Group images fetch error:", error);
+        return [];
+    }
+}
+
+
 }));
 
 export default useImageStore;

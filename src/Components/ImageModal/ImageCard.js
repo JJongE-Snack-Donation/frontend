@@ -15,17 +15,6 @@ const ImageCard = ({
 }) => {
     
 
-    useEffect(() => {
-        console.log(`Image ${index + 1} - ${image.FileName}:`, {
-            imageId: image._id,
-            exception_status: image.exception_status,
-            is_classified: image.is_classified,
-            BestClass: image.BestClass,
-            evtnum: image.evtnum,
-            exception_comment: image.exception_comment,
-            exception_updated_at: image.exception_updated_at
-        });
-    }, [image, index]);
 
 return (
     <div 

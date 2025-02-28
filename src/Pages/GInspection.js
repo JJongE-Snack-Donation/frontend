@@ -70,7 +70,7 @@ const GeneralInspection = () => {
                     {!isModalOpen && (
                         <PaginationComponent
                             currentPage={currentPage}
-                            itemsPerPage={100}
+                            itemsPerPage={10}
                             totalItems={totalItems}
                             onChange={handlePageChange}
                         />

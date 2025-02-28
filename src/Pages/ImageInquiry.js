@@ -20,7 +20,7 @@ const ImageInquiry = () => {
         groupedImages,
         totalItems,
         currentPage,
-        handleSearch,
+        handleCompletedSearch,
         loading,
         error,
         options,
@@ -29,11 +29,11 @@ const ImageInquiry = () => {
     } = useSearch(selectedPage);
 
     const handlePageChange = async (pageNumber) => {
-        await handleSearch(pageNumber);
+        await handleCompletedSearch(pageNumber);
     };
 
     const handleSearchSubmit = async () => {
-        await handleSearch(1);
+        await handleCompletedSearch(1);
     };
 
     const handleGroupClick = async (group) => {
@@ -56,7 +56,7 @@ const ImageInquiry = () => {
                 options={options}
                 searchParams={searchParams}
                 updateSearchParam={updateSearchParam}
-                handleSearch={handleSearch}
+                handleSearch={handleCompletedSearch}
             />
 
             {error && <div className="error-message">{error}</div>}
@@ -71,14 +71,21 @@ const ImageInquiry = () => {
                         onGroupClick={handleGroupClick}
                     />
 
-                    {/* 페이지네이션 */}
                     {!isModalOpen && (
                         <PaginationComponent
                             currentPage={currentPage}
-                            itemsPerPage={100}
+                            itemsPerPage={10}
                             totalItems={totalItems}
                             onChange={handlePageChange}
                         />
+                    )}
+                    {isModalOpen && selectedGroup && (
+                        <ImageModal
+                            onClose={() => setIsModalOpen(false)}
+                            groupData={selectedGroup}
+                            selectedPage={selectedPage} 
+                        />
+            
                     )}
                 </>
             )}

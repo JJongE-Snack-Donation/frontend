@@ -36,7 +36,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 100,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
@@ -71,7 +71,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 20,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
@@ -106,7 +106,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 50,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
@@ -134,53 +134,65 @@ const useSearch = (selectedPage) => {
     // 🔹 필터 옵션 불러오기
     const fetchOptions = useCallback(async () => {
         try {
-            let endpoint;
-            if (selectedPage === 'normal') {
-                endpoint = '/search/inspection/normal/search';
-            } else if (selectedPage === 'exception') {
-                endpoint = '/search/inspection/exception/search';
-            } else if (selectedPage === 'completed') {
-                endpoint = '/search/images/search';
-            } else {
-                return;
-            }
-
-            const response = await api.get(endpoint, {
-                params: { is_classified: selectedPage === 'normal' || selectedPage === 'completed' },
-                headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          const endpoint = selectedPage === 'normal' 
+            ? '/search/inspection/normal/search'
+            : '/search/inspection/exception/search';
+      
+          const response = await api.get(endpoint, {
+            params: { is_classified: selectedPage === 'normal' ? true : false },
+            headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
+          });
+          
+          // 이미지 데이터가 어디에 있는지 확인
+          let images = [];
+          if (response.data.images) {
+            images = response.data.images;
+          } else if (response.data.data?.images) {
+            images = response.data.data.images;
+          } else if (response.data.groups) {
+            images = response.data.groups;
+          }
+          
+          
+          if (images && images.length > 0) {
+            
+            setOptions({
+              projectOptions: [...new Set(images.map(item => item.project_name || item.projectName))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              speciesOptions: [...new Set(images.map(item => item.species || item.BestClass))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              cameraSerialOptions: [...new Set(images.map(item => item.serial_number || item.serialNumber))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value }))
             });
-
-            if (response.data.data?.images) {
-                const images = response.data.data.images;
-                setOptions({
-                    projectOptions: [...new Set(images.map(item => item.project_name))]
-                        .map(value => ({ value, label: value })),
-                    speciesOptions: [...new Set(images.map(item => item.species))]
-                        .map(value => ({ value, label: value })),
-                    cameraSerialOptions: [...new Set(images.map(item => item.serial_number))]
-                        .map(value => ({ value, label: value })),
-                    cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
-                        .map(value => ({ value, label: value }))
-                });
-            }
+          } else {
+            console.error('이미지 데이터가 없습니다:', response.data);
+          }
         } catch (error) {
-            console.error('옵션 로드 실패:', error);
-            setError('옵션을 불러오는 중 오류가 발생했습니다.');
+          console.error('옵션 로드 실패:', error);
+          setError('옵션을 불러오는 중 오류가 발생했습니다.');
         }
-    }, [selectedPage]);
+      }, [selectedPage]);
+      
+    
+
 
     useEffect(() => {
         fetchOptions();
         if (selectedPage === 'normal') {
-            handleSearch(1);
+          handleSearch(1);
         } else if (selectedPage === 'exception') {
-            handleExceptionSearch(1);
-        } else if (selectedPage === 'completed') {
-            handleCompletedSearch(1);
-        } else {
-            setError('선택된 페이지가 없습니다.');
+          handleExceptionSearch(1);
         }
-    }, [fetchOptions, handleSearch, handleExceptionSearch, handleCompletedSearch, selectedPage]);
+      }, [fetchOptions, handleSearch, handleExceptionSearch, selectedPage, setOptions]);
+      
+    
+
 
     const updateSearchParam = useCallback((key, value) => {
         setSearchParams(prev => ({ ...prev, [key]: value }));
