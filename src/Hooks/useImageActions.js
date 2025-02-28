@@ -10,6 +10,33 @@ const useImageActions = () => {
     const { deleteMultipleImages } = useImageStore();
     const [checkedBoxes, setCheckedBoxes] = useState([]);
     
+      // ✅ 검수 완료된 이미지 예외 검수 처리
+      const handleCompletedInspection = async (checkedIds) => {
+        for (const imageId of checkedIds) {
+            try {
+                const response = await api.put(`/images/${imageId}/status`, 
+                    {
+                        status: "processed",
+                        comment: "Processed via completed inspection"
+                    },
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${localStorage.getItem("token")}`
+                        }
+                    }
+                );
+    
+                console.log("Update successful:", response.data);
+            } catch (error) {
+                console.error("Error updating completed image status:", error);
+            }
+        }
+    
+        updateExceptionStatus(checkedIds, "processed");
+        setShowConfirmToast(false);
+    };
 
     // 예외 상태 processed로 처리 
     const handleExceptionInspection = async (checkedIds) => {
@@ -358,6 +385,7 @@ const useImageActions = () => {
         handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
+        handleCompletedInspection,
         handleExceptionInspection,
         handleInspectionComplete,
         handleBulkImageDelete,

@@ -13,6 +13,7 @@
   height: 90%;
   padding: 20px;
   border-radius: 8px;
+  font-size: 12px !important;
 }
 
 .modal__content {
@@ -35,7 +36,7 @@
   align-items: center;
   background: #f8f8f8;
   border-radius: 4px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .modal__main-image {
@@ -50,9 +51,6 @@
   justify-content: right;
   align-items: center;
   background-color: #ffffff;
-  padding: 5px 16px;
-  border-radius: 4px;
-  margin-bottom: 5px;
   position: relative;
 }
 
@@ -63,13 +61,14 @@
 
 .modal__inspection-btn,
 .modal__bulk-action-btn {  /* .modal__bulk-action을 .modal__bulk-action-btn으로 변경 */
-    padding: 8px 16px;
+    padding: 6px 12px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     background-color: #f3f3f3;
     color: #333;
-    margin-left: 5px;
+    margin-left: 10px;
+    font-size: 12px;
 }
 
 .modal__inspection-btn:disabled {
@@ -97,7 +96,7 @@ color: rgb(204, 204, 204);
   background: none;
   text-align: left;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   color: #333;
 }
 
@@ -152,43 +151,11 @@ color: rgb(204, 204, 204);
   border-bottom: 1px solid #eee;
 }
 
-.modal__all_image-checkbox {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 1.2em;  /* 폰트 크기의 1.2배 */
-  height: 1.2em; /* 폰트 크기의 1.2배 */
-  border: 0.15em solid #129900;
-  border-radius: 0.2em;
-  outline: none;
-  cursor: pointer;
-  position: relative;
-  background-color: white;
-  font-size: 1em; /* 기본 폰트 크기 설정 */
-}
-
-.modal__all_image-checkbox:checked {
-  background-color: #129900;
-}
-
-.modal__all_image-checkbox:checked::after {
-  content: '\2714';
-  font-size: 0.8em;
-  color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.modal__all_image-checkbox:focus {
-  box-shadow: 0 0 0 0.15em rgba(18, 153, 0, 0.2);
-}
-
-
 .modal__all_image-number {
   flex: 1;
   font-size: 12px;
+  gap: 4px;
+  display: flex;
 }
 
 .modal__all_image-delete,
@@ -196,10 +163,13 @@ color: rgb(204, 204, 204);
     border: none;
     background-color:transparent;
     cursor: pointer;
-    padding: 4px;
     transition: transform 0.2s ease;
-    width: 20px;
-    height: 20px;
+    width: 12px;
+    height: 12px;
+    margin-left: 5px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 }
 
 .modal__all_image-delete:active,
@@ -251,10 +221,11 @@ color: rgb(204, 204, 204);
 }
 
 .modal__info-section__title {
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
   color: #333;
   margin-bottom: 15px;
+  margin-top: 0;
 }
 
 .modal__info-table {
@@ -262,6 +233,7 @@ color: rgb(204, 204, 204);
   border-collapse: collapse;
   background: #fff;
   margin-bottom: 8px;
+  background-color: beige;
 }
 
 .modal__info-table tr {
@@ -275,14 +247,14 @@ color: rgb(204, 204, 204);
   color: #666;
   padding: 18px 10px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .modal__info-table td {
   width: 180px;
   color: #333;
   padding: 12px 16px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 
@@ -315,10 +287,10 @@ color: rgb(204, 204, 204);
 
 .confirm-toast__cancel-btn,
 .confirm-toast__confirm-btn {
-  padding: 6px 16px;
+  padding: 6px 10px;
   border: none;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
 }
 
@@ -371,11 +343,11 @@ color: rgb(204, 204, 204);
 
 .modal__confirm-btn,
 .modal__close-btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .modal__confirm-btn {

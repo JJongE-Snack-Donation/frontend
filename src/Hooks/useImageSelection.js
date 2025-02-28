@@ -25,16 +25,17 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
     if (e && e.stopPropagation) {
         e.stopPropagation();
     }
+
     setSelectedCards([clickedImage.imageId]);
     setMainImage(clickedImage);
+    setSelectedImageInfo(clickedImage); // ✅ 먼저 선택한 이미지 정보 업데이트
 
-    // 이미 상세 정보가 있다면 API 호출을 하지 않음
-    if (!clickedImage.detailFetched) {
+    // ✅ 검수 완료된 이미지(completed)에서는 항상 `fetchImageDetail` 실행
+    if (selectedPage === 'completed' || !clickedImage.detailFetched) {
         fetchImageDetail(clickedImage.imageId, selectedPage);
-    } else {
-        setSelectedImageInfo(clickedImage);
     }
 }, [selectedPage]);
+
 
 
   // 체크 박스 선택 시
@@ -55,24 +56,30 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   // 모달창에서 선택한 이미지의 상세 정보 조회
   const fetchImageDetail = async (imageId, selectedPage) => {
     try {
-      const endpoint = selectedPage === 'normal'
-        ? `/classified-images/${imageId}`
-        : `/unclassified-images/${imageId}`;
-  
-      const response = await api.get(endpoint, {
-        headers: { 
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+        let endpoint;
+        if (selectedPage === 'normal') {
+            endpoint = `/classified-images/${imageId}`;
+        } else if (selectedPage === 'exception') {
+            endpoint = `/unclassified-images/${imageId}`;
+        } else if (selectedPage === 'completed') {  // ✅ 검수 완료된 이미지 조회
+            endpoint = `/images/${imageId}`;
         }
-      });
-  
-      console.log('Fetched Image Detail:', response.data);
-      // 예외 검수의 경우 data 키 안의 내용을 추출
-      const imageData = selectedPage === 'normal' ? response.data : response.data.data;
-      setSelectedImageInfo(imageData);
+
+        const response = await api.get(endpoint, {
+            headers: { 
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        console.log('Fetched Image Detail:', response.data);
+
+        // ✅ 검수 완료된 이미지는 response.data.data에서 가져옴
+        //const imageData = selectedPage === 'completed' ? response.data.data : response.data;
+        //setSelectedImageInfo(imageData);
     } catch (error) {
-      console.error('Error fetching image detail:', error.response || error);
+        console.error('Error fetching image detail:', error.response || error);
     }
-  };
+};
   
 
   return {
