@@ -1,7 +1,5 @@
 import React from 'react';
 import '../../Styles/Pagination/ImageGrid.css';
-import trashBinIcon from '../../Assets/Imgs/btn/trash_bin.svg'
-import starIcon from '../../Assets/Imgs/etc/star.svg'
 
 const ImageGrid = ({ groups, onGroupClick }) => {
   const handleImageError = (e) => {
@@ -18,7 +16,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
     const url = `http://localhost:5000/images/${path.replace(/^\.?\/?(mnt\/)?/, '')}`;
     return url;
   };
-  
 
   return (
     <div className="image-grid">
@@ -27,7 +24,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
           <div className="image-card__header">
             <input type='checkbox' className="image-card__checkbox"/>
             <p className="image-card__title">Event: {group.evtnum}</p>
-            <button className='image-card__delete-btn'><img src={trashBinIcon} alt="Delete"/></button>
           </div>
           <div className="image-card__content">
             <img
@@ -35,15 +31,12 @@ const ImageGrid = ({ groups, onGroupClick }) => {
               onError={handleImageError}
               alt="" 
               className='image-card__img'/>
-            <button className='image-card__favorite-btn'>
-              <img src={starIcon} alt="Favorite"/>
-            </button>
           </div>
           <div className="image-card__info">
             <p className="image-card__info-item">이미지 수: {group.imageCount}</p>
             <p className="image-card__info-item">프로젝트: {group.projectName}</p>
             <p className="image-card__info-item">카메라 시리얼: {group.serialNumber}</p>
-            <p className="image-card__info-item">촬영 날짜: {new Date(group.DateTimeOriginal).toLocaleDateString()}</p>
+            <p className="image-card__info-item">촬영 날짜: {new Date(group.DateTimeOriginal.$date).toLocaleDateString()}</p>
           </div>
         </div>
       ))}

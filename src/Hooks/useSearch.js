@@ -1,10 +1,13 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import axios from 'axios';
 import useImageStore from './useImageStore';
+import api from '../Api';
 
 const useSearch = (selectedPage) => {
     const { groupedImages, setGroupedImages } = useImageStore();
     const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
+    const fetchExceptionGroupImages = useImageStore(state => state.fetchExceptionGroupImages);
+    const fetchCompletedGroupImages = useImageStore(state => state.fetchCompletedGroupImages);
+    
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [searchParams, setSearchParams] = useState({
         projectName: '',
@@ -23,8 +26,6 @@ const useSearch = (selectedPage) => {
         cameraLabelOptions: [],
     });
 
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
-
     // 일반 검수 리스트 조회
     const handleSearch = useCallback(async (page = 1) => {
         setLoading(true);
@@ -35,35 +36,21 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 100,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
-            const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
+            const response = await api.get('/search/inspection/normal/search', {
                 params: queryParams,
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
             });
 
             if (response.data.status === 200) {
-                if (response.data.groups) {
-                    setGroupedImages(response.data.groups);
-                    setTotalItems(response.data.total);
-                    setCurrentPage(page);
-                } else if (response.data.images) {
-                    const grouped = response.data.images.map(img => ({
-                        evtnum: img.event_number,
-                        serialNumber: img.serial_number,
-                        imageCount: 1,
-                        ThumnailPath: img.thumbnail,
-                        projectName: img.project_name,
-                        DateTimeOriginal: img.date
-                    }));
-                    setGroupedImages(grouped);
-                    setTotalItems(response.data.total);
-                    setCurrentPage(page);
-                } else {
-                    setError('서버 응답 형식이 예상과 다릅니다.');
-                }
+                setGroupedImages(response.data.groups || []);
+                setTotalItems(response.data.total);
+                setCurrentPage(page);
             } else {
                 setError(`API 요청 실패: ${response.data.message}`);
             }
@@ -73,7 +60,6 @@ const useSearch = (selectedPage) => {
             setLoading(false);
         }
     }, [searchParams, setGroupedImages]);
-
 
     // 예외 검수 리스트 조회
     const handleExceptionSearch = useCallback(async (page = 1) => {
@@ -85,30 +71,19 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 20,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
-            const response = await axios.get('http://localhost:5000/search/inspection/exception/search', {
+            const response = await api.get('/search/inspection/exception/search', {
                 params: queryParams,
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
             });
 
             if (response.data.status === 200) {
-                if (response.data.groups) {
-                    setGroupedImages(response.data.groups);
-                } else if (response.data.images) {
-                    const grouped = response.data.images.map(img => ({
-                        evtnum: img.event_number,
-                        serialNumber: img.serial_number,
-                        imageCount: 1,
-                        ThumnailPath: img.thumbnail,
-                        projectName: img.project_name,
-                        DateTimeOriginal: img.date,
-                        exceptionStatus: img.exception_status
-                    }));
-                    setGroupedImages(grouped);
-                }
+                setGroupedImages(response.data.groups || []);
                 setTotalItems(response.data.total);
                 setCurrentPage(page);
             } else {
@@ -121,53 +96,103 @@ const useSearch = (selectedPage) => {
         }
     }, [searchParams, setGroupedImages]);
 
-
-
-    const filteredGroups = useMemo(() => {
-        if (!selectedGroup || !groupedImages.length) return groupedImages;
-        return groupedImages.filter(
-            (group) =>
-                group.projectName === selectedGroup.projectName &&
-                group.serialNumber === selectedGroup.serialNumber
-        );
-    }, [selectedGroup, groupedImages]);
-
-    const fetchOptions = useCallback(async () => {
+    // 🔹 검수 완료된 이미지 검색
+    const handleCompletedSearch = useCallback(async (page = 1) => {
+        setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/search/inspection/normal/search', {
-                params: { is_classified: true },
-                headers: { 'Authorization': `Bearer ${token}` }
+            const queryParams = {
+                project_name: searchParams.projectName || undefined,
+                date: searchParams.date || undefined,
+                serial_number: searchParams.serialNumber || undefined,
+                species: searchParams.species || undefined,
+                page,
+                per_page: 12,
+                group_by: 'evtnum'
+            };
+
+            const response = await api.get('/search/images/search', {
+                params: queryParams,
+                headers: { 
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
             });
 
-            if (response.data.data?.images) {
-                const images = response.data.data.images;
-                setOptions({
-                    projectOptions: [...new Set(images.map(item => item.project_name))]
-                        .map(value => ({ value, label: value })),
-                    speciesOptions: [...new Set(images.map(item => item.species))]
-                        .map(value => ({ value, label: value })),
-                    cameraSerialOptions: [...new Set(images.map(item => item.serial_number))]
-                        .map(value => ({ value, label: value })),
-                    cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
-                        .map(value => ({ value, label: value }))
-                });
+            if (response.data.status === 200) {
+                setGroupedImages(response.data.groups || []);
+                setTotalItems(response.data.total);
+                setCurrentPage(page);
+            } else {
+                setError(`API 요청 실패: ${response.data.message}`);
             }
-        } catch (error) {
-            console.error('옵션 로드 실패:', error);
-            setError('옵션을 불러오는 중 오류가 발생했습니다.');
+        } catch (err) {
+            setError(err.response?.data?.message || '검수 완료된 이미지 데이터를 가져오는 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
         }
-    }, []);
+    }, [searchParams, setGroupedImages]);
 
-    // 페이지 선택에 따라 검수 조회 목록 다르게 설정
+    // 🔹 필터 옵션 불러오기
+    const fetchOptions = useCallback(async () => {
+        try {
+          const endpoint = selectedPage === 'normal' 
+            ? '/search/inspection/normal/search'
+            : '/search/inspection/exception/search';
+      
+          const response = await api.get(endpoint, {
+            params: { is_classified: selectedPage === 'normal' ? true : false },
+            headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
+          });
+          
+          // 이미지 데이터가 어디에 있는지 확인
+          let images = [];
+          if (response.data.images) {
+            images = response.data.images;
+          } else if (response.data.data?.images) {
+            images = response.data.data.images;
+          } else if (response.data.groups) {
+            images = response.data.groups;
+          }
+          
+          
+          if (images && images.length > 0) {
+            
+            setOptions({
+              projectOptions: [...new Set(images.map(item => item.project_name || item.projectName))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              speciesOptions: [...new Set(images.map(item => item.species || item.BestClass))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              cameraSerialOptions: [...new Set(images.map(item => item.serial_number || item.serialNumber))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value })),
+              cameraLabelOptions: [...new Set(images.map(item => item.camera_label))]
+                .filter(Boolean)
+                .map(value => ({ value, label: value }))
+            });
+          } else {
+            console.error('이미지 데이터가 없습니다:', response.data);
+          }
+        } catch (error) {
+          console.error('옵션 로드 실패:', error);
+          setError('옵션을 불러오는 중 오류가 발생했습니다.');
+        }
+      }, [selectedPage]);
+      
+    
+
+
     useEffect(() => {
         fetchOptions();
         if (selectedPage === 'normal') {
-            handleSearch(1);
+          handleSearch(1);
         } else if (selectedPage === 'exception') {
-            handleExceptionSearch(1);
+          handleExceptionSearch(1);
         }
-    }, [fetchOptions, handleSearch, handleExceptionSearch, selectedPage]);
+      }, [fetchOptions, handleSearch, handleExceptionSearch, selectedPage, setOptions]);
+      
     
+
 
     const updateSearchParam = useCallback((key, value) => {
         setSearchParams(prev => ({ ...prev, [key]: value }));
@@ -177,17 +202,19 @@ const useSearch = (selectedPage) => {
         searchParams,
         updateSearchParam,
         groupedImages,
-        filteredGroups,
         totalItems,
         currentPage,
         handleSearch,
+        handleExceptionSearch,
+        handleCompletedSearch,
         loading,
         error,
         setSelectedGroup,
         options,
         fetchOptions,
         fetchGroupImages,
-        handleExceptionSearch,
+        fetchExceptionGroupImages,
+        fetchCompletedGroupImages
     };
 };
 

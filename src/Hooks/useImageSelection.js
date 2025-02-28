@@ -1,15 +1,14 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useCallback } from 'react';
+import api from '../Api';
+import useImageStore from './useImageStore';
 
-export const useImageSelection = (initialImage) => {
-  const [relatedImages, setRelatedImages] = useState(initialImage?.relatedImages || []);
+export const useImageSelection = ({ initialImage, selectedPage }) => {
+  const { relatedImages, setRelatedImages: setStoreRelatedImages } = useImageStore();
   const [mainImage, setMainImage] = useState(initialImage || {});
   const [selectedCards, setSelectedCards] = useState([]);
   const [checkedBoxes, setCheckedBoxes] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
-
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MDA2MTY3NSwianRpIjoiYWU5NmM5MGMtNmRmZC00MDNhLThiMzAtNjU3NWIxM2ViMzU2IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImFkbWluIiwibmJmIjoxNzQwMDYxNjc1LCJjc3JmIjoiNDBkMWZkODItNGVlMS00ODQxLTlhYTctMjFmMDRjNjIzY2FjIiwiZXhwIjoxNzQwMTQ4MDc1fQ.YoOThZi5ck2H1QRnot3w_bttIEH-vRGCbXObOwPhzCY";
 
   const handleSelectAll = (e) => {
     const isChecked = e.target.checked;
@@ -17,17 +16,29 @@ export const useImageSelection = (initialImage) => {
     setCheckedBoxes(isChecked ? relatedImages.map(img => img.imageId) : []);
   };
 
-  const handleCardClick = (clickedImage, e = null) => {
+  const setRelatedImages = useCallback((images) => {
+    setStoreRelatedImages(images);
+  }, [setStoreRelatedImages]);
+
+  // 카드 클릭 시 선택된 카드의 아이디와 정보 재설정, 메인 이미지로 설정
+  const handleCardClick = useCallback((clickedImage, e = null) => {
     if (e && e.stopPropagation) {
-      e.stopPropagation();
+        e.stopPropagation();
     }
-    setSelectedCards([clickedImage.imageId]); // 선택된 카드 ID 업데이트
-    setSelectedImageInfo(clickedImage); // 선택된 이미지 정보 업데이트
-    setMainImage(clickedImage); // mainImage 업데이트
 
-    fetchImageDetail(clickedImage.imageId);
-  };
+    setSelectedCards([clickedImage.imageId]);
+    setMainImage(clickedImage);
+    setSelectedImageInfo(clickedImage); // ✅ 먼저 선택한 이미지 정보 업데이트
 
+    // ✅ 검수 완료된 이미지(completed)에서는 항상 `fetchImageDetail` 실행
+    if (selectedPage === 'completed' || !clickedImage.detailFetched) {
+        fetchImageDetail(clickedImage.imageId, selectedPage);
+    }
+}, [selectedPage]);
+
+
+
+  // 체크 박스 선택 시
   const handleCheckboxChange = (imageId, e) => {
     if (e && e.stopPropagation) {
       e.stopPropagation();
@@ -42,17 +53,41 @@ export const useImageSelection = (initialImage) => {
   };
   
 
-  const fetchImageDetail = async (imageId) => {
+  // 모달창에서 선택한 이미지의 상세 정보 조회
+  const fetchImageDetail = async (imageId, selectedPage) => {
     try {
-      const response = await axios.get(`http://localhost:5000/classified-images/${imageId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      let endpoint;
+      if (selectedPage === 'normal') {
+        endpoint = `/classified-images/${imageId}`;
+      } else if (selectedPage === 'exception') {
+        endpoint = `/unclassified-images/${imageId}`;
+      } else if (selectedPage === 'completed') { 
+        endpoint = `/images/${imageId}`;
+      }
+
+  
+      const response = await api.get(endpoint, {
+        headers: { 
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
       });
-      console.log('Fetched Image Detail:', response.data);
-      setSelectedImageInfo(response.data); // 상세 정보 업데이트
+
+      // 페이지 타입에 따라 다른 응답 구조 처리
+      if (selectedPage === 'completed') {
+        // completed 페이지는 response.data.image 구조
+        if (response.data.image) {
+          setSelectedImageInfo(response.data.image); // .data 제거
+        } else {
+          console.error('완료된 이미지 데이터 구조가 예상과 다릅니다:', response.data);
+        }
+      } else {
+        setSelectedImageInfo(response.data);
+      }
     } catch (error) {
-      console.error('Error fetching image detail:', error);
+      console.error('Error fetching image detail:', error.response || error);
     }
   };
+  
 
   return {
     selectedCards,
@@ -61,8 +96,8 @@ export const useImageSelection = (initialImage) => {
     relatedImages,
     mainImage,
     selectedImageInfo,
-    setRelatedImages,
     setCheckedBoxes,
+    setRelatedImages,
     setIsAllSelected,
     handleSelectAll,
     handleCardClick,

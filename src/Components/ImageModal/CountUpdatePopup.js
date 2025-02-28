@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
 import '../../Styles/CountUpdatePopup.css';
+import useImageActions from '../../Hooks/useImageActions';
 
-const CountUpdatePopup = ({ isOpen, onClose, onSubmit }) => {
-    const [bestClass, setBestClass] = useState('사람');
+const classMapping = {
+    '너구리': 'raccoon',
+    '멧돼지': 'pig',
+    '고라니': 'deer'
+  };
+
+const CountUpdatePopup = ({ isOpen, onClose, checkedIds, onSubmit }) => {
+    const [bestClass, setBestClass] = useState('너구리');
     const [count, setCount] = useState(1);
+    const { handleBulkEdit } = useImageActions();
 
     if (!isOpen) return null;
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        onSubmit({ BestClass: bestClass, Count: count });
+        const updates = { BestClass: classMapping[bestClass], Count: count };
+        onSubmit(checkedIds, updates);
+        onClose();
     };
+    
 
     return (
         <div className="count-update-popup__overlay" onClick={onClose}>
@@ -28,10 +39,9 @@ const CountUpdatePopup = ({ isOpen, onClose, onSubmit }) => {
                             onChange={(e) => setBestClass(e.target.value)}
                             className="count-update-popup__select"
                         >
-                            <option value="사람">사람</option>
-                            <option value="동물">너구리</option>
-                            <option value="동물">고라니</option>
-                            <option value="동물">동물</option>
+                            <option value="고라니">고라니</option>
+                            <option value="멧돼지">멧돼지</option>
+                            <option value="너구리">너구리</option>
                         </select>
                     </div>
 

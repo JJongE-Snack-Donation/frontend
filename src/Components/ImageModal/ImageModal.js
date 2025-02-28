@@ -13,18 +13,26 @@ import checkIcon from '../../Assets/Imgs/etc/check_message.svg';
 import useCountUpdate from '../../Hooks/useCountUpdate';
 import CountUpdatePopup from './CountUpdatePopup';
 
-const ImageModal = ({ groupData, onClose }) => {
+const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
-    const { fetchGroupImages } = useSearch();
-    const { relatedImages, updateClassification } = useImageStore();
+    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useSearch();
+    //const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
+    const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
+    const [completedGroupImages, setCompletedGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
+    
+    const imagesToUse = 
+    selectedPage === 'normal' ? groupImages 
+    : selectedPage === 'exception' ? exceptionGroupImages 
+    : selectedPage === 'completed' ? completedGroupImages 
+    : [];
 
 
-    const {
+     const {
         selectedCards,
         checkedBoxes,
         isAllSelected,
@@ -36,7 +44,7 @@ const ImageModal = ({ groupData, onClose }) => {
         handleCardClick,
         handleCheckboxChange,
         setRelatedImages
-    } = useImageSelection({ relatedImages: groupImages });
+    } = useImageSelection({ relatedImages: imagesToUse, selectedPage });
 
     const {
         isDropdownOpen,
@@ -44,6 +52,7 @@ const ImageModal = ({ groupData, onClose }) => {
         setIsDropdownOpen,
         setShowConfirmToast,
         handleDelete,
+        handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
         handleExceptionInspection,
@@ -83,37 +92,50 @@ const ImageModal = ({ groupData, onClose }) => {
         setIsPopupOpen(false);
     };
 
-    const handleSubmitPopup = async (updates) => {
+    const handleSubmitPopup = async (checkedIds, updates) => {
         try {
-            const result = await updateNormalInspectionBulk(checkedBoxes, updates);
-            alert(`${result.modified_count}개의 이미지가 수정되었습니다.`);
+            const result = await updateNormalInspectionBulk(checkedIds, updates);
+            if (result && result.data && typeof result.data.modified_count === 'number') {
+                alert(`${result.data.modified_count}개의 이미지가 수정되었습니다.`);
+            } else {
+                alert('이미지가 성공적으로 수정되었습니다.');
+            }
         } catch (error) {
+            console.error('이미지 수정 중 오류 발생:', error);
             alert('이미지 수정 중 오류가 발생했습니다.');
         } finally {
             handleClosePopup();
         }
     };
+    
 
 
     useEffect(() => {
         const loadGroupImages = async () => {
-          if (groupData && groupData.evtnum) {
-            const images = await fetchGroupImages(groupData.evtnum);
-    
-            setGroupImages(images);
-    
-            if (images.length > 0) {
-              setRelatedImages(images);
-              handleCardClick(images[0]); // 첫 번째 이미지를 기본 선택
-            }
-          }
-        };    
-    
-        loadGroupImages();
-      }, [groupData, fetchGroupImages]);
-    
-    
+            if (groupData && groupData.evtnum) {
+                let images;
+                if (selectedPage === 'normal') {
+                    images = await fetchGroupImages(groupData.evtnum);
+                    setGroupImages(images);
+                } else if (selectedPage === 'exception') {
+                    images = await fetchExceptionGroupImages(groupData.evtnum);
+                    setExceptionGroupImages(images);
+                } else if (selectedPage === 'completed') {
+                    images = await fetchCompletedGroupImages(groupData.evtnum);
+                    setCompletedGroupImages(images);
+                }
 
+                if (images && images.length > 0) {
+                    setRelatedImages(images);
+                    handleCardClick(images[0]);
+                }
+            }
+        };    
+
+        loadGroupImages();
+    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+
+    
 
     return (
         <div className="modal" onClick={onClose}>
@@ -128,15 +150,17 @@ const ImageModal = ({ groupData, onClose }) => {
                                 checked={isAllSelected}
                                 onChange={handleSelectAll}
                             />
-                            <label>전체 선택</label>
+                            전체 선택
                             <div className="modal__option-bar-right">
+                            {selectedPage === 'normal' && (
                                 <button 
                                     className="modal__inspection-btn"
                                     disabled={checkedBoxes.length === 0}
                                     onClick={() => setShowConfirmToast(true)}
                                 >
-                                    예외 검수
+                                예외 검수
                                 </button>
+                            )}
 
                                 {checkedBoxes.length > 1 && (
                                     <div className="modal__bulk-action">
@@ -152,6 +176,7 @@ const ImageModal = ({ groupData, onClose }) => {
                                                 <CountUpdatePopup
                                                     isOpen={isPopupOpen}
                                                     onClose={handleClosePopup}
+                                                    checkedIds={checkedBoxes}
                                                     onSubmit={handleSubmitPopup}
                                                 />
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
@@ -169,8 +194,8 @@ const ImageModal = ({ groupData, onClose }) => {
                         </div>
 
                         <div className="modal__all">
-                        {groupImages.length > 0 ? (
-                            groupImages.map((img, index) => (
+                        {imagesToUse.length > 0 ? (
+                            imagesToUse.map((img, index) => (
                                     <ImageCard
                                         key={img.imageId}
                                         image={img}
@@ -180,7 +205,9 @@ const ImageModal = ({ groupData, onClose }) => {
                                         onCardClick={(e) => handleCardClick(img, e)}
                                         onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
                                         onDownload={() => handleDownload(img.imageId)}
-                                        onDelete={(e) => handleDelete(img.imageId, e)}
+                                        onDelete={(e) => selectedPage === 'normal' 
+                                            ? handleDelete(img.imageId, e) 
+                                            : handleExceptionDelete(img.imageId, e)}
                                     />
                                 ))
                             ) : (
@@ -188,16 +215,18 @@ const ImageModal = ({ groupData, onClose }) => {
                             )}
                         </div>
                     </div>
-                    <ImageInfo imageData={selectedImageInfo} />
+                    <ImageInfo imageData={selectedImageInfo} selectedPage={selectedPage} />
                 </div>
 
                 <div className="modal__footer">
-                    <button
-                        className="modal__confirm-btn"
-                        onClick={() => setShowInspectionCompleteToast(true)}
-                    >
-                        검수 확정
-                    </button>
+                    {selectedPage === 'normal' && (
+                        <button
+                            className="modal__confirm-btn"
+                            onClick={() => setShowInspectionCompleteToast(true)}
+                        >
+                            검수 확정
+                        </button>
+                    )}
                     <button
                         className="modal__close-btn"
                         onClick={onClose}

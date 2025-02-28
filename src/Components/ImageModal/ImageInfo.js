@@ -1,12 +1,12 @@
 import React from 'react';
 import { getTableData } from '../../Utils/tableDataFormatter';
 
-const ImageInfo = ({ imageData }) => {
-    const tableData = getTableData(imageData);
+const ImageInfo = ({ imageData, selectedPage }) => {
+    const tableData = imageData ? getTableData(imageData, selectedPage) : {};
     
     return (
         <div className="modal__info">
-            {Object.entries(tableData).map(([title, rows]) => (
+            {imageData && Object.entries(tableData).map(([title, rows]) => (
                 <div key={title} className="modal__info-section">
                     <h3 className="modal__info-section__title">{title}</h3>
                     <table className="modal__info-table">

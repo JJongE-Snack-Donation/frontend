@@ -10,13 +10,11 @@
     bottom: 0;
     left: 240px;
     right: 0;
-    background: #F4F4F4;
     padding: 15px 0;
     display: flex;
     justify-content: center;
     align-items: center;
     border: none;
-    z-index: 1000;
 }
 
 .page-item {

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import downloadIcon from '../../Assets/Imgs/btn/download.svg';
 import trashbinIcon from '../../Assets/Imgs/btn/trash_bin.svg';
-import starIcon from '../../Assets/Imgs/etc/star.svg';
 import '../../Styles/ImageModal.css'
 
 const ImageCard = ({ 
@@ -13,8 +12,11 @@ const ImageCard = ({
     onCheckboxChange, 
     onDownload, 
     onDelete 
-}) => (
+}) => {
     
+
+
+return (
     <div 
         className={`modal__all_image-item ${isSelected ? 'selected' : ''}`}
         onClick={(e) => onCardClick(image, e)}
@@ -22,14 +24,13 @@ const ImageCard = ({
         <div className="modal__all_image-header">
             <input 
                 type="checkbox" 
-                className="modal__all_image-checkbox"
                 checked={isChecked}
                 onChange={(e) => {
                     e.stopPropagation();
                     onCheckboxChange(image.imageId, e); // image.imageId 전달
                   }}
             />
-            <span className="modal__all_image-number">{index + 1} - {image.fileName}</span>
+            <span className="modal__all_image-number">{index + 1}</span> {/* - 사슴류 이렇게 종명 안내 필요*/}
             <button 
                 className="modal__all_image-download"
                 onClick={(e) => {
@@ -46,21 +47,16 @@ const ImageCard = ({
                 <img src={trashbinIcon} alt="Delete" />
             </button>
         </div>
-        <div className="modal__all_image-content">
+        <div className="modal__all_image-content" style={{ position: 'relative' }}>
             <img  src={image.imageUrl} alt="" />
             {image.exception_status === "processed" && (
-                <div className="exception-overlay">예외</div>
+            <div className="exception-overlay">예외</div>
             )}
-            <button 
-                className="modal__favorite-btn"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <img src={starIcon} alt="Favorite" />
-            </button>
+
         </div>
 
     </div>
 );
-
+};
 
 export default ImageCard;

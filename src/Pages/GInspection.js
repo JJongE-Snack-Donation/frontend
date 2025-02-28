@@ -13,6 +13,9 @@ const GeneralInspection = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const fetchGroupImages = useImageStore(state => state.fetchGroupImages);
+
+    const selectedPage = 'normal'; 
+
     
     const {
         groupedImages,
@@ -24,7 +27,7 @@ const GeneralInspection = () => {
         options,
         searchParams,
         updateSearchParam
-    } = useSearch('normal');
+    } = useSearch(selectedPage);
 
     const handlePageChange = async (pageNumber) => {
         await handleSearch(pageNumber);
@@ -67,7 +70,7 @@ const GeneralInspection = () => {
                     {!isModalOpen && (
                         <PaginationComponent
                             currentPage={currentPage}
-                            itemsPerPage={100}
+                            itemsPerPage={10}
                             totalItems={totalItems}
                             onChange={handlePageChange}
                         />
@@ -76,10 +79,12 @@ const GeneralInspection = () => {
             )}
 
             {isModalOpen && selectedGroup && (
-                <ImageModal 
-                    onClose={() => setIsModalOpen(false)} 
-                    groupData={selectedGroup}
-                />
+                <ImageModal
+                onClose={() => setIsModalOpen(false)}
+                groupData={selectedGroup}
+                selectedPage={selectedPage}
+            />
+            
             )}
         </div>
     );
