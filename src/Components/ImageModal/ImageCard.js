@@ -35,14 +35,13 @@ return (
         <div className="modal__all_image-header">
             <input 
                 type="checkbox" 
-                className="modal__all_image-checkbox"
                 checked={isChecked}
                 onChange={(e) => {
                     e.stopPropagation();
                     onCheckboxChange(image.imageId, e); // image.imageId 전달
                   }}
             />
-            <span className="modal__all_image-number">{index + 1}</span>
+            <span className="modal__all_image-number">{index + 1}</span> {/* - 사슴류 이렇게 종명 안내 필요*/}
             <button 
                 className="modal__all_image-download"
                 onClick={(e) => {

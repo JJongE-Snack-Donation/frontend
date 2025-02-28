@@ -17,16 +17,20 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
-    const { fetchGroupImages, fetchExceptionGroupImages } = useSearch();
+    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useSearch();
     //const { relatedImages, updateClassification } = useImageStore();
     const [groupImages, setGroupImages] = useState([]);
     const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
+    const [completedGroupImages, setCompletedGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
 
-    const imagesToUse = selectedPage === 'normal' ? groupImages : exceptionGroupImages;
+    const imagesToUse = 
+    selectedPage === 'normal' ? groupImages 
+    : selectedPage === 'exception' ? exceptionGroupImages 
+    : completedGroupImages || []; 
 
-    const {
+     const {
         selectedCards,
         checkedBoxes,
         isAllSelected,
@@ -38,7 +42,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         handleCardClick,
         handleCheckboxChange,
         setRelatedImages
-    }  = useImageSelection({ relatedImages: imagesToUse, selectedPage });
+    } = useImageSelection({ relatedImages: imagesToUse, selectedPage });
 
     const {
         isDropdownOpen,
@@ -114,22 +118,20 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                 } else if (selectedPage === 'exception') {
                     images = await fetchExceptionGroupImages(groupData.evtnum);
                     setExceptionGroupImages(images);
+                } else if (selectedPage === 'completed') {
+                    images = await fetchCompletedGroupImages(groupData.evtnum);
+                    setCompletedGroupImages(images);
                 }
-    
+
                 if (images && images.length > 0) {
                     setRelatedImages(images);
                     handleCardClick(images[0]);
                 }
             }
         };    
-    
-        loadGroupImages();
-    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, selectedPage, setRelatedImages, handleCardClick]);
-    
-      
-    
-    
 
+        loadGroupImages();
+    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
 
     return (
         <div className="modal" onClick={onClose}>

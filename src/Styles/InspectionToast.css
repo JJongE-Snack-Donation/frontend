@@ -2,7 +2,6 @@
     position: fixed;
     bottom: 90px;
     right: 250px;
-    width: 300px;
     background-color: #ffffff;
     border: 1px solid #e0e0e0f1;
     border-radius: 10px;
@@ -24,7 +23,7 @@
 
 .inspection-complete-toast__description {
     margin-top: 8px;
-    font-size: 14px;
+    font-size: 12px;
     color: #666666;
     text-align: center;
 }
@@ -39,9 +38,9 @@
 
 .inspection-complete-toast__cancel-btn,
 .inspection-complete-toast__confirm-btn {
-    padding: 10px 16px;
+    padding: 6px 12px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 12px;
     /* flex-grow 속성 제거 */
 }
 
