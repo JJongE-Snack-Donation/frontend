@@ -24,11 +24,13 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [completedGroupImages, setCompletedGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
-
+    
     const imagesToUse = 
     selectedPage === 'normal' ? groupImages 
     : selectedPage === 'exception' ? exceptionGroupImages 
-    : completedGroupImages || []; 
+    : selectedPage === 'completed' ? completedGroupImages 
+    : [];
+
 
      const {
         selectedCards,
@@ -133,6 +135,8 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         loadGroupImages();
     }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
 
+    
+
     return (
         <div className="modal" onClick={onClose}>
             <div className="modal__container" onClick={e => e.stopPropagation()}>
@@ -211,7 +215,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                             )}
                         </div>
                     </div>
-                    <ImageInfo imageData={selectedImageInfo} />
+                    <ImageInfo imageData={selectedImageInfo} selectedPage={selectedPage} />
                 </div>
 
                 <div className="modal__footer">
