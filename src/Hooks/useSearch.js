@@ -106,7 +106,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 50,
+                per_page: 12,
                 group_by: 'evtnum'
             };
 
@@ -153,7 +153,6 @@ const useSearch = (selectedPage) => {
             images = response.data.groups;
           }
           
-          console.log('추출된 이미지 데이터:', images);
           
           if (images && images.length > 0) {
             

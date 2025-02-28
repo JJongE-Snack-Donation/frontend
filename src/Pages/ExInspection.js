@@ -81,14 +81,6 @@ const ExceptionInspection = () => {
                             onChange={handlePageChange}
                         />
                     )}
-                    {isModalOpen && selectedGroup && (
-                        <ImageModal
-                            onClose={() => setIsModalOpen(false)}
-                            groupData={selectedGroup}
-                            selectedPage={selectedPage} 
-                        />
-            
-                    )}
                 </>
             )}
 
