@@ -2,6 +2,9 @@ import React from 'react';
 import '../../Styles/SearchBar.css'
 import Legend from './Legend';
 import FilterItem from './FilterItem';
+import DatePicker from "react-datepicker";
+import "../../Styles/DatePicker.css";
+import { ko } from "date-fns/locale";
 
 const SearchBar = ({ 
     onSearch, 
@@ -27,6 +30,12 @@ const SearchBar = ({
         }
     };
 
+    // 날짜 변경 핸들러
+    const handleDateChange = (date) => {
+        const formattedDate = date ? date.toISOString().split('T')[0] : '';
+        updateSearchParam('date', formattedDate);
+    };
+
     return (
         <div className="search-filter">
             <FilterItem
@@ -36,12 +45,28 @@ const SearchBar = ({
                 options={[{ value: "", label: "ALL" }, ...projectOptions]}
             />
 
-            <FilterItem
-                label="날짜"
-                value={searchParams.date || ''}
-                onChange={(e) => updateSearchParam('date', e.target.value)}
-                options={[{ value: "", label: "ALL" }]}
-            />
+        <div className="filter-item">
+                <div className="filter-label">날짜</div>
+                <DatePicker
+                    selected={searchParams.date ? new Date(searchParams.date) : null}
+                    onChange={handleDateChange}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="날짜 선택"
+                    locale={ko}
+                    isClearable
+                    showYearDropdown
+                    yearDropdownItemNumber={15}
+                    showMonthDropdown
+                    popperPlacement="bottom-start"
+                    popperModifiers={{
+                        preventOverflow: {
+                            enabled: true,
+                            escapeWithReference: false,
+                            boundariesElement: 'viewport'
+                        }
+                    }}
+                />
+            </div>
 
             <FilterItem
                 label="카메라 시리얼"
