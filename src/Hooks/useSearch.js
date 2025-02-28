@@ -34,7 +34,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 100,
+                per_page: 10,
                 group_by: 'evtnum'
             };
 
@@ -86,7 +86,7 @@ const useSearch = (selectedPage) => {
                 serial_number: searchParams.serialNumber || undefined,
                 species: searchParams.species || undefined,
                 page,
-                per_page: 20,
+                per_page: 10,
                 group_by: 'evtnum'
             };
 
