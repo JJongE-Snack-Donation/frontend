@@ -138,6 +138,7 @@ color: rgb(204, 204, 204);
   border-radius: 4px;
   overflow: hidden;
   position: relative;
+  height: 36%;
 }
 
 .modal__all_image-item.selected {
