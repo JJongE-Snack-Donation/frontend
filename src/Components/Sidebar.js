@@ -85,12 +85,6 @@ const Sidebar = () => {
                 이미지 조회
             </Link>
           </li>
-          <li className={isActive("/camera") ? "active" : ""}>
-            <Link to="/camera">
-              <Icon6 className="menu-icon" />
-              카메라 정보
-            </Link>
-          </li>
           <li onClick={handleLogout}>
             <Icon7 className="menu-icon" />
             로그아웃
