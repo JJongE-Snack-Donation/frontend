@@ -47,7 +47,7 @@ const StepThree = ({ nextStep, projectId, projectName, projectFile, setAnalysisE
           });
 
           if (progressResponse.status === 200 && progressResponse.data.progress !== undefined) {
-            const newProgress = progressResponse.data.progress;
+            const newProgress = Math.round(progressResponse.data.progress); // 소수점 제거
             setProgress(newProgress);
 
             if (newProgress >= 100) {
@@ -132,7 +132,7 @@ const CircularProgress = ({ value, isCompleted }) => {
         </g>
       ) : (
         <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="14" fill="#000">
-          {value}%
+          {Math.round(value)}% {/* 소수점 제거 */}
         </text>
       )}
     </svg>
