@@ -79,25 +79,18 @@ const ImageInquiry = () => {
                             onChange={handlePageChange}
                         />
                     )}
-                    {isModalOpen && selectedGroup && (
-                        <ImageModal
-                            onClose={() => setIsModalOpen(false)}
-                            groupData={selectedGroup}
-                            selectedPage={selectedPage} 
-                        />
-            
-                    )}
                 </>
             )}
 
             {/* 이미지 모달 */}
             {isModalOpen && selectedGroup && (
-                <ImageModal
-                    onClose={() => setIsModalOpen(false)}
-                    groupData={selectedGroup}
-                    selectedPage={selectedPage} 
-                />
-            )}
+    <ImageModal
+        onClose={() => setIsModalOpen(false)}
+        groupData={selectedGroup}
+        selectedPage={selectedPage} 
+    />
+)}
+
         </div>
     );
 }

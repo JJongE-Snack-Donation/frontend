@@ -38,6 +38,7 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
 
 
 
+
   // 체크 박스 선택 시
   const handleCheckboxChange = (imageId, e) => {
     if (e && e.stopPropagation) {
@@ -56,37 +57,32 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   // 모달창에서 선택한 이미지의 상세 정보 조회
   const fetchImageDetail = async (imageId, selectedPage) => {
     try {
-      let endpoint;
-      if (selectedPage === 'normal') {
-        endpoint = `/classified-images/${imageId}`;
-      } else if (selectedPage === 'exception') {
-        endpoint = `/unclassified-images/${imageId}`;
-      } else if (selectedPage === 'completed') { 
-        endpoint = `/images/${imageId}`;
-      }
-
-  
-      const response = await api.get(endpoint, {
-        headers: { 
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+        let endpoint;
+        if (selectedPage === 'normal') {
+            endpoint = `/classified-images/${imageId}`;
+        } else if (selectedPage === 'exception') {
+            endpoint = `/unclassified-images/${imageId}`;
+        } else if (selectedPage === 'completed') { 
+            endpoint = `/images/${imageId}`;
         }
-      });
 
-      // 페이지 타입에 따라 다른 응답 구조 처리
-      if (selectedPage === 'completed') {
-        // completed 페이지는 response.data.image 구조
-        if (response.data.image) {
-          setSelectedImageInfo(response.data.image); // .data 제거
-        } else {
-          console.error('완료된 이미지 데이터 구조가 예상과 다릅니다:', response.data);
-        }
+        const response = await api.get(endpoint, {
+            headers: { 
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        // 페이지 타입에 따라 다른 응답 구조 처리
+        if (selectedPage === 'completed') {
+          setSelectedImageInfo(response.data); // 응답 데이터 설정
       } else {
-        setSelectedImageInfo(response.data);
+          setSelectedImageInfo(response.data);
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Error fetching image detail:', error.response || error);
-    }
-  };
+  }
+};
+
   
 
   return {
