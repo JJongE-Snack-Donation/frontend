@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import api from '../Api';
 import useImageStore from './useImageStore';
 
@@ -13,14 +13,13 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const handleSelectAll = useCallback((e) => {
     const isChecked = e.target.checked;
     setIsAllSelected(isChecked);
-    setCheckedBoxes(prevCheckedBoxes => {
-      if (isChecked) {
-        return relatedImages.map(img => img.imageId);
-      } else {
-        return [];
-      }
-    });
+    if (isChecked) {
+      setCheckedBoxes(relatedImages.map(img => img.imageId));
+    } else {
+      setCheckedBoxes([]);
+    }
   }, [relatedImages]);
+  
   
 
   const setRelatedImages = useCallback((images) => {
@@ -96,6 +95,10 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
       console.error('Error fetching image detail:', error.response || error);
   }
 };
+
+useEffect(() => {
+  setIsAllSelected(checkedBoxes.length === relatedImages.length);
+}, [checkedBoxes, relatedImages]);
 
   
 

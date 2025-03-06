@@ -151,7 +151,7 @@ const useImageStore = create((set, get) => ({
 
     completedGroupImages: {},
 
-// 🔹 검수 완료된 이미지 조회 추가
+    // 검수 완료된 이미지 조회
 fetchCompletedGroupImages: async (evtnum) => {
     if (get().completedGroupImages[evtnum]) {
         set({ relatedImages: get().completedGroupImages[evtnum] });
