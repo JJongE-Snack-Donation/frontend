@@ -67,6 +67,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         setTimeout(() => setShowExceptionCompletionMessage(false), 4000);
     };
     
+    
 
     const handleConfirmInspectionComplete = async () => {
         try {
@@ -92,6 +93,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         setIsPopupOpen(false);
     };
 
+    // 모달창 닫았을때 데이터 상태 갱신
+    const handleClose = () => {
+        const { removeExceptionImages } = useImageStore.getState();
+        removeExceptionImages(checkedBoxes, selectedPage);
+        onClose();
+      };
+      
+
     const handleSubmitPopup = async (checkedIds, updates) => {
         try {
             const result = await updateNormalInspectionBulk(checkedIds, updates);
@@ -109,32 +118,28 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     };
     
 
-
     useEffect(() => {
         const loadImages = async () => {
-            if (groupData && groupData.evtnum) {
-                let images;
-                if (selectedPage === 'normal') {
-                    images = await fetchGroupImages(groupData.evtnum);
-                    images = images.filter(img => img.exception_status !== "processed");
-                    setGroupImages(images);
-                } else if (selectedPage === 'exception') {
-                    images = await fetchExceptionGroupImages(groupData.evtnum);
-                    setExceptionGroupImages(images);
-                } else if (selectedPage === 'completed') {
-                    images = await fetchCompletedGroupImages(groupData.evtnum);
-                    setCompletedGroupImages(images);
-                }
-                setImagesToUse(images || []);
-                if (images && images.length > 0) {
-                    setRelatedImages(images);
-                    handleCardClick(images[0]);
-                }
+          if (groupData && groupData.evtnum) {
+            let images;
+            if (selectedPage === 'normal') {
+              images = await fetchGroupImages(groupData.evtnum);
+              images = images.filter(img => img.exception_status !== "processed");
+            } else if (selectedPage === 'exception') {
+              images = await fetchExceptionGroupImages(groupData.evtnum);
+            } else if (selectedPage === 'completed') {
+              images = await fetchCompletedGroupImages(groupData.evtnum);
             }
+            setImagesToUse(images || []);
+            setRelatedImages(images || []); // 여기서 setRelatedImages 호출
+            if (images && images.length > 0) {
+              handleCardClick(images[0]);
+            }
+          }
         };
         loadImages();
-    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick, setGroupImages, setExceptionGroupImages, setCompletedGroupImages]);
-    
+      }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+      
 
     
 
@@ -229,8 +234,8 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                         </button>
                     )}
                     <button
-                        className="modal__close-btn"
-                        onClick={onClose}
+                    className="modal__close-btn"
+                    onClick={handleClose}
                     >
                         닫기
                     </button>

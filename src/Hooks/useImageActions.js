@@ -40,31 +40,41 @@ const useImageActions = () => {
 
     // 예외 상태 processed로 처리 
     const handleExceptionInspection = async (checkedIds) => {
-      for (const imageId of checkedIds) {
-          try {
-              const response = await api.put(`/exception/${imageId}/status`, 
-                  {
-                      status: "processed",
-                      comment: "Processed via exception inspection"
-                  },
-                  {
-                      headers: {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${localStorage.getItem("token")}`
-                      }
-                  }
-              );
-  
-              console.log("Update successful:", response.data);
-          } catch (error) {
-              console.error("Error updating image status:", error);
-          }
+      try {
+        for (const imageId of checkedIds) {
+          const response = await api.put(`/exception/${imageId}/status`, 
+            {
+              status: "processed",
+              comment: "Processed via exception inspection"
+            },
+            {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          console.log("Update successful:", response.data);
+        }
+    
+        updateExceptionStatus(checkedIds, "processed");
+        useImageStore.getState().removeExceptionImages(checkedIds, 'normal');
+        setShowConfirmToast(false);
+    
+        // Optionally, update the local state to reflect the changes
+        setRelatedImages(prevImages => 
+          prevImages.filter(img => !checkedIds.includes(img.imageId))
+        );
+    
+        return true; // Indicate successful operation
+      } catch (error) {
+        console.error("Error updating image status:", error);
+        alert("예외 처리 중 오류가 발생했습니다.");
+        return false; // Indicate failed operation
       }
-  
-      updateExceptionStatus(checkedIds, "processed");
-      setShowConfirmToast(false);
-  };
+    };
+    
   
     
   useEffect(() => {

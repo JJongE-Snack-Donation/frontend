@@ -18,7 +18,14 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
 
   const setRelatedImages = useCallback((images) => {
     setStoreRelatedImages(images);
+    // 로컬 상태도 업데이트
+    setMainImage(images[0] || {});
+    setSelectedCards([]);
+    setCheckedBoxes([]);
+    setIsAllSelected(false);
+    setSelectedImageInfo(images[0] || {});
   }, [setStoreRelatedImages]);
+  
 
   // 카드 클릭 시 선택된 카드의 아이디와 정보 재설정, 메인 이미지로 설정
   const handleCardClick = useCallback((clickedImage, e = null) => {

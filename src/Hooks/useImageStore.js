@@ -42,6 +42,35 @@ const useImageStore = create((set, get) => ({
             groupedImages: state.groupedImages.filter((group) => group.evtnum !== evtnum),
         })),
 
+
+    // 예외 처리 후 모달창에서 없어진 이미지 데이터 관리
+    removeExceptionImages: (imageIds, page) => set((state) => {
+        if (page !== 'normal') return state;
+      
+        const newGroupImages = Object.fromEntries(
+          Object.entries(state.groupImages).map(([evtnum, images]) => [
+            evtnum,
+            images.filter(img => !imageIds.includes(img.imageId))
+          ])
+        );
+      
+        const newGroupedImages = state.groupedImages.map(group => ({
+          ...group,
+          imageCount: (newGroupImages[group.evtnum] || []).length
+        })).filter(group => group.imageCount > 0);
+      
+        const newRelatedImages = state.relatedImages.filter(img => !imageIds.includes(img.imageId));
+      
+        return {
+          groupImages: newGroupImages,
+          groupedImages: newGroupedImages,
+          relatedImages: newRelatedImages
+        };
+      }),
+      
+      
+
+
     updateExceptionStatus: (evtnum, status) =>
         set((state) => ({
             groupedImages: state.groupedImages.map((group) =>
