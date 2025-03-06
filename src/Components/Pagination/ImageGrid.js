@@ -22,7 +22,6 @@ const ImageGrid = ({ groups, onGroupClick }) => {
       {groups.map((group) => (
         <div key={group.evtnum} className="image-card" onClick={() => onGroupClick(group)}>
           <div className="image-card__header">
-            <input type='checkbox' className="image-card__checkbox"/>
             <p className="image-card__title">Event: {group.evtnum}</p>
           </div>
           <div className="image-card__content">
