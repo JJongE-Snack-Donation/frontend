@@ -180,7 +180,9 @@ const useImageActions = () => {
         });
     
         deleteImage(imageId);
+        setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
         alert('이미지가 성공적으로 삭제되었습니다.');
+        
       } catch (error) {
         console.error('삭제 중 오류:', error);
     

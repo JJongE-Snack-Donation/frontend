@@ -211,9 +211,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                         onCardClick={(e) => handleCardClick(img, e)}
                                         onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
                                         onDownload={() => handleDownload(img.imageId)}
-                                        onDelete={(e) => selectedPage === 'normal' 
-                                            ? handleDelete(img.imageId, e) 
-                                            : handleExceptionDelete(img.imageId, e)}
+                                        onDelete={(e) => {
+                                            if (selectedPage === 'normal') {
+                                              handleDelete(img.imageId, e);
+                                              setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
+                                            } else {
+                                              handleExceptionDelete(img.imageId, e);
+                                            }
+                                          }}
                                     />
                                 ))
                             ) : (
