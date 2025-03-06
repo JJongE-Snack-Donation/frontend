@@ -117,6 +117,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         }
     };
     
+    const handleDeleteClick = async () => {
+        const success = await handleBulkImageDelete(checkedBoxes);
+        if (success) {
+          setImagesToUse(prevImages => prevImages.filter(img => !checkedBoxes.includes(img.imageId)));
+          setCheckedBoxes([]);
+          setIsAllSelected(false);
+        }
+      };
 
     useEffect(() => {
         const loadImages = async () => {
@@ -186,8 +194,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                                     onSubmit={handleSubmitPopup}
                                                 />
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
-                                                <button onClick={() => handleBulkImageDelete(checkedBoxes)}
-                                                    disabled={checkedBoxes.length === 0}
+                                                <button onClick={handleDeleteClick} disabled={checkedBoxes.length === 0} 
                                                     style={{ color: '#ff4d4f' }}
                                                 >
                                                     이미지 삭제

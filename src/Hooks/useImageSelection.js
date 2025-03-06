@@ -10,11 +10,18 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
 
-  const handleSelectAll = (e) => {
+  const handleSelectAll = useCallback((e) => {
     const isChecked = e.target.checked;
     setIsAllSelected(isChecked);
-    setCheckedBoxes(isChecked ? relatedImages.map(img => img.imageId) : []);
-  };
+    setCheckedBoxes(prevCheckedBoxes => {
+      if (isChecked) {
+        return relatedImages.map(img => img.imageId);
+      } else {
+        return [];
+      }
+    });
+  }, [relatedImages]);
+  
 
   const setRelatedImages = useCallback((images) => {
     setStoreRelatedImages(images);

@@ -25,17 +25,21 @@ const useImageStore = create((set, get) => ({
                 images.filter(img => !imageIds.includes(img.imageId))
             ])
         );
-
+    
         const newGroupedImages = state.groupedImages.map(group => ({
             ...group,
             imageCount: (newGroupImages[group.evtnum] || []).length
         })).filter(group => group.imageCount > 0);
-
+    
+        const newRelatedImages = state.relatedImages.filter(img => !imageIds.includes(img.imageId));
+    
         return {
             groupImages: newGroupImages,
-            groupedImages: newGroupedImages
+            groupedImages: newGroupedImages,
+            relatedImages: newRelatedImages
         };
     }),
+    
 
     deleteGroup: (evtnum) =>
         set((state) => ({

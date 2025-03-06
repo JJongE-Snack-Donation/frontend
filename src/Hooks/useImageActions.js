@@ -229,6 +229,7 @@ const useImageActions = () => {
           }
       
           deleteImage(imageId);
+          setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
           alert('이미지가 성공적으로 삭제되었습니다.');
         } catch (error) {
           console.error('삭제 중 오류:', error);
@@ -372,10 +373,16 @@ const useImageActions = () => {
           }
         );
         
+        // Zustand 스토어 업데이트
         deleteMultipleImages(checkedIds);
+        
+        // 로컬 상태 업데이트
         setCheckedBoxes([]);
+        setRelatedImages(prevImages => prevImages.filter(img => !checkedIds.includes(img.imageId)));
         
         alert(response.data.message || '선택한 이미지들이 성공적으로 삭제되었습니다.');
+        
+        return true; // 삭제 성공을 나타내는 값 반환
       } catch (error) {
         console.error('Bulk delete failed:', error);
         if (error.response && error.response.status === 401) {
@@ -383,8 +390,11 @@ const useImageActions = () => {
         } else {
           alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response?.data?.message || error.message}`);
         }
+        return false; // 삭제 실패를 나타내는 값 반환
       }
     };
+    
+    
     
 
     return {
