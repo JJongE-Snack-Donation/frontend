@@ -17,19 +17,17 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
-    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useSearch();
-    //const { relatedImages, updateClassification } = useImageStore();
+    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useImageStore();
+    const [imagesToUse, setImagesToUse] = useState([]);
+    const { relatedImages } = useImageStore();
+    const [filteredImages, setFilteredImages] = useState([]);
     const [groupImages, setGroupImages] = useState([]);
     const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
     const [completedGroupImages, setCompletedGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
     
-    const imagesToUse = 
-    selectedPage === 'normal' ? groupImages 
-    : selectedPage === 'exception' ? exceptionGroupImages 
-    : selectedPage === 'completed' ? completedGroupImages 
-    : [];
+
 
 
      const {
@@ -60,13 +58,15 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         handleBulkImageDelete
     } = useImageActions();
 
-    const handleConfirmInspection = () => {
-        handleExceptionInspection(checkedBoxes);
+    const handleConfirmInspection = async () => {
+        await handleExceptionInspection(checkedBoxes);
+        setImagesToUse(prevImages => prevImages.filter(img => !checkedBoxes.includes(img.imageId)));
         setCheckedBoxes([]);
         setIsAllSelected(false);
         setShowExceptionCompletionMessage(true);
         setTimeout(() => setShowExceptionCompletionMessage(false), 4000);
     };
+    
 
     const handleConfirmInspectionComplete = async () => {
         try {
@@ -111,11 +111,12 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
 
 
     useEffect(() => {
-        const loadGroupImages = async () => {
+        const loadImages = async () => {
             if (groupData && groupData.evtnum) {
                 let images;
                 if (selectedPage === 'normal') {
                     images = await fetchGroupImages(groupData.evtnum);
+                    images = images.filter(img => img.exception_status !== "processed");
                     setGroupImages(images);
                 } else if (selectedPage === 'exception') {
                     images = await fetchExceptionGroupImages(groupData.evtnum);
@@ -124,16 +125,16 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                     images = await fetchCompletedGroupImages(groupData.evtnum);
                     setCompletedGroupImages(images);
                 }
-
+                setImagesToUse(images || []);
                 if (images && images.length > 0) {
                     setRelatedImages(images);
                     handleCardClick(images[0]);
                 }
             }
-        };    
-
-        loadGroupImages();
-    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+        };
+        loadImages();
+    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick, setGroupImages, setExceptionGroupImages, setCompletedGroupImages]);
+    
 
     
 
