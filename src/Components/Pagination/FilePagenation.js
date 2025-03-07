@@ -1,5 +1,9 @@
 import React from "react";
 import "../../Styles/Pagination/FilePagenation.css";
+import { ReactComponent as PrevArrow } from '../../Assets/Imgs/etc/pre_arrow.svg';
+import { ReactComponent as NextArrow } from '../../Assets/Imgs/etc/next_arrow.svg';
+import { ReactComponent as FirstPageArrow } from '../../Assets/Imgs/etc/first_page_arrow.svg';
+import { ReactComponent as LastPageArrow } from '../../Assets/Imgs/etc/last_page_arrow.svg';
 
 const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -29,12 +33,12 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => 
     <div className="pagination">
       {/* 첫 페이지 이동 */}
       <button onClick={() => onPageChange(1)} disabled={currentPage === 1}>
-        &laquo;&laquo;
+        <FirstPageArrow />
       </button>
 
       {/* 이전 페이지 이동 */}
       <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
-        &laquo;
+        <PrevArrow />
       </button>
 
       {/* 페이지 숫자 버튼 */}
@@ -50,12 +54,12 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => 
 
       {/* 다음 페이지 이동 */}
       <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
-        &raquo;
+        <NextArrow />
       </button>
 
       {/* 마지막 페이지 이동 */}
       <button onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages}>
-        &raquo;&raquo;
+        <LastPageArrow />
       </button>
     </div>
   );
