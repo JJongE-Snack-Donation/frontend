@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import api from '../Api';
 import useImageStore from './useImageStore';
 
@@ -10,15 +10,28 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedImageInfo, setSelectedImageInfo] = useState(initialImage || {});
 
-  const handleSelectAll = (e) => {
+  const handleSelectAll = useCallback((e) => {
     const isChecked = e.target.checked;
     setIsAllSelected(isChecked);
-    setCheckedBoxes(isChecked ? relatedImages.map(img => img.imageId) : []);
-  };
+    if (isChecked) {
+      setCheckedBoxes(relatedImages.map(img => img.imageId));
+    } else {
+      setCheckedBoxes([]);
+    }
+  }, [relatedImages]);
+  
+  
 
   const setRelatedImages = useCallback((images) => {
     setStoreRelatedImages(images);
+    // 로컬 상태도 업데이트
+    setMainImage(images[0] || {});
+    setSelectedCards([]);
+    setCheckedBoxes([]);
+    setIsAllSelected(false);
+    setSelectedImageInfo(images[0] || {});
   }, [setStoreRelatedImages]);
+  
 
   // 카드 클릭 시 선택된 카드의 아이디와 정보 재설정, 메인 이미지로 설정
   const handleCardClick = useCallback((clickedImage, e = null) => {
@@ -82,6 +95,10 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
       console.error('Error fetching image detail:', error.response || error);
   }
 };
+
+useEffect(() => {
+  setIsAllSelected(checkedBoxes.length === relatedImages.length);
+}, [checkedBoxes, relatedImages]);
 
   
 

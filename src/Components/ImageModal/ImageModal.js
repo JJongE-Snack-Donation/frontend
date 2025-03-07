@@ -17,19 +17,17 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
-    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useSearch();
-    //const { relatedImages, updateClassification } = useImageStore();
+    const { fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages } = useImageStore();
+    const [imagesToUse, setImagesToUse] = useState([]);
+    const { relatedImages } = useImageStore();
+    const [filteredImages, setFilteredImages] = useState([]);
     const [groupImages, setGroupImages] = useState([]);
     const [exceptionGroupImages, setExceptionGroupImages] = useState([]);
     const [completedGroupImages, setCompletedGroupImages] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const { updateNormalInspectionBulk } = useCountUpdate();
     
-    const imagesToUse = 
-    selectedPage === 'normal' ? groupImages 
-    : selectedPage === 'exception' ? exceptionGroupImages 
-    : selectedPage === 'completed' ? completedGroupImages 
-    : [];
+
 
 
      const {
@@ -60,13 +58,16 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         handleBulkImageDelete
     } = useImageActions();
 
-    const handleConfirmInspection = () => {
-        handleExceptionInspection(checkedBoxes);
+    const handleConfirmInspection = async () => {
+        await handleExceptionInspection(checkedBoxes);
+        setImagesToUse(prevImages => prevImages.filter(img => !checkedBoxes.includes(img.imageId)));
         setCheckedBoxes([]);
         setIsAllSelected(false);
         setShowExceptionCompletionMessage(true);
         setTimeout(() => setShowExceptionCompletionMessage(false), 4000);
     };
+    
+    
 
     const handleConfirmInspectionComplete = async () => {
         try {
@@ -92,6 +93,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         setIsPopupOpen(false);
     };
 
+    // 모달창 닫았을때 데이터 상태 갱신
+    const handleClose = () => {
+        const { removeExceptionImages } = useImageStore.getState();
+        removeExceptionImages(checkedBoxes, selectedPage);
+        onClose();
+      };
+      
+
     const handleSubmitPopup = async (checkedIds, updates) => {
         try {
             const result = await updateNormalInspectionBulk(checkedIds, updates);
@@ -108,32 +117,37 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         }
     };
     
-
+    const handleDeleteClick = async () => {
+        const success = await handleBulkImageDelete(checkedBoxes);
+        if (success) {
+          setImagesToUse(prevImages => prevImages.filter(img => !checkedBoxes.includes(img.imageId)));
+          setCheckedBoxes([]);
+          setIsAllSelected(false);
+        }
+      };
 
     useEffect(() => {
-        const loadGroupImages = async () => {
-            if (groupData && groupData.evtnum) {
-                let images;
-                if (selectedPage === 'normal') {
-                    images = await fetchGroupImages(groupData.evtnum);
-                    setGroupImages(images);
-                } else if (selectedPage === 'exception') {
-                    images = await fetchExceptionGroupImages(groupData.evtnum);
-                    setExceptionGroupImages(images);
-                } else if (selectedPage === 'completed') {
-                    images = await fetchCompletedGroupImages(groupData.evtnum);
-                    setCompletedGroupImages(images);
-                }
-
-                if (images && images.length > 0) {
-                    setRelatedImages(images);
-                    handleCardClick(images[0]);
-                }
+        const loadImages = async () => {
+          if (groupData && groupData.evtnum) {
+            let images;
+            if (selectedPage === 'normal') {
+              images = await fetchGroupImages(groupData.evtnum);
+              images = images.filter(img => img.exception_status !== "processed");
+            } else if (selectedPage === 'exception') {
+              images = await fetchExceptionGroupImages(groupData.evtnum);
+            } else if (selectedPage === 'completed') {
+              images = await fetchCompletedGroupImages(groupData.evtnum);
             }
-        };    
-
-        loadGroupImages();
-    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+            setImagesToUse(images || []);
+            setRelatedImages(images || []); // 여기서 setRelatedImages 호출
+            if (images && images.length > 0) {
+              handleCardClick(images[0]);
+            }
+          }
+        };
+        loadImages();
+      }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+      
 
     
 
@@ -180,8 +194,7 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                                     onSubmit={handleSubmitPopup}
                                                 />
                                                 <button onClick={() => handleBulkImageDownload(checkedBoxes)}>이미지 다운로드</button>
-                                                <button onClick={() => handleBulkImageDelete(checkedBoxes)}
-                                                    disabled={checkedBoxes.length === 0}
+                                                <button onClick={handleDeleteClick} disabled={checkedBoxes.length === 0} 
                                                     style={{ color: '#ff4d4f' }}
                                                 >
                                                     이미지 삭제
@@ -205,9 +218,14 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                                         onCardClick={(e) => handleCardClick(img, e)}
                                         onCheckboxChange={(e) => handleCheckboxChange(img.imageId, e)}
                                         onDownload={() => handleDownload(img.imageId)}
-                                        onDelete={(e) => selectedPage === 'normal' 
-                                            ? handleDelete(img.imageId, e) 
-                                            : handleExceptionDelete(img.imageId, e)}
+                                        onDelete={(e) => {
+                                            if (selectedPage === 'normal') {
+                                              handleDelete(img.imageId, e);
+                                              setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
+                                            } else {
+                                              handleExceptionDelete(img.imageId, e);
+                                            }
+                                          }}
                                     />
                                 ))
                             ) : (
@@ -228,8 +246,8 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
                         </button>
                     )}
                     <button
-                        className="modal__close-btn"
-                        onClick={onClose}
+                    className="modal__close-btn"
+                    onClick={handleClose}
                     >
                         닫기
                     </button>

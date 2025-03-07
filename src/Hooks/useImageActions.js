@@ -10,61 +10,71 @@ const useImageActions = () => {
     const { deleteMultipleImages } = useImageStore();
     const [checkedBoxes, setCheckedBoxes] = useState([]);
     
-      // ✅ 검수 완료된 이미지 예외 검수 처리
-      const handleCompletedInspection = async (checkedIds) => {
-        for (const imageId of checkedIds) {
-            try {
-                const response = await api.put(`/images/${imageId}/status`, 
-                    {
-                        status: "processed",
-                        comment: "Processed via completed inspection"
-                    },
-                    {
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${localStorage.getItem("token")}`
-                        }
-                    }
-                );
+    //   // ✅ 검수 완료된 이미지 예외 검수 처리
+    //   const handleCompletedInspection = async (checkedIds) => {
+    //     for (const imageId of checkedIds) {
+    //         try {
+    //             const response = await api.put(`/images/${imageId}/status`, 
+    //                 {
+    //                     status: "processed",
+    //                     comment: "Processed via completed inspection"
+    //                 },
+    //                 {
+    //                     headers: {
+    //                         'Accept': 'application/json',
+    //                         'Content-Type': 'application/json',
+    //                         Authorization: `Bearer ${localStorage.getItem("token")}`
+    //                     }
+    //                 }
+    //             );
     
-                console.log("Update successful:", response.data);
-            } catch (error) {
-                console.error("Error updating completed image status:", error);
-            }
-        }
+    //             console.log("Update successful:", response.data);
+    //         } catch (error) {
+    //             console.error("Error updating completed image status:", error);
+    //         }
+    //     }
     
-        updateExceptionStatus(checkedIds, "processed");
-        setShowConfirmToast(false);
-    };
+    //     updateExceptionStatus(checkedIds, "processed");
+    //     setShowConfirmToast(false);
+    // };
 
     // 예외 상태 processed로 처리 
     const handleExceptionInspection = async (checkedIds) => {
-      for (const imageId of checkedIds) {
-          try {
-              const response = await api.put(`/exception/${imageId}/status`, 
-                  {
-                      status: "processed",
-                      comment: "Processed via exception inspection"
-                  },
-                  {
-                      headers: {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${localStorage.getItem("token")}`
-                      }
-                  }
-              );
-  
-              console.log("Update successful:", response.data);
-          } catch (error) {
-              console.error("Error updating image status:", error);
-          }
+      try {
+        for (const imageId of checkedIds) {
+          const response = await api.put(`/exception/${imageId}/status`, 
+            {
+              status: "processed",
+              comment: "Processed via exception inspection"
+            },
+            {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          console.log("Update successful:", response.data);
+        }
+    
+        updateExceptionStatus(checkedIds, "processed");
+        useImageStore.getState().removeExceptionImages(checkedIds, 'normal');
+        setShowConfirmToast(false);
+    
+        // Optionally, update the local state to reflect the changes
+        setRelatedImages(prevImages => 
+          prevImages.filter(img => !checkedIds.includes(img.imageId))
+        );
+    
+        return true; // Indicate successful operation
+      } catch (error) {
+        console.error("Error updating image status:", error);
+        alert("예외 처리 중 오류가 발생했습니다.");
+        return false; // Indicate failed operation
       }
-  
-      updateExceptionStatus(checkedIds, "processed");
-      setShowConfirmToast(false);
-  };
+    };
+    
   
     
   useEffect(() => {
@@ -170,7 +180,9 @@ const useImageActions = () => {
         });
     
         deleteImage(imageId);
+        setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
         alert('이미지가 성공적으로 삭제되었습니다.');
+        
       } catch (error) {
         console.error('삭제 중 오류:', error);
     
@@ -217,6 +229,7 @@ const useImageActions = () => {
           }
       
           deleteImage(imageId);
+          setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
           alert('이미지가 성공적으로 삭제되었습니다.');
         } catch (error) {
           console.error('삭제 중 오류:', error);
@@ -360,10 +373,16 @@ const useImageActions = () => {
           }
         );
         
+        // Zustand 스토어 업데이트
         deleteMultipleImages(checkedIds);
+        
+        // 로컬 상태 업데이트
         setCheckedBoxes([]);
+        setRelatedImages(prevImages => prevImages.filter(img => !checkedIds.includes(img.imageId)));
         
         alert(response.data.message || '선택한 이미지들이 성공적으로 삭제되었습니다.');
+        
+        return true; // 삭제 성공을 나타내는 값 반환
       } catch (error) {
         console.error('Bulk delete failed:', error);
         if (error.response && error.response.status === 401) {
@@ -371,8 +390,11 @@ const useImageActions = () => {
         } else {
           alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response?.data?.message || error.message}`);
         }
+        return false; // 삭제 실패를 나타내는 값 반환
       }
     };
+    
+    
     
 
     return {
@@ -385,7 +407,7 @@ const useImageActions = () => {
         handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
-        handleCompletedInspection,
+        //handleCompletedInspection,
         handleExceptionInspection,
         handleInspectionComplete,
         handleBulkImageDelete,
