@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ReactComponent as CheckIcon } from "../../Assets/Imgs/etc/check.svg";
 
 const StepFour = ({nextStep, upload, analysisEndTime}) => {
+    const navigate = useNavigate();
 
     const handleNextStep = () => {
-        nextStep();
+        navigate('/general-inspection');
     }
 
     const handleUpload = () => {
