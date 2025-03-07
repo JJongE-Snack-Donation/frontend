@@ -102,14 +102,14 @@ const useImageStore = create((set, get) => ({
     groupImages: {},
 
     // 일반 검수 이미지 조회
-    fetchGroupImages: async (evtnum) => {
+    fetchGroupImages: async (evtnum, projectId) => {
         if (get().groupImages[evtnum]) {
             set({ relatedImages: get().groupImages[evtnum] });
             return get().groupImages[evtnum];
         }
         try {
             const response = await api.get('/inspection/normal', {
-                params: { evtnum },
+                params: { evtnum, project_id: projectId },
                 headers: { 
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -129,10 +129,10 @@ const useImageStore = create((set, get) => ({
     exceptionGroupImages: {},
 
     // 예외 검수 이미지 조회
-    fetchExceptionGroupImages: async (evtnum) => {
+    fetchExceptionGroupImages: async (evtnum, projectId) => {
         try {
             const response = await api.get('/inspection/exception', {
-                params: { evtnum },
+                params: { evtnum, project_id: projectId },
                 headers: { 
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -152,14 +152,14 @@ const useImageStore = create((set, get) => ({
     completedGroupImages: {},
 
     // 검수 완료된 이미지 조회
-fetchCompletedGroupImages: async (evtnum) => {
+fetchCompletedGroupImages: async (evtnum, projectId) => {
     if (get().completedGroupImages[evtnum]) {
         set({ relatedImages: get().completedGroupImages[evtnum] });
         return get().completedGroupImages[evtnum];
     }
     try {
         const response = await api.get('/images', {
-            params: { evtnum },
+            params: { evtnum, project_id: projectId },
             headers: { 
                 Authorization: `Bearer ${localStorage.getItem("token")}`
             }
