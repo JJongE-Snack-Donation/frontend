@@ -37,11 +37,13 @@ const ImageInquiry = () => {
     };
 
     const handleGroupClick = async (group) => {
+        console.log('clicked group:', group); // 클릭한 그룹 데이터 확인
         setSelectedGroup(group);
-        await fetchCompletedGroupImages(group.evtnum);
+        const images = await fetchCompletedGroupImages(group.evtnum, group.projectId);
+        console.log('fetched completed images:', images); // 받은 이미지 데이터 확인
         setIsModalOpen(true);
     };
-
+    
     return (
         <div className="wrap">
             <NameTag />
