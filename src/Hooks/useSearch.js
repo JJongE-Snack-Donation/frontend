@@ -188,7 +188,9 @@ const useSearch = (selectedPage) => {
           handleSearch(1);
         } else if (selectedPage === 'exception') {
           handleExceptionSearch(1);
-        }
+        } else if (selectedPage === 'completed') {
+        handleCompletedSearch(1);
+    }
       }, [fetchOptions, handleSearch, handleExceptionSearch, selectedPage, setOptions]);
       
     
