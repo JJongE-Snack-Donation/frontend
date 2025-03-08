@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Styles/Home.css';
 import ImageModal from '../Components/ImageModal/ImageModal';
 import ImageGrid from '../Components/Pagination/ImageGrid';
@@ -27,6 +27,13 @@ const ImageInquiry = () => {
         searchParams,
         updateSearchParam
     } = useSearch(selectedPage);
+
+    useEffect(() => {
+        if (handleCompletedSearch) {
+            handleCompletedSearch(1); // 페이지 렌더링 시 데이터 가져오기
+        }
+    }, [handleCompletedSearch]);
+    
 
     const handlePageChange = async (pageNumber) => {
         await handleCompletedSearch(pageNumber);
