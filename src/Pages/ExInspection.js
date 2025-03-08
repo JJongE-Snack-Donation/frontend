@@ -39,7 +39,7 @@ const ExceptionInspection = () => {
 
     const handleGroupClick = async (group) => {
         setSelectedGroup(group);
-        await fetchExceptionGroupImages(group.evtnum);
+        await fetchExceptionGroupImages(group.evtnum, group.projectId);
         setIsModalOpen(true);
     };
 

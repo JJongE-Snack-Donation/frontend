@@ -38,10 +38,12 @@ const GeneralInspection = () => {
     };
 
     const handleGroupClick = async (group) => {
+        console.log('clicked group:', group); // 클릭한 그룹 데이터 확인
         setSelectedGroup(group);
-        await fetchGroupImages(group.evtnum);
+        await fetchGroupImages(group.evtnum, group.projectId);
         setIsModalOpen(true);
     };
+    
 
     return (
         <div className="wrap">
