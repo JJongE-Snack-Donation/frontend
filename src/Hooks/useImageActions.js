@@ -169,73 +169,138 @@ const useImageActions = () => {
 
 
 
-    // 단일 이미지 삭제(일반 검수)
-    const handleDelete = async (imageId) => {
-      try {
-        const response = await api.delete(`/classified-images/${imageId}`, {
+// 단일 이미지 삭제(일반 검수)
+const handleDelete = async (imageId) => {
+  try {
+      const response = await api.delete(`/classified-images/${imageId}`, {
           headers: {
-            'Accept': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem("token")}`
-          }
-        });
-    
-        deleteImage(imageId);
-        setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
-        alert('이미지가 성공적으로 삭제되었습니다.');
-        
-      } catch (error) {
-        console.error('삭제 중 오류:', error);
-    
-        if (error.response) {
-          if (error.response.status === 404) {
-            deleteImage(imageId);
-            alert('이미지가 이미 삭제되었거나 존재하지 않습니다.');
-          } else if (error.response.status === 410) {
-            deleteImage(imageId);
-            alert('이미지가 이미 영구적으로 삭제되었습니다.');
-          } else {
-            alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response.data.message || '알 수 없는 오류'}`);
-          }
-        } else {
-          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-        }
-      }
-    
-      // 삭제 후 리소스 존재 여부 확인
-      try {
-        await api.get(`/classified-images/${imageId}`);
-      } catch (checkError) {
-        if (checkError.response && checkError.response.status === 404) {
-          deleteImage(imageId);
-          alert('이미지가 성공적으로 삭제되었음을 확인했습니다.');
-        }
-      }
-    };
-    
-      
-    // 단일 이미지 삭제(예외 검수)
-      const handleExceptionDelete = async (imageId) => {
-        try {
-          const response = await api.delete(`/unclassified-images/${imageId}`, {
-            headers: {
               'Accept': 'application/json',
               Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-          });
-      
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || '이미지 삭제 실패');
           }
-      
+      });
+
+      deleteImage(imageId);
+      setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
+      alert('이미지가 성공적으로 삭제되었습니다.');
+  } catch (error) {
+      console.error('삭제 중 오류:', error);
+
+      if (error.response) {
+          if (error.response.status === 401) {
+              alert('인증이 실패했습니다. 로그인 후 다시 시도해주세요.');
+          } else if (error.response.status === 404) {
+              deleteImage(imageId);
+              alert('이미지가 이미 삭제되었거나 존재하지 않습니다.');
+          } else if (error.response.status === 410) {
+              deleteImage(imageId);
+              alert('이미지가 이미 영구적으로 삭제되었습니다.');
+          } else {
+              alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response.data.message || '알 수 없는 오류'}`);
+          }
+      } else {
+          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+  }
+
+  // 삭제 후 리소스 존재 여부 확인
+  try {
+      await api.get(`/classified-images/${imageId}`);
+  } catch (checkError) {
+      if (checkError.response && checkError.response.status === 404) {
           deleteImage(imageId);
-          setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
-          alert('이미지가 성공적으로 삭제되었습니다.');
-        } catch (error) {
-          console.error('삭제 중 오류:', error);
-          alert(`이미지 삭제 중 오류가 발생했습니다: ${error.message}`);
-        }
-      };
+          alert('이미지가 성공적으로 삭제되었음을 확인했습니다.');
+      }
+  }
+};
+
+// 단일 이미지 삭제(예외 검수)
+const handleExceptionDelete = async (imageId) => {
+  try {
+      const response = await api.delete(`/unclassified-images/${imageId}`, {
+          headers: {
+              'Accept': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+      });
+
+      deleteImage(imageId);
+      setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
+      alert('이미지가 성공적으로 삭제되었습니다.');
+  } catch (error) {
+      console.error('삭제 중 오류:', error);
+
+      if (error.response) {
+          if (error.response.status === 401) {
+              alert('인증이 실패했습니다. 로그인 후 다시 시도해주세요.');
+          } else if (error.response.status === 404) {
+              deleteImage(imageId);
+              alert('이미지가 이미 삭제되었거나 존재하지 않습니다.');
+          } else if (error.response.status === 410) {
+              deleteImage(imageId);
+              alert('이미지가 이미 영구적으로 삭제되었습니다.');
+          } else {
+              alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response.data.message || '알 수 없는 오류'}`);
+          }
+      } else {
+          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+  }
+
+  // 삭제 후 리소스 존재 여부 확인
+  try {
+      await api.get(`/unclassified-images/${imageId}`);
+  } catch (checkError) {
+      if (checkError.response && checkError.response.status === 404) {
+          deleteImage(imageId);
+          alert('이미지가 성공적으로 삭제되었음을 확인했습니다.');
+      }
+  }
+};
+
+// 단일 이미지 삭제(검수 완료된 이미지 조회 페이지)
+const handleCompletedDelete = async (imageId) => {
+  try {
+      const response = await api.delete(`/images/${imageId}`, {
+          headers: {
+              'Accept': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+      });
+
+      deleteImage(imageId);
+      setRelatedImages(prevImages => prevImages.filter(img => img.imageId !== imageId));
+      alert('이미지가 성공적으로 삭제되었습니다.');
+  } catch (error) {
+      console.error('삭제 중 오류:', error);
+
+      if (error.response) {
+          if (error.response.status === 401) {
+              alert('인증이 실패했습니다. 로그인 후 다시 시도해주세요.');
+          } else if (error.response.status === 404) {
+              deleteImage(imageId);
+              alert('이미지가 이미 삭제되었거나 존재하지 않습니다.');
+          } else if (error.response.status === 410) {
+              deleteImage(imageId);
+              alert('이미지가 이미 영구적으로 삭제되었습니다.');
+          } else {
+              alert(`이미지 삭제 중 오류가 발생했습니다: ${error.response.data.message || '알 수 없는 오류'}`);
+          }
+      } else {
+          alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+  }
+
+  // 삭제 후 리소스 존재 여부 확인
+  try {
+      await api.get(`/images/${imageId}`);
+  } catch (checkError) {
+      if (checkError.response && checkError.response.status === 404) {
+          deleteImage(imageId);
+          alert('이미지가 성공적으로 삭제되었음을 확인했습니다.');
+      }
+  }
+};
+
 
 
 
@@ -407,7 +472,7 @@ const useImageActions = () => {
         handleExceptionDelete,
         handleDownload,
         handleBulkImageDownload,
-        //handleCompletedInspection,
+        handleCompletedDelete,
         handleExceptionInspection,
         handleInspectionComplete,
         handleBulkImageDelete,

@@ -56,7 +56,8 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         handleBulkImageDownload,
         handleExceptionInspection,
         handleInspectionComplete,
-        handleBulkImageDelete
+        handleBulkImageDelete,
+        handleCompletedDelete
     } = useImageActions();
 
     const handleConfirmInspection = async () => {
@@ -234,12 +235,18 @@ useEffect(() => {
                                         onDownload={() => handleDownload(img.imageId)}
                                         onDelete={(e) => {
                                             if (selectedPage === 'normal') {
-                                              handleDelete(img.imageId, e);
-                                              setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
-                                            } else {
-                                              handleExceptionDelete(img.imageId, e);
+                                                handleDelete(img.imageId, e);
+                                                setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
+                                            } else if (selectedPage === 'exception') {
+                                                handleExceptionDelete(img.imageId);
+                                                setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
+                                            } else if (selectedPage === 'completed') {
+                                                handleCompletedDelete(img.imageId);
+                                                setImagesToUse(prevImages => prevImages.filter(image => image.imageId !== img.imageId));
                                             }
-                                          }}
+                                        }}
+                                        
+                                        
                                     />
                                 ))
                             ) : (
