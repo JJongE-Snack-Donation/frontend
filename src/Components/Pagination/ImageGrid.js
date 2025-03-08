@@ -20,7 +20,7 @@ const ImageGrid = ({ groups, onGroupClick }) => {
   return (
     <div className="image-grid">
       {groups.map((group) => (
-        <div key={group.evtnum} className="image-card" onClick={() => onGroupClick(group)}>
+        <div key={`${group.projectId}-${group.evtnum}`} className="image-card" onClick={() => onGroupClick(group)}>
           <div className="image-card__header">
             <p className="image-card__title">Event: {group.evtnum}</p>
           </div>
