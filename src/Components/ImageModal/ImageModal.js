@@ -199,7 +199,8 @@ useEffect(() => {
                                         </button>
                                         {isDropdownOpen && (
                                             <div className="modal__bulk-action-dropdown">
-                                                <button onClick={handleOpenPopup} className="modal__edit-button">수정</button>
+                                                {selectedPage !== 'completed' && (
+                                                <button onClick={handleOpenPopup} className="modal__edit-button">수정</button>)}
                                                 <CountUpdatePopup
                                                     isOpen={isPopupOpen}
                                                     onClose={handleClosePopup}
