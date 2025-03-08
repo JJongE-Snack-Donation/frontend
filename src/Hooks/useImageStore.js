@@ -101,61 +101,64 @@ const useImageStore = create((set, get) => ({
 
     groupImages: {},
 
-    // 일반 검수 이미지 조회
-    fetchGroupImages: async (evtnum, projectId) => {
-        if (get().groupImages[evtnum]) {
-            set({ relatedImages: get().groupImages[evtnum] });
-            return get().groupImages[evtnum];
-        }
-        try {
-            const response = await api.get('/inspection/normal', {
-                params: { evtnum, project_id: projectId },
-                headers: { 
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            const images = response.data.images;
-            set((state) => ({
-                groupImages: { ...state.groupImages, [evtnum]: images },
-                relatedImages: images
-            }));
-            return images;
-        } catch (error) {
-            console.error("Group images fetch error:", error);
-            return [];
-        }
-    },
+// 일반 검수 이미지 조회
+fetchGroupImages: async (evtnum, projectId) => {
+    if (get().groupImages[`${evtnum}-${projectId}`]) {
+        set({ relatedImages: get().groupImages[`${evtnum}-${projectId}`] });
+        return get().groupImages[`${evtnum}-${projectId}`];
+    }
+    try {
+        const response = await api.get('/inspection/normal', {
+            params: { evtnum, project_id: projectId },
+            headers: { 
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+        const images = response.data.images;
+        set((state) => ({
+            groupImages: { ...state.groupImages, [`${evtnum}-${projectId}`]: images },
+            relatedImages: images
+        }));
+        return images;
+    } catch (error) {
+        console.error("Group images fetch error:", error);
+        return [];
+    }
+},
+
+
 
     exceptionGroupImages: {},
 
-    // 예외 검수 이미지 조회
-    fetchExceptionGroupImages: async (evtnum, projectId) => {
-        try {
-            const response = await api.get('/inspection/exception', {
-                params: { evtnum, project_id: projectId },
-                headers: { 
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            });
-            const images = response.data.images;
-            set((state) => ({
-                exceptionGroupImages: { ...state.exceptionGroupImages, [evtnum]: images },
-                relatedImages: images
-            }));
-            return images;
-        } catch (error) {
-            console.error("Exception Group images fetch error:", error);
-            return [];
-        }
-    },
+// 예외 검수 이미지 조회
+fetchExceptionGroupImages: async (evtnum, projectId) => {
+    try {
+        const response = await api.get('/inspection/exception', {
+            params: { evtnum, project_id: projectId },
+            headers: { 
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+        const images = response.data.images;
+        set((state) => ({
+            exceptionGroupImages: { ...state.exceptionGroupImages, [`${evtnum}-${projectId}`]: images },
+            relatedImages: images
+        }));
+        return images;
+    } catch (error) {
+        console.error("Exception Group images fetch error:", error);
+        return [];
+    }
+},
+
 
     completedGroupImages: {},
 
-    // 검수 완료된 이미지 조회
+// 검수 완료된 이미지 조회
 fetchCompletedGroupImages: async (evtnum, projectId) => {
-    if (get().completedGroupImages[evtnum]) {
-        set({ relatedImages: get().completedGroupImages[evtnum] });
-        return get().completedGroupImages[evtnum];
+    if (get().completedGroupImages[`${evtnum}-${projectId}`]) {
+        set({ relatedImages: get().completedGroupImages[`${evtnum}-${projectId}`] });
+        return get().completedGroupImages[`${evtnum}-${projectId}`];
     }
     try {
         const response = await api.get('/images', {
@@ -182,7 +185,7 @@ fetchCompletedGroupImages: async (evtnum, projectId) => {
         console.log('처리된 이미지 데이터:', processedImages);
         
         set((state) => ({
-            completedGroupImages: { ...state.completedGroupImages, [evtnum]: processedImages },
+            completedGroupImages: { ...state.completedGroupImages, [`${evtnum}-${projectId}`]: processedImages },
             relatedImages: processedImages
         }));
         return processedImages;

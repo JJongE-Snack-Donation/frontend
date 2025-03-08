@@ -126,27 +126,33 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         }
       };
 
-    useEffect(() => {
+      useEffect(() => {
         const loadImages = async () => {
-          if (groupData && groupData.evtnum) {
-            let images;
-            if (selectedPage === 'normal') {
-              images = await fetchGroupImages(groupData.evtnum);
-              images = images.filter(img => img.exception_status !== "processed");
-            } else if (selectedPage === 'exception') {
-              images = await fetchExceptionGroupImages(groupData.evtnum);
-            } else if (selectedPage === 'completed') {
-              images = await fetchCompletedGroupImages(groupData.evtnum);
+            if (groupData && groupData.evtnum) {
+                let images;
+                if (selectedPage === 'normal') {
+                    images = await fetchGroupImages(groupData.evtnum, groupData.projectId);
+                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
+                } else if (selectedPage === 'exception') {
+                    images = await fetchExceptionGroupImages(groupData.evtnum, groupData.projectId);
+                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
+                } else if (selectedPage === 'completed') {
+                    images = await fetchCompletedGroupImages(groupData.evtnum, groupData.projectId);
+                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
+                }
+                console.log('images to use:', images); // imagesToUse 상태 확인
+                setImagesToUse(images || []);
+                setRelatedImages(images || []); // relatedImages 초기화
+                if (images && images.length > 0) {
+                    handleCardClick(images[0]);
+                }
             }
-            setImagesToUse(images || []);
-            setRelatedImages(images || []); // 여기서 setRelatedImages 호출
-            if (images && images.length > 0) {
-              handleCardClick(images[0]);
-            }
-          }
         };
         loadImages();
-      }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+    
+    
+    
       
 
     
