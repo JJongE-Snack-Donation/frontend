@@ -14,6 +14,7 @@ import useCountUpdate from '../../Hooks/useCountUpdate';
 import CountUpdatePopup from './CountUpdatePopup';
 
 const ImageModal = ({ groupData, onClose, selectedPage }) => {
+    const [errorMessage, setErrorMessage] = useState('');
     const [showExceptionCompletionMessage, setShowExceptionCompletionMessage] = useState(false);
     const [showInspectionCompletionMessage, setShowInspectionCompletionMessage] = useState(false);
     const [showInspectionCompleteToast, setShowInspectionCompleteToast] = useState(false);
@@ -126,30 +127,36 @@ const ImageModal = ({ groupData, onClose, selectedPage }) => {
         }
       };
 
-      useEffect(() => {
-        const loadImages = async () => {
-            if (groupData && groupData.evtnum) {
-                let images;
-                if (selectedPage === 'normal') {
-                    images = await fetchGroupImages(groupData.evtnum, groupData.projectId);
-                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
-                } else if (selectedPage === 'exception') {
-                    images = await fetchExceptionGroupImages(groupData.evtnum, groupData.projectId);
-                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
-                } else if (selectedPage === 'completed') {
-                    images = await fetchCompletedGroupImages(groupData.evtnum, groupData.projectId);
-                    images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
-                }
-                console.log('images to use:', images); // imagesToUse 상태 확인
-                setImagesToUse(images || []);
-                setRelatedImages(images || []); // relatedImages 초기화
-                if (images && images.length > 0) {
-                    handleCardClick(images[0]);
+useEffect(() => {
+    const loadImages = async () => {
+        if (groupData && groupData.evtnum) {
+            let images;
+            if (selectedPage === 'normal') {
+                images = await fetchGroupImages(groupData.evtnum, groupData.projectId);
+                images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
+            } else if (selectedPage === 'exception') {
+                images = await fetchExceptionGroupImages(groupData.evtnum, groupData.projectId);
+                images = images.filter(img => img.evtnum === groupData.evtnum && img.projectId === groupData.projectId);
+            } else if (selectedPage === 'completed') {
+                images = await fetchCompletedGroupImages(groupData.evtnum, groupData.projectId);
+                // 이미지가 없을 때 메시지 표시
+                if (!images || images.length === 0) {
+                    console.log('No images found for the completed group.');
+                    // 사용자에게 알림 메시지 표시
+                    setErrorMessage('이미지가 없습니다.');
                 }
             }
-        };
-        loadImages();
-    }, [groupData, fetchGroupImages, fetchExceptionGroupImages, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+            console.log('images to use:', images); // imagesToUse 상태 확인
+            setImagesToUse(images || []);
+            setRelatedImages(images || []); // relatedImages 초기화
+            if (images && images.length > 0) {
+                handleCardClick(images[0]);
+            }
+        }
+    };
+    loadImages();
+}, [groupData, fetchCompletedGroupImages, selectedPage, setRelatedImages, handleCardClick]);
+
     
     
     

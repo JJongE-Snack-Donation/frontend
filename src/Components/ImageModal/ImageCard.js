@@ -49,9 +49,6 @@ return (
         </div>
         <div className="modal__all_image-content" style={{ position: 'relative' }}>
             <img  src={image.imageUrl} alt="" />
-            {image.exception_status === "processed" && (
-            <div className="exception-overlay">예외</div>
-            )}
 
         </div>
 

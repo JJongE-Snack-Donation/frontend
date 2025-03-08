@@ -69,6 +69,11 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
 
   // 모달창에서 선택한 이미지의 상세 정보 조회
   const fetchImageDetail = async (imageId, selectedPage) => {
+    if (!imageId) {
+        console.error('Image ID is undefined.');
+        return;
+    }
+    
     try {
         let endpoint;
         if (selectedPage === 'normal') {
@@ -95,6 +100,7 @@ export const useImageSelection = ({ initialImage, selectedPage }) => {
       console.error('Error fetching image detail:', error.response || error);
   }
 };
+
 
 useEffect(() => {
   setIsAllSelected(checkedBoxes.length === relatedImages.length);

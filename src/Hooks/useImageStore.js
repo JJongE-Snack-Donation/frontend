@@ -156,10 +156,6 @@ fetchExceptionGroupImages: async (evtnum, projectId) => {
 
 // 검수 완료된 이미지 조회
 fetchCompletedGroupImages: async (evtnum, projectId) => {
-    if (get().completedGroupImages[`${evtnum}-${projectId}`]) {
-        set({ relatedImages: get().completedGroupImages[`${evtnum}-${projectId}`] });
-        return get().completedGroupImages[`${evtnum}-${projectId}`];
-    }
     try {
         const response = await api.get('/images', {
             params: { evtnum, project_id: projectId },
@@ -169,31 +165,34 @@ fetchCompletedGroupImages: async (evtnum, projectId) => {
         });
         
         console.log('완료된 이미지 응답:', response.data);
+
+        const images = response.data.data?.groups[0].images || [];
         
-        // 백엔드 응답 구조에 맞게 수정
-        const images = response.data.data?.images || [];
-        
-        // 이미지 데이터 구조 변환 (필요한 필드 추가)
         const processedImages = images.map(img => ({
             ...img,
-            imageId: img._id, // imageId 필드 추가
-            imageUrl: img.ThumnailPath, // 이미지 URL 필드 추가
-            thumbnail: img.ThumnailPath, // 썸네일 필드 추가
-            FileName: img.FileName || '' // FileName 필드 확인
+            imageId: img.imageId || img._id,
+            imageUrl: img.imageUrl || img.thumbnailUrl, // 올바른 필드를 사용
+            thumbnail: img.thumbnailUrl,
+            FileName: img.fileName || ''
         }));
-        
+
         console.log('처리된 이미지 데이터:', processedImages);
-        
+
         set((state) => ({
             completedGroupImages: { ...state.completedGroupImages, [`${evtnum}-${projectId}`]: processedImages },
             relatedImages: processedImages
         }));
+        
         return processedImages;
     } catch (error) {
         console.error("Completed Group images fetch error:", error);
         return [];
     }
 }
+
+
+
+
 
 
 }));
